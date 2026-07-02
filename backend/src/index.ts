@@ -8,7 +8,8 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
 import connectDB from './config/database.js';
-import { User, Student, Teacher, OfficeMember, Program, MockTest, Result } from './models/index.js';
+import authRoutes from './routes/auth.routes.js';
+import { errorHandler, notFound } from './middlewares/error.middleware.js';
 
 const app: Express = express();
 
@@ -47,37 +48,22 @@ app.get('/health', (_req: Request, res: Response) => {
   });
 });
 
-// Test models endpoint (temporary - we'll remove this later)
-app.get('/test-models', async (_req: Request, res: Response) => {
-  try {
-    const modelNames = {
-      User: User.modelName,
-      Student: Student.modelName,
-      Teacher: Teacher.modelName,
-      OfficeMember: OfficeMember.modelName,
-      Program: Program.modelName,
-      MockTest: MockTest.modelName,
-      Result: Result.modelName,
-    };
-    res.status(200).json({
-      success: true,
-      message: 'Models loaded successfully',
-      models: modelNames,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error loading models',
-      error: error.message,
-    });
-  }
+// API routes
+app.use('/api/auth', authRoutes);
+
+// Test endpoint for protected route
+app.get('/api/protected', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'You have accessed a protected route!',
+  });
 });
 
-// API routes (to be added)
-// app.use('/api/auth', authRoutes);
+// 404 handler
+app.use(notFound);
 
-// Error handling middleware (to be added)
-// app.use(errorHandler);
+// Error handler
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
@@ -87,7 +73,7 @@ const startServer = async (): Promise<void> => {
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`📦 Models loaded: User, Student, Teacher, OfficeMember, Program, MockTest, Result`);
+      console.log(`🔐 Auth routes: /api/auth/*`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
