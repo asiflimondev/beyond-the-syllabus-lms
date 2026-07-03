@@ -11,6 +11,8 @@ import {
   Clock,
   ChevronRight,
   User,
+  TrendingUp,
+  Award,
 } from 'lucide-react';
 
 interface Program {
@@ -29,9 +31,8 @@ interface Program {
 const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
 
-  // Fetch teacher profile - using any type to avoid TypeScript errors
+  // Fetch teacher profile
   const profileQuery: any = useQuery({
     queryKey: ['teacher-profile'],
     queryFn: () => teacherApi.getProfile(),
@@ -43,48 +44,54 @@ const TeacherDashboard: React.FC = () => {
     queryFn: () => teacherApi.getPrograms(),
   });
 
-  // Fetch students for selected program - using any for the query object
+  // Fetch all students for all programs
   const studentsQuery: any = useQuery({
-    queryKey: ['teacher-students', selectedProgram],
+    queryKey: ['teacher-all-students'],
     queryFn: async () => {
-      if (!selectedProgram) {
-        return { data: { data: { students: [] } } };
+      // Get all programs first
+      const programsRes = await teacherApi.getPrograms();
+      const programs = programsRes?.data?.data || [];
+      
+      // Fetch students for each program
+      let allStudents: any[] = [];
+      for (const program of programs) {
+        const studentsRes = await teacherApi.getStudentsByProgram(program._id, { limit: 100 });
+        const students = studentsRes?.data?.data?.students || [];
+        allStudents = [...allStudents, ...students.map((s: any) => ({ ...s, programName: program.displayName?.en || program.name }))];
       }
-      return await teacherApi.getStudentsByProgram(selectedProgram, { limit: 10 });
+      
+      return { data: { data: { students: allStudents, total: allStudents.length } } };
     },
-    enabled: Boolean(selectedProgram),
   });
 
-  // Fetch mock tests for selected program
+  // Fetch all mock tests
   const mockTestsQuery: any = useQuery({
-    queryKey: ['teacher-mocktests', selectedProgram],
+    queryKey: ['teacher-all-mocktests'],
     queryFn: async () => {
-      if (!selectedProgram) {
-        return { data: { data: [] } };
+      const programsRes = await teacherApi.getPrograms();
+      const programs = programsRes?.data?.data || [];
+      
+      let allMockTests: any[] = [];
+      for (const program of programs) {
+        const mockTestsRes = await teacherApi.getMockTestsByProgram(program._id);
+        const mockTests = mockTestsRes?.data?.data || [];
+        allMockTests = [...allMockTests, ...mockTests.map((m: any) => ({ ...m, programName: program.displayName?.en || program.name }))];
       }
-      return await teacherApi.getMockTestsByProgram(selectedProgram);
+      
+      return { data: { data: allMockTests } };
     },
-    enabled: Boolean(selectedProgram),
   });
 
-  // Safely extract data
   const profile = profileQuery?.data?.data?.data || null;
   const programs = programsQuery?.data?.data?.data || [];
   const students = studentsQuery?.data?.data?.data?.students || [];
   const mockTests = mockTestsQuery?.data?.data?.data || [];
 
-  if (profileQuery.isLoading || programsQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-        <span className="ml-3 text-gray-600">Loading dashboard...</span>
-      </div>
-    );
-  }
+  const isLoading = profileQuery.isLoading || programsQuery.isLoading;
 
   // Stats
-  const totalStudents = programs.reduce((acc: number, p: Program) => acc + (p.studentCount || 0), 0);
-  const totalMockTests = programs.reduce((acc: number, p: Program) => acc + (p.mockTestCount || 0), 0);
+  const totalStudents = students.length;
+  const totalMockTests = mockTests.length;
 
   const stats = [
     { 
@@ -99,7 +106,7 @@ const TeacherDashboard: React.FC = () => {
       value: totalStudents, 
       icon: Users, 
       color: 'bg-green-500',
-      description: 'Students in your programs'
+      description: 'Total students in your programs'
     },
     { 
       title: 'Mock Tests', 
@@ -109,6 +116,15 @@ const TeacherDashboard: React.FC = () => {
       description: 'Tests created by you'
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -141,7 +157,7 @@ const TeacherDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Now with Real Data */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((stat) => (
           <div key={stat.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
@@ -187,7 +203,7 @@ const TeacherDashboard: React.FC = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">My Students</h4>
-              <p className="text-sm text-gray-500">View students in your programs</p>
+              <p className="text-sm text-gray-500">View all students in your programs</p>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
           </div>
@@ -203,82 +219,54 @@ const TeacherDashboard: React.FC = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Mock Tests</h4>
-              <p className="text-sm text-gray-500">Create and manage mock tests</p>
+              <p className="text-sm text-gray-500">View all your mock tests</p>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
           </div>
         </button>
       </div>
 
-      {/* Assigned Programs Section */}
+      {/* Recent Mock Tests Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">My Assigned Programs</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Recent Mock Tests</h3>
           <Link
-            to="/teacher/programs"
+            to="/teacher/mock-tests"
             className="text-sm text-primary-600 hover:text-primary-700"
           >
             View All
           </Link>
         </div>
-        {programs.length === 0 ? (
+        {mockTests.length === 0 ? (
           <div className="text-center py-12">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No programs assigned yet</p>
-            <p className="text-sm text-gray-400">Contact admin for program assignments</p>
+            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No mock tests created yet</p>
+            <p className="text-sm text-gray-400">Create your first mock test</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {programs.slice(0, 3).map((program: Program) => (
-              <div key={program._id} className="px-6 py-4 hover:bg-gray-50">
+            {mockTests.slice(0, 3).map((test: any) => (
+              <div key={test._id} className="px-6 py-4 hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/teacher/mark-entry/${test._id}`)}>
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-gray-900">
-                      {program.displayName?.en || program.name}
+                      {test.title || `Mock Test ${test.testNumber}`}
                     </h4>
                     <p className="text-sm text-gray-500">
-                      {program.name} • {program.duration} months
+                      {test.programName || 'Unknown Program'} • Test #{test.testNumber}
                     </p>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => setSelectedProgram(program._id)}
-                      className="px-3 py-1 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    >
-                      View Students
-                    </button>
-                    <button
-                      onClick={() => navigate(`/teacher/mock-tests?program=${program._id}`)}
-                      className="px-3 py-1 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                    >
-                      Mock Tests
-                    </button>
+                    <span className="text-sm text-gray-500">
+                      {new Date(test.testDate).toLocaleDateString()}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
-
-      {/* Quick Stats Footer */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-center">
-          <p className="text-xs text-gray-500">Programs</p>
-          <p className="text-lg font-bold text-gray-900">{programs.length}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-center">
-          <p className="text-xs text-gray-500">Students</p>
-          <p className="text-lg font-bold text-gray-900">{totalStudents}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-center">
-          <p className="text-xs text-gray-500">Mock Tests</p>
-          <p className="text-lg font-bold text-gray-900">{totalMockTests}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-center">
-          <p className="text-xs text-gray-500">Pending Marks</p>
-          <p className="text-lg font-bold text-orange-600">0</p>
-        </div>
       </div>
     </div>
   );

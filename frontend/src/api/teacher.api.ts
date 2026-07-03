@@ -111,4 +111,12 @@ export const teacherApi = {
   
   getMockTestResults: (mockTestId: string) =>
     apiClient.get(`/teacher/mock-tests/${mockTestId}/results`),
+
+  // Get mark entry data
+getMarkEntryData: (mockTestId: string) =>
+  apiClient.get(`/teacher/mock-tests/${mockTestId}/mark-entry`),
+
+// Save marks
+saveMarks: (mockTestId: string, data: { marks: any[] }) =>
+  apiClient.post(`/teacher/mock-tests/${mockTestId}/mark-entry`, data),
 };

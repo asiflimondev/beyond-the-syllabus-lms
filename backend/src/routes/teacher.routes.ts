@@ -8,6 +8,8 @@ import {
   createMockTest,
   updateMockTest,
   getMockTestResults,
+  getStudentsForMarkEntry,
+  saveMarks,
 } from '../controllers/teacher.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 
@@ -32,5 +34,9 @@ router.get('/programs/:programId/mock-tests', getMockTestsByProgram);
 router.post('/mock-tests', createMockTest);
 router.put('/mock-tests/:id', updateMockTest);
 router.get('/mock-tests/:mockTestId/results', getMockTestResults);
+
+// Mark Entry
+router.get('/mock-tests/:mockTestId/mark-entry', getStudentsForMarkEntry);
+router.post('/mock-tests/:mockTestId/mark-entry', saveMarks);
 
 export default router;

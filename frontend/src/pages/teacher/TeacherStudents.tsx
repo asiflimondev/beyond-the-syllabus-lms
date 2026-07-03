@@ -1,45 +1,56 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { teacherApi } from '@api/teacher.api';
-import { useSearchParams } from 'react-router-dom';
-import { Search, Users, Mail, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Users, Mail, Phone, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 
 const TeacherStudents: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const programId = searchParams.get('program');
-
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
 
-  // Use the same pattern as TeacherDashboard - : any and Boolean()
+  // Fetch all students from all assigned programs
   const studentsQuery: any = useQuery({
-    queryKey: ['teacher-students', programId, page, limit, search],
+    queryKey: ['teacher-all-students', page, limit, search],
     queryFn: async () => {
-      if (!programId) {
-        return { data: { data: { students: [], pagination: { total: 0, totalPages: 1 } } } };
+      // Get all programs first
+      const programsRes = await teacherApi.getPrograms();
+      const programs = programsRes?.data?.data || [];
+      
+      // Fetch students for each program
+      let allStudents: any[] = [];
+      for (const program of programs) {
+        const studentsRes = await teacherApi.getStudentsByProgram(program._id, { 
+          page, 
+          limit: 100, 
+          search: search || undefined 
+        });
+        const students = studentsRes?.data?.data?.students || [];
+        allStudents = [...allStudents, ...students.map((s: any) => ({ 
+          ...s, 
+          programName: program.displayName?.en || program.name 
+        }))];
       }
-      return await teacherApi.getStudentsByProgram(programId, { page, limit, search: search || undefined });
+      
+      // Paginate manually
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      const paginated = allStudents.slice(start, end);
+      
+      return { 
+        data: { 
+          data: { 
+            students: paginated, 
+            total: allStudents.length,
+            totalPages: Math.ceil(allStudents.length / limit)
+          } 
+        } 
+      };
     },
-    enabled: Boolean(programId),
   });
 
-  // Safe data extraction with optional chaining
   const students = studentsQuery?.data?.data?.data?.students || [];
-  const pagination = studentsQuery?.data?.data?.data?.pagination || { total: 0, totalPages: 1 };
-
-  // Early return if no program selected
-  if (!programId) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Select a program to view students</p>
-          <p className="text-sm text-gray-400">Go to My Programs and select a program</p>
-        </div>
-      </div>
-    );
-  }
+  const total = studentsQuery?.data?.data?.data?.total || 0;
+  const totalPages = studentsQuery?.data?.data?.data?.totalPages || 1;
 
   if (studentsQuery.isLoading) {
     return (
@@ -54,7 +65,7 @@ const TeacherStudents: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">My Students</h2>
-        <p className="text-sm text-gray-500">Students enrolled in your programs</p>
+        <p className="text-sm text-gray-500">All students enrolled in your programs</p>
       </div>
 
       {/* Search */}
@@ -62,7 +73,7 @@ const TeacherStudents: React.FC = () => {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           type="text"
-          placeholder="Search students..."
+          placeholder="Search students by name, admission ID, or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -73,7 +84,7 @@ const TeacherStudents: React.FC = () => {
       {students.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
           <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No students found in this program</p>
+          <p className="text-gray-500">No students found in your programs</p>
         </div>
       ) : (
         <>
@@ -87,6 +98,9 @@ const TeacherStudents: React.FC = () => {
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Admission ID
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Program
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Contact
@@ -104,6 +118,9 @@ const TeacherStudents: React.FC = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {student.admissionId}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {student.programName || 'N/A'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         <div className="flex flex-col">
@@ -140,7 +157,7 @@ const TeacherStudents: React.FC = () => {
           {/* Pagination */}
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Showing {students.length} of {pagination.total} students
+              Showing {students.length} of {total} students
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -150,10 +167,10 @@ const TeacherStudents: React.FC = () => {
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm text-gray-600">Page {page} of {pagination.totalPages}</span>
+              <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
               <button
-                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
-                disabled={page === pagination.totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
                 className="p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >
                 <ChevronRight className="w-4 h-4" />

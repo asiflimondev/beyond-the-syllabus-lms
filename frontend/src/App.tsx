@@ -31,6 +31,7 @@ import TeacherDashboard from '@pages/teacher/TeacherDashboard';
 import TeacherPrograms from '@pages/teacher/TeacherPrograms';
 import TeacherStudents from '@pages/teacher/TeacherStudents';
 import TeacherMockTests from '@pages/teacher/TeacherMockTests';
+import TeacherMarkEntry from '@pages/teacher/TeacherMarkEntry';
 
 // Protected Pages (Student)
 import StudentDashboard from '@pages/student/StudentDashboard';
@@ -62,7 +63,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return <Navigate to="/login" />;
   }
 
-  // Role-based redirection for root path
+  // Role-based redirection for root paths
   if (location === '/' || location === '/admin' || location === '/teacher' || location === '/student' || location === '/office') {
     const role = user?.role;
     if (role === 'admin') return <Navigate to="/admin/dashboard" />;
@@ -156,7 +157,7 @@ function App() {
               path="/teacher"
               element={
                 <ProtectedRoute>
-                  <TeacherDashboard />
+                  <Navigate to="/teacher/dashboard" />
                 </ProtectedRoute>
               }
             />
@@ -193,6 +194,14 @@ function App() {
               }
             />
             <Route
+              path="/teacher/mark-entry/:mockTestId"
+              element={
+                <ProtectedRoute>
+                  <TeacherMarkEntry />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/teacher/settings"
               element={
                 <ProtectedRoute>
@@ -206,7 +215,7 @@ function App() {
               path="/student"
               element={
                 <ProtectedRoute>
-                  <StudentDashboard />
+                  <Navigate to="/student/dashboard" />
                 </ProtectedRoute>
               }
             />
@@ -248,7 +257,7 @@ function App() {
               path="/office"
               element={
                 <ProtectedRoute>
-                  <OfficeDashboard />
+                  <Navigate to="/office/dashboard" />
                 </ProtectedRoute>
               }
             />

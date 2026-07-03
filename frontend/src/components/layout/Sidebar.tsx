@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const getMenuItems = () => {
     const items = [];
 
-    // Dashboard - role-specific
+    // Dashboard - role-specific (ONLY ONE)
     let dashboardPath = '/';
     if (user?.role === 'admin') dashboardPath = '/admin/dashboard';
     else if (user?.role === 'teacher') dashboardPath = '/teacher/dashboard';
@@ -91,22 +91,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       });
     }
 
-    // Teacher Menu Items
+    // Teacher Menu Items - ONLY ONE DASHBOARD
     if (user?.role === 'teacher') {
       items.push({
-        path: '/teacher',
-        icon: LayoutDashboard,
-        label: 'Dashboard',
-      });
-      items.push({
-        path: '/teacher/programs',  // <-- Changed from '/teacher' to '/teacher/programs'
+        path: '/teacher/programs',
         icon: BookOpen,
-        label: 'Programs',          // <-- Changed from 'My Dashboard'
+        label: 'My Programs',
       });
       items.push({
         path: '/teacher/students',
         icon: Users,
-        label: 'Students',
+        label: 'My Students',
       });
       items.push({
         path: '/teacher/mock-tests',
@@ -117,11 +112,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
     // Student Menu Items
     if (user?.role === 'student') {
-      items.push({
-        path: '/student',
-        icon: LayoutDashboard,
-        label: 'Dashboard',
-      });
       items.push({
         path: '/student/mock-tests',
         icon: FileText,

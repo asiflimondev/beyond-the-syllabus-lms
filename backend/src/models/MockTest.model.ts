@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IMockTest } from '../types/index.js';
 
-export interface IMockTestDocument extends Document, IMockTest {}
+export interface IMockTestDocument extends IMockTest, Document {}
 
 const MockTestSchema = new Schema<IMockTestDocument>(
   {
     programId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Program',
       required: [true, 'Program ID is required'],
     },
@@ -18,6 +18,7 @@ const MockTestSchema = new Schema<IMockTestDocument>(
     description: {
       type: String,
       trim: true,
+      default: '',
     },
     testNumber: {
       type: Number,
@@ -29,62 +30,91 @@ const MockTestSchema = new Schema<IMockTestDocument>(
       default: Date.now,
     },
     reading: {
-      totalMarks: {
-        type: Number,
-        required: [true, 'Reading total marks is required'],
-        min: [0, 'Total marks cannot be negative'],
+      type: {
+        totalMarks: {
+          type: Number,
+          required: false,
+          default: 0,
+          min: [0, 'Total marks cannot be negative'],
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: '',
+        },
       },
-      description: {
-        type: String,
-        trim: true,
-      },
+      required: false,
+      default: undefined,
     },
     writing: {
-      totalMarks: {
-        type: Number,
-        required: [true, 'Writing total marks is required'],
-        min: [0, 'Total marks cannot be negative'],
+      type: {
+        totalMarks: {
+          type: Number,
+          required: false,
+          default: 0,
+          min: [0, 'Total marks cannot be negative'],
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: '',
+        },
       },
-      description: {
-        type: String,
-        trim: true,
-      },
+      required: false,
+      default: undefined,
     },
     listening: {
-      totalMarks: {
-        type: Number,
-        required: [true, 'Listening total marks is required'],
-        min: [0, 'Total marks cannot be negative'],
+      type: {
+        totalMarks: {
+          type: Number,
+          required: false,
+          default: 0,
+          min: [0, 'Total marks cannot be negative'],
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: '',
+        },
       },
-      description: {
-        type: String,
-        trim: true,
-      },
+      required: false,
+      default: undefined,
     },
     speaking: {
-      description: {
-        type: String,
-        trim: true,
+      type: {
+        description: {
+          type: String,
+          trim: true,
+          default: '',
+        },
       },
+      required: false,
+      default: undefined,
     },
     presentation: {
-      totalMarks: {
-        type: Number,
-        required: [true, 'Presentation total marks is required'],
-        min: [0, 'Total marks cannot be negative'],
+      type: {
+        totalMarks: {
+          type: Number,
+          required: false,
+          default: 0,
+          min: [0, 'Total marks cannot be negative'],
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: '',
+        },
       },
-      description: {
-        type: String,
-        trim: true,
-      },
+      required: false,
+      default: undefined,
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Created by is required'],
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Updated by is required'],
     },
@@ -102,7 +132,7 @@ const MockTestSchema = new Schema<IMockTestDocument>(
   }
 );
 
-// Compound unique index
+// Compound unique index: One test number per program
 MockTestSchema.index({ programId: 1, testNumber: 1 }, { unique: true });
 MockTestSchema.index({ programId: 1 });
 MockTestSchema.index({ isActive: 1 });
