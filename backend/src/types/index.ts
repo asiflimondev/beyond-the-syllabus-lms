@@ -58,6 +58,7 @@ export interface ITeacher {
   dateOfBirth?: Date;
   gender?: 'male' | 'female' | 'other';
   bloodGroup?: string;
+  address?: string;
   profileImage?: {
     url: string;
     publicId: string;
@@ -83,6 +84,7 @@ export interface IOfficeMember {
   dateOfBirth?: Date;
   gender?: 'male' | 'female' | 'other';
   bloodGroup?: string;
+  address?: string;
   profileImage?: {
     url: string;
     publicId: string;

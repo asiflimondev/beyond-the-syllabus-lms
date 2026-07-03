@@ -4,10 +4,14 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '@context/AuthContext';
+import { admissionApi } from '@api/admission.api';
 
-// Validation schema with role
-const registerSchema = yup.object({
+// Validation schema
+const studentRegisterSchema = yup.object({
+  admissionId: yup
+    .string()
+    .required('Admission ID is required')
+    .trim(),
   email: yup
     .string()
     .email('Please enter a valid email address')
@@ -21,16 +25,11 @@ const registerSchema = yup.object({
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('Please confirm your password'),
-  role: yup
-    .string()
-    .oneOf(['admin', 'teacher', 'office', 'student'])
-    .default('student'),
 });
 
-type RegisterFormData = yup.InferType<typeof registerSchema>;
+type StudentRegisterFormData = yup.InferType<typeof studentRegisterSchema>;
 
-const RegisterPage: React.FC = () => {
-  const { register: registerUser } = useAuth();
+const StudentRegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,29 +37,43 @@ const RegisterPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: yupResolver(registerSchema),
-    defaultValues: {
-      role: 'student',
-    },
+  } = useForm<StudentRegisterFormData>({
+    resolver: yupResolver(studentRegisterSchema),
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
-    try {
-      await registerUser(data.email, data.password, data.confirmPassword, data.role);
-      toast.success('Registration successful! Redirecting...');
+
+  const onSubmit = async (data: StudentRegisterFormData) => {
+  setIsLoading(true);
+  try {
+    const response = await admissionApi.registerStudent({
+      admissionId: data.admissionId,
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    });
+
+    if (response.data.success) {
+      toast.success('Registration successful! Please login with your credentials.');
       setTimeout(() => {
         navigate('/login');
-      }, 1000);
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      const message = error.response?.data?.message || 'Failed to register. Please try again.';
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
+      }, 2000);
     }
-  };
+  } catch (error: any) {
+    console.error('Student registration error:', error);
+    // Show more detailed error
+    const message = error.response?.data?.message || 'Failed to register. Please check your Admission ID and try again.';
+    toast.error(message);
+    
+    // Log the full error for debugging
+    if (error.response) {
+      console.log('Error response:', error.response.data);
+      console.log('Error status:', error.response.status);
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -68,27 +81,44 @@ const RegisterPage: React.FC = () => {
         {/* Logo and Title */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-primary-600">Beyond the Syllabus</h1>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">Create your account</h2>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">Student Registration</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Join our learning community today!
+            Enter your Admission ID to create your account
           </p>
-          <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            For Teachers, Staff & Students
-          </div>
         </div>
 
         {/* Registration Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
+            {/* Admission ID Field */}
+            <div>
+              <label htmlFor="admissionId" className="label">
+                Admission ID *
+              </label>
+              <input
+                id="admissionId"
+                type="text"
+                placeholder="Enter your Admission ID (e.g., BTS101)"
+                className={`input-field ${errors.admissionId ? 'border-red-500' : ''}`}
+                {...register('admissionId')}
+              />
+              {errors.admissionId && (
+                <p className="mt-1 text-sm text-red-600">{errors.admissionId.message}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                You received your Admission ID from the office when you were admitted
+              </p>
+            </div>
+
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="label">
-                Email Address
+                Email Address *
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
                 className={`input-field ${errors.email ? 'border-red-500' : ''}`}
                 {...register('email')}
               />
@@ -100,7 +130,7 @@ const RegisterPage: React.FC = () => {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="label">
-                Password
+                Password *
               </label>
               <input
                 id="password"
@@ -117,7 +147,7 @@ const RegisterPage: React.FC = () => {
             {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="label">
-                Confirm Password
+                Confirm Password *
               </label>
               <input
                 id="confirmPassword"
@@ -129,26 +159,6 @@ const RegisterPage: React.FC = () => {
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
               )}
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <label htmlFor="role" className="label">
-                Account Type
-              </label>
-              <select
-                id="role"
-                className="input-field"
-                {...register('role')}
-              >
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-                <option value="office">Office Member</option>
-                <option value="admin">Admin</option>
-              </select>
-              <p className="text-xs text-gray-400 mt-1">
-                Select the appropriate role for this account
-              </p>
             </div>
           </div>
 
@@ -165,26 +175,20 @@ const RegisterPage: React.FC = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating account...
+                  Registering...
                 </span>
               ) : (
-                'Create Account'
+                'Register'
               )}
             </button>
           </div>
 
-          {/* Login Links */}
-          <div className="text-center space-y-2">
+          {/* Login Link */}
+          <div className="text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
                 Sign in here
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600">
-              Are you a student?{' '}
-              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-500">
-                Register with Admission ID
               </Link>
             </p>
           </div>
@@ -194,4 +198,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage;
+export default StudentRegisterPage;

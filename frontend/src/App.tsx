@@ -3,18 +3,49 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@context/AuthContext';
+import Layout from '@components/layout/Layout';
+import PublicLayout from '@components/layout/PublicLayout';
+
+// Public Pages
+import HomePage from '@pages/public/HomePage';
+import AboutPage from '@pages/public/AboutPage';
+import ProgramsPublicPage from '@pages/public/ProgramsPublicPage';
+import GalleryPublicPage from '@pages/public/GalleryPublicPage';
+import FAQPublicPage from '@pages/public/FAQPublicPage';
+import ContactPage from '@pages/public/ContactPage';
+
+// Auth Pages
 import LoginPage from '@pages/LoginPage';
 import RegisterPage from '@pages/RegisterPage';
+import StudentRegisterPage from '@pages/StudentRegisterPage';
 
-// Placeholder pages (we'll build these next)
-const DashboardPage = () => <div>Dashboard Page - Coming Soon</div>;
-const ProgramsPage = () => <div>Programs Page - Coming Soon</div>;
-const StudentsPage = () => <div>Students Page - Coming Soon</div>;
-const AdmissionPage = () => <div>Admission Page - Coming Soon</div>;
+// Protected Pages (Admin)
+import DashboardPage from '@pages/DashboardPage';
+import ProgramsPage from '@pages/ProgramsPage';
+import AdmissionPage from '@pages/AdmissionPage';
+import TeacherManagement from '@pages/admin/TeacherManagement';
+import StudentsManagement from '@pages/admin/StudentsManagement';
 
-// Protected Route component
+// Protected Pages (Teacher)
+import TeacherDashboard from '@pages/teacher/TeacherDashboard';
+import TeacherPrograms from '@pages/teacher/TeacherPrograms';
+import TeacherStudents from '@pages/teacher/TeacherStudents';
+import TeacherMockTests from '@pages/teacher/TeacherMockTests';
+
+// Protected Pages (Student)
+import StudentDashboard from '@pages/student/StudentDashboard';
+import MockTestsPage from '@pages/student/MockTestsPage';
+import StudentProfile from '@pages/student/StudentProfile';
+
+// Protected Pages (Office)
+import OfficeDashboard from '@pages/office/OfficeDashboard';
+
+// Settings Page
+import SettingsPage from '@pages/SettingsPage';
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = window.location.pathname;
   
   if (isLoading) {
     return (
@@ -30,8 +61,17 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
+
+  // Role-based redirection for root path
+  if (location === '/' || location === '/admin' || location === '/teacher' || location === '/student' || location === '/office') {
+    const role = user?.role;
+    if (role === 'admin') return <Navigate to="/admin/dashboard" />;
+    if (role === 'office') return <Navigate to="/office/dashboard" />;
+    if (role === 'teacher') return <Navigate to="/teacher/dashboard" />;
+    if (role === 'student') return <Navigate to="/student/dashboard" />;
+  }
   
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 };
 
 const queryClient = new QueryClient({
@@ -49,10 +89,13 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* ==========================================
+                PROTECTED ROUTES (Require Login)
+                ========================================== */}
+            
+            {/* Admin Routes */}
             <Route
-              path="/"
+              path="/admin"
               element={
                 <ProtectedRoute>
                   <DashboardPage />
@@ -60,7 +103,15 @@ function App() {
               }
             />
             <Route
-              path="/programs"
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/programs"
               element={
                 <ProtectedRoute>
                   <ProgramsPage />
@@ -68,23 +119,179 @@ function App() {
               }
             />
             <Route
-              path="/students"
-              element={
-                <ProtectedRoute>
-                  <StudentsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admission"
+              path="/admin/admission"
               element={
                 <ProtectedRoute>
                   <AdmissionPage />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/students"
+              element={
+                <ProtectedRoute>
+                  <StudentsManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/teachers"
+              element={
+                <ProtectedRoute>
+                  <TeacherManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Teacher Routes */}
+            <Route
+              path="/teacher"
+              element={
+                <ProtectedRoute>
+                  <TeacherDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/dashboard"
+              element={
+                <ProtectedRoute>
+                  <TeacherDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/programs"
+              element={
+                <ProtectedRoute>
+                  <TeacherPrograms />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/students"
+              element={
+                <ProtectedRoute>
+                  <TeacherStudents />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/mock-tests"
+              element={
+                <ProtectedRoute>
+                  <TeacherMockTests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Student Routes */}
+            <Route
+              path="/student"
+              element={
+                <ProtectedRoute>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/dashboard"
+              element={
+                <ProtectedRoute>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/mock-tests"
+              element={
+                <ProtectedRoute>
+                  <MockTestsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/mock-tests/:id"
+              element={
+                <ProtectedRoute>
+                  <div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/profile"
+              element={
+                <ProtectedRoute>
+                  <StudentProfile />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Office Routes */}
+            <Route
+              path="/office"
+              element={
+                <ProtectedRoute>
+                  <OfficeDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/office/dashboard"
+              element={
+                <ProtectedRoute>
+                  <OfficeDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/office/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* ==========================================
+                PUBLIC ROUTES (No Login Required)
+                ========================================== */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/programs" element={<ProgramsPublicPage />} />
+            <Route path="/gallery" element={<GalleryPublicPage />} />
+            <Route path="/faq" element={<FAQPublicPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+
+            {/* ==========================================
+                AUTH ROUTES
+                ========================================== */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/student-register" element={<StudentRegisterPage />} />
+
+            {/* ==========================================
+                CATCH ALL
+                ========================================== */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
+          
           <Toaster 
             position="top-right"
             toastOptions={{

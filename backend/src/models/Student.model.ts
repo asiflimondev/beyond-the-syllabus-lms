@@ -1,16 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IStudent } from '../types/index.js';
 
-export interface IStudentDocument extends Document, IStudent {}
+export interface IStudentDocument extends IStudent, Document {}
 
 const StudentSchema = new Schema<IStudentDocument>(
   {
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: false, // Not required during admission
-      unique: true,
-      sparse: true, // Allows multiple null values
+      required: false,
+      // REMOVE unique: true - we handle this in code
+      index: true, // Keep index for faster queries
     },
     fullName: {
       type: String,
@@ -114,7 +114,7 @@ const StudentSchema = new Schema<IStudentDocument>(
 
 // Indexes for faster queries
 StudentSchema.index({ admissionId: 1 }, { unique: true });
-StudentSchema.index({ userId: 1 }, { unique: true, sparse: true });
+StudentSchema.index({ userId: 1 }); // Regular index, not unique
 StudentSchema.index({ programId: 1 });
 StudentSchema.index({ status: 1 });
 StudentSchema.index({ isDeleted: 1 });

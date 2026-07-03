@@ -4,8 +4,11 @@ import {
   getAdmissionSettings, 
   updateAdmissionSettings, 
   getStudentByAdmissionId, 
-  registerStudent 
+  registerStudent,
+  getStudents
 } from '../services/admission.service.js';
+import { Student } from '../models/Student.model.js';
+import { User } from '../models/User.model.js';
 
 // ============================================
 // ADMIT STUDENT
@@ -58,7 +61,6 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       schoolCollege,
     });
 
-    // Use type assertion to access _id
     const studentData = student as any;
 
     res.status(201).json({
@@ -264,6 +266,164 @@ export const registerStudentController = async (req: Request, res: Response): Pr
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to register student',
+    });
+  }
+};
+
+// ============================================
+// GET ALL STUDENTS (with pagination)
+// ============================================
+export const getAllStudentsController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { page = 1, limit = 10, search, status, programId } = req.query;
+
+    const { students, total } = await getStudents({
+      page: Number(page),
+      limit: Number(limit),
+      status: status as string,
+      programId: programId as string,
+      search: search as string,
+    });
+
+    const studentsData = students.map((s: any) => ({
+      id: s._id,
+      fullName: s.fullName,
+      admissionId: s.admissionId,
+      email: s.email,
+      phone: s.phone,
+      programId: s.programId,
+      status: s.status,
+      userId: s.userId,
+      admissionDate: s.admissionDate,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        students: studentsData,
+        pagination: {
+          total,
+          page: Number(page),
+          limit: Number(limit),
+          totalPages: Math.ceil(total / Number(limit)),
+        },
+      },
+    });
+  } catch (error: any) {
+    console.error('Get all students error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get students',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// CHECK STUDENT STATUS (DEBUG - Admin Only)
+// ============================================
+export const checkStudentStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { admissionId } = req.params;
+
+    const student = await Student.findOne({ admissionId });
+    if (!student) {
+      res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+      return;
+    }
+
+    // Get user info if exists
+    let userInfo = null;
+    if (student.userId) {
+      const user = await User.findById(student.userId);
+      if (user) {
+        userInfo = {
+          id: user._id,
+          email: user.email,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+        };
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: student._id,
+        admissionId: student.admissionId,
+        fullName: student.fullName,
+        email: student.email,
+        phone: student.phone,
+        status: student.status,
+        hasUserId: !!student.userId,
+        userId: student.userId,
+        userInfo: userInfo,
+        isDeleted: student.isDeleted,
+        createdAt: student.createdAt,
+        updatedAt: student.updatedAt,
+      },
+    });
+  } catch (error: any) {
+    console.error('Check student status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check student status',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// RESET STUDENT REGISTRATION (Admin Only)
+// ============================================
+export const resetStudentRegistration = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { admissionId } = req.params;
+
+    const student = await Student.findOne({ admissionId });
+    if (!student) {
+      res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+      return;
+    }
+
+    // Store the userId for logging
+    const oldUserId = student.userId;
+
+    // Reset the student's registration status
+    student.userId = null;
+    student.status = 'pending_registration';
+    await student.save();
+
+    // If there was a user, delete it
+    if (oldUserId) {
+      await User.findByIdAndDelete(oldUserId);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Student registration reset successfully',
+      data: {
+        admissionId: student.admissionId,
+        fullName: student.fullName,
+        status: student.status,
+        userId: student.userId,
+        wasRegistered: !!oldUserId,
+      },
+    });
+  } catch (error: any) {
+    console.error('Reset student registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset student registration',
+      error: error.message,
     });
   }
 };

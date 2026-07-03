@@ -21,7 +21,7 @@ const loginSchema = yup.object({
 type LoginFormData = yup.InferType<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,9 +38,29 @@ const LoginPage: React.FC = () => {
     try {
       await login(data.email, data.password);
       toast.success('Login successful! Redirecting...');
-      // Small delay before redirect for user feedback
+      
+      // Get the user role from the auth context
+      // The user object is updated after login
+      const role = user?.role || 'student';
+      
+      // Redirect based on role
       setTimeout(() => {
-        navigate('/');
+        switch (role) {
+          case 'admin':
+            navigate('/admin/dashboard');
+            break;
+          case 'teacher':
+            navigate('/teacher/dashboard');
+            break;
+          case 'office':
+            navigate('/admin/dashboard');
+            break;
+          case 'student':
+            navigate('/student/dashboard');
+            break;
+          default:
+            navigate('/');
+        }
       }, 1000);
     } catch (error: any) {
       console.error('Login error:', error);
@@ -122,12 +142,18 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Register Link */}
-          <div className="text-center">
+          {/* Register Links */}
+          <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
                 Register here
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              Are you a student?{' '}
+              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-500">
+                Register with Admission ID
               </Link>
             </p>
           </div>

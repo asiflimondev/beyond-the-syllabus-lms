@@ -8,9 +8,18 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
 import connectDB from './config/database.js';
+
+// ============================================
+// IMPORT ROUTES - MAKE SURE THESE EXIST!
+// ============================================
 import authRoutes from './routes/auth.routes.js';
 import admissionRoutes from './routes/admission.routes.js';
 import programRoutes from './routes/program.routes.js';
+import teacherRoutes from './routes/teacher.routes.js';
+import studentRoutes from './routes/student.routes.js';
+import adminTeacherRoutes from './routes/admin/teacherManagement.routes.js';
+import adminStudentRoutes from './routes/admin/studentManagement.routes.js';
+
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
 
@@ -19,93 +28,86 @@ const app: Express = express();
 // ============================================
 // SECURITY MIDDLEWARE
 // ============================================
-
-// Helmet - Sets various HTTP headers for security
 app.use(helmet());
 
-// Rate limiting - Prevent brute force attacks
+// Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use('/api', limiter);
 
-// Compression - Compress responses for better performance
+// Compression
 app.use(compression());
 
-// CORS - Allow frontend to access API
+// CORS
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true, // Allow cookies to be sent
+    credentials: true,
   })
 );
 
-// ============================================
-// BODY PARSING MIDDLEWARE
-// ============================================
-
-// Parse JSON bodies (limit to 10mb for large payloads)
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
-
-// Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ============================================
-// HEALTH CHECK ENDPOINT
+// HEALTH CHECK
 // ============================================
-
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'OK',
     message: 'Server is running',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
   });
 });
 
 // ============================================
-// API ROUTES
+// MOUNT API ROUTES - THIS IS THE FIX!
 // ============================================
-
-// Authentication routes (public & protected)
+console.log('📌 Mounting routes...');
 app.use('/api/auth', authRoutes);
+console.log('✅ Auth routes mounted at /api/auth');
 
-// Admission routes (public & protected)
 app.use('/api/admission', admissionRoutes);
+console.log('✅ Admission routes mounted at /api/admission');
 
-// Program CRUD routes (authenticated users can view, admin can manage)
 app.use('/api/programs', programRoutes);
+console.log('✅ Program routes mounted at /api/programs');
+
+app.use('/api/teacher', teacherRoutes);
+console.log('✅ Teacher routes mounted at /api/teacher');
+
+app.use('/api/student', studentRoutes);
+console.log('✅ Student routes mounted at /api/student');
+
+app.use('/api/admin/teachers', adminTeacherRoutes);
+console.log('✅ Admin Teacher routes mounted at /api/admin/teachers');
+
+app.use('/api/admin/students', adminStudentRoutes);
+console.log('✅ Admin Student routes mounted at /api/admin/students');
 
 // ============================================
 // ERROR HANDLING
 // ============================================
-
-// 404 Not Found handler
 app.use(notFound);
-
-// Global error handler
 app.use(errorHandler);
 
 // ============================================
-// SERVER STARTUP
+// START SERVER
 // ============================================
-
 const PORT = process.env.PORT || 5000;
 
 const startServer = async (): Promise<void> => {
   try {
-    // Connect to MongoDB
     await connectDB();
     console.log('✅ Database connection established');
 
-    // Seed admin user (only if no admin exists)
     await seedAdmin();
+    console.log('✅ Admin seeded');
 
-    // Start the server
     app.listen(PORT, () => {
       console.log('\n=================================');
       console.log('🚀 Beyond the Syllabus LMS - Backend');
@@ -113,45 +115,21 @@ const startServer = async (): Promise<void> => {
       console.log(`📡 Server running on port: ${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 API URL: http://localhost:${PORT}/api`);
-      console.log(`✅ Health check: http://localhost:${PORT}/health`);
       console.log('=================================');
       console.log('📌 Available Routes:');
-      console.log(`   🔐 /api/auth     - Authentication`);
+      console.log(`   🔐 /api/auth      - Authentication`);
       console.log(`   🎓 /api/admission - Student Admission`);
-      console.log(`   📚 /api/programs - Program Management`);
+      console.log(`   📚 /api/programs  - Program Management`);
+      console.log(`   👨‍🏫 /api/teacher   - Teacher Dashboard`);
+      console.log(`   🧑‍🎓 /api/student   - Student Dashboard`);
+      console.log(`   👑 /api/admin     - Admin Management`);
       console.log('=================================\n');
     });
   } catch (error: any) {
     console.error('❌ Failed to start server:', error.message);
-    console.error('Stack trace:', error.stack);
     process.exit(1);
   }
 };
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (error: Error) => {
-  console.error('❌ Unhandled Promise Rejection:', error.message);
-  console.error('Stack trace:', error.stack);
-  // Don't exit - let the error handler deal with it
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (error: Error) => {
-  console.error('❌ Uncaught Exception:', error.message);
-  console.error('Stack trace:', error.stack);
-  // Don't exit - let the error handler deal with it
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('🛑 Received SIGTERM signal. Closing server...');
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('🛑 Received SIGINT signal. Closing server...');
-  process.exit(0);
-});
 
 startServer();
 

@@ -23,6 +23,19 @@ export interface RegisterStudentRequest {
   confirmPassword: string;
 }
 
+export interface Student {
+  id: string;
+  fullName: string;
+  admissionId: string;
+  email: string;
+  phone: string;
+  programId: string;
+  status: 'pending_registration' | 'active' | 'completed' | 'inactive';
+  admissionDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const admissionApi = {
   admitStudent: (data: AdmitStudentRequest) =>
     apiClient.post('/admission/admit', data),
@@ -38,4 +51,15 @@ export const admissionApi = {
   
   getStudentByAdmissionId: (admissionId: string) =>
     apiClient.get(`/admission/student/${admissionId}`),
+  
+  getAllStudents: (params?: { page?: number; limit?: number; search?: string; status?: string; programId?: string }) =>
+    apiClient.get('/admission/students', { params }),
+  
+  getRecentAdmissions: (limit?: number) =>
+    apiClient.get('/admission/students', { 
+      params: { 
+        limit: limit || 10,
+        page: 1,
+      } 
+    }),
 };

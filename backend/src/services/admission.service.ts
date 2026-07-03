@@ -14,7 +14,6 @@ interface AdmissionSettings {
 }
 
 // In production, this would come from a settings collection
-// For now, we'll use a simple in-memory config
 let admissionSettings: AdmissionSettings = {
   mode: 'automatic',
   prefix: 'BTS',
@@ -31,15 +30,11 @@ export const generateAdmissionId = async (): Promise<string> => {
     throw new Error('Manual mode: Admission ID must be provided manually');
   }
 
-  // Automatic mode
   if (!settings.prefix || settings.currentNumber === undefined) {
     throw new Error('Prefix and current number must be configured for automatic mode');
   }
 
-  // Increment current number
   settings.currentNumber += 1;
-
-  // Format: PREFIX + Number (with leading zeros)
   const paddedNumber = String(settings.currentNumber).padStart(3, '0');
   return `${settings.prefix}${paddedNumber}`;
 };
@@ -87,7 +82,6 @@ export const admitStudent = async (data: {
     let admissionId: string;
 
     if (admissionSettings.mode === 'manual') {
-      // Manual mode: must provide admission ID
       if (!data.admissionId) {
         throw new Error('Admission ID is required in manual mode');
       }
@@ -100,11 +94,10 @@ export const admitStudent = async (data: {
 
       admissionId = data.admissionId;
     } else {
-      // Automatic mode: generate ID
       admissionId = await generateAdmissionId();
     }
 
-    // Create student - NO userId during admission (will be linked during registration)
+    // Create student - NO userId during admission
     const student = await Student.create({
       fullName: data.fullName,
       admissionId,
@@ -199,7 +192,12 @@ export const registerStudent = async (
       throw new Error('User already exists with this email');
     }
 
-    // 5. Create user account
+    // 5. Check if student already has a userId (shouldn't happen, but just in case)
+    if (student.userId) {
+      throw new Error('This student already has a user account. Please contact admin.');
+    }
+
+    // 6. Create user account
     const user = await User.create({
       email: student.email,
       password,
@@ -207,7 +205,7 @@ export const registerStudent = async (
       isActive: true,
     });
 
-    // 6. Link userId to student and update status
+    // 7. Link userId to student and update status
     student.userId = user._id as any;
     student.status = 'active';
     await student.save();
@@ -245,7 +243,6 @@ export const getStudents = async (options: {
 }): Promise<{ students: IStudent[]; total: number }> => {
   const { page = 1, limit = 10, status, programId, search } = options;
 
-  // Build filter
   const filter: any = { isDeleted: false };
   if (status) filter.status = status;
   if (programId) filter.programId = programId;
@@ -287,13 +284,11 @@ export const updateStudent = async (
       throw new Error('Student not found');
     }
 
-    // Update fields
     const updateData: any = {
       ...data,
       updatedBy,
     };
 
-    // Don't allow updating these fields
     delete updateData._id;
     delete updateData.admissionId;
     delete updateData.userId;

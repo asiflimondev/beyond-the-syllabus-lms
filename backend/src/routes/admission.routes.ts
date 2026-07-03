@@ -5,23 +5,42 @@ import {
   updateAdmissionSettingsController,
   getStudentByAdmissionIdController,
   registerStudentController,
+  getAllStudentsController,
+  checkStudentStatus,
+  resetStudentRegistration,
 } from '../controllers/admission.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Public routes (student registration)
+// ============================================
+// PUBLIC ROUTES (No authentication required)
+// ============================================
 router.post('/register-student', registerStudentController);
 router.get('/student/:admissionId', getStudentByAdmissionIdController);
 
-// Protected routes (require authentication)
+// ============================================
+// PROTECTED ROUTES (Authentication required)
+// ============================================
 router.use(authenticate);
+
+// Admin & Office - Admit students
+router.post('/admit', authorize('admin', 'office'), admitStudentController);
+
+// Admin & Office - Get all students
+router.get('/students', authorize('admin', 'office'), getAllStudentsController);
 
 // Admin only - Admission settings
 router.get('/settings', authorize('admin'), getAdmissionSettingsController);
 router.put('/settings', authorize('admin'), updateAdmissionSettingsController);
 
-// Admin & Office only - Admit students
-router.post('/admit', authorize('admin', 'office'), admitStudentController);
+// ============================================
+// DEBUG ROUTES (Admin only)
+// ============================================
+// Check student status - useful for debugging
+router.get('/check-student/:admissionId', authorize('admin'), checkStudentStatus);
+
+// Reset student registration - use if student is stuck
+router.post('/reset-student/:admissionId', authorize('admin'), resetStudentRegistration);
 
 export default router;

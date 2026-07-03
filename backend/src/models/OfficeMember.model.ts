@@ -43,6 +43,10 @@ const OfficeMemberSchema = new Schema<IOfficeMemberDocument>(
       type: String,
       enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
     },
+    address: {
+      type: String,
+      trim: true,
+    },
     profileImage: {
       url: { type: String },
       publicId: { type: String },

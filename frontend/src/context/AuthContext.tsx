@@ -4,7 +4,7 @@ import { authApi } from '@api/auth.api';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, confirmPassword: string) => Promise<void>;
+  register: (email: string, password: string, confirmPassword: string, role?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -45,65 +45,110 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isAuthenticated: true,
           isLoading: false,
         });
+      } else {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setState({ user: null, isAuthenticated: false, isLoading: false });
       }
     } catch (error) {
+      console.error('Refresh user error:', error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       setState({ user: null, isAuthenticated: false, isLoading: false });
     }
   };
 
-  const login = async (email: string, password: string) => {
-    const response = await authApi.login({ email, password });
-    if (response.data.success && response.data.data) {
-      const { accessToken, refreshToken, user: userData } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+  const login = async (email: string, password: string): Promise<void> => {
+    try {
+      console.log('🔐 Login attempt for:', email);
+      const response = await authApi.login({ email, password });
+      console.log('📦 Login response:', response);
       
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        role: userData.role as 'admin' | 'teacher' | 'office' | 'student',
-        isActive: userData.isActive,
-        lastLogin: userData.lastLogin,
-        profile: userData.profile || null,
-      };
-      
-      setState({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      if (response.data.success && response.data.data) {
+        const { accessToken, refreshToken, user: userData } = response.data.data;
+        
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        const user: User = {
+          id: userData.id,
+          email: userData.email,
+          role: userData.role as 'admin' | 'teacher' | 'office' | 'student',
+          isActive: userData.isActive,
+          lastLogin: userData.lastLogin,
+          profile: userData.profile || null,
+        };
+        
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+        
+        console.log('✅ Login successful for:', email);
+      } else {
+        console.error('❌ Login failed: Success false');
+        throw new Error(response.data.message || 'Login failed');
+      }
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setState({ user: null, isAuthenticated: false, isLoading: false });
+      throw error;
     }
   };
 
-  const register = async (email: string, password: string, confirmPassword: string) => {
-    const response = await authApi.register({ email, password, confirmPassword });
-    if (response.data.success && response.data.data) {
-      const { accessToken, refreshToken, user: userData } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+  const register = async (email: string, password: string, confirmPassword: string, role: string = 'student'): Promise<void> => {
+    try {
+      console.log('📝 Registration attempt for:', email);
+      const response = await authApi.register({ email, password, confirmPassword, role });
+      console.log('📦 Registration response:', response);
       
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        role: userData.role as 'admin' | 'teacher' | 'office' | 'student',
-        isActive: userData.isActive,
-        lastLogin: userData.lastLogin,
-        profile: userData.profile || null,
-      };
-      
-      setState({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      if (response.data.success && response.data.data) {
+        const { accessToken, refreshToken, user: userData } = response.data.data;
+        
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        const user: User = {
+          id: userData.id,
+          email: userData.email,
+          role: userData.role as 'admin' | 'teacher' | 'office' | 'student',
+          isActive: userData.isActive,
+          lastLogin: userData.lastLogin,
+          profile: userData.profile || null,
+        };
+        
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+        
+        console.log('✅ Registration successful for:', email);
+      } else {
+        console.error('❌ Registration failed: Success false');
+        throw new Error(response.data.message || 'Registration failed');
+      }
+    } catch (error: any) {
+      console.error('❌ Registration error:', error);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setState({ user: null, isAuthenticated: false, isLoading: false });
+      throw error;
     }
   };
 
   const logout = () => {
+    console.log('🔓 Logging out');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     setState({
       user: null,
       isAuthenticated: false,
