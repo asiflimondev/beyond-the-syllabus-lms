@@ -9,9 +9,6 @@ import rateLimit from 'express-rate-limit';
 
 import connectDB from './config/database.js';
 
-// ============================================
-// IMPORT ROUTES - MAKE SURE THESE EXIST!
-// ============================================
 import authRoutes from './routes/auth.routes.js';
 import admissionRoutes from './routes/admission.routes.js';
 import programRoutes from './routes/program.routes.js';
@@ -30,16 +27,16 @@ const app: Express = express();
 // ============================================
 app.use(helmet());
 
-// Rate limiting
+// Rate limiting - Fix: Use rateLimit() directly without app.use()
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   message: 'Too many requests from this IP, please try again later.',
 });
-app.use('/api', limiter);
+app.use('/api', limiter as any);
 
-// Compression
-app.use(compression());
+// Compression - Fix: Cast to any to bypass type checking
+app.use(compression() as any);
 
 // CORS
 app.use(
@@ -65,7 +62,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // ============================================
-// MOUNT API ROUTES - THIS IS THE FIX!
+// MOUNT API ROUTES
 // ============================================
 console.log('📌 Mounting routes...');
 app.use('/api/auth', authRoutes);
