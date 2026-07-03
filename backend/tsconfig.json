@@ -4,7 +4,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022", "dom"],
-    "types": ["node", "express", "cors", "compression", "bcryptjs", "jsonwebtoken"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": false,
