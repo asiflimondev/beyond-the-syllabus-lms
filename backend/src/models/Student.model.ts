@@ -8,7 +8,9 @@ const StudentSchema = new Schema<IStudentDocument>(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'User ID is required'],
+      required: false, // Not required during admission
+      unique: true,
+      sparse: true, // Allows multiple null values
     },
     fullName: {
       type: String,
@@ -110,9 +112,9 @@ const StudentSchema = new Schema<IStudentDocument>(
   }
 );
 
-// Indexes
+// Indexes for faster queries
 StudentSchema.index({ admissionId: 1 }, { unique: true });
-StudentSchema.index({ userId: 1 }, { unique: true });
+StudentSchema.index({ userId: 1 }, { unique: true, sparse: true });
 StudentSchema.index({ programId: 1 });
 StudentSchema.index({ status: 1 });
 StudentSchema.index({ isDeleted: 1 });

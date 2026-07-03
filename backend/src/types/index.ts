@@ -17,7 +17,7 @@ export interface IUser {
 // STUDENT TYPES
 // ============================================
 export interface IStudent {
-  userId: Types.ObjectId;
+  userId?: Types.ObjectId | null;
   fullName: string;
   admissionId: string;
   status: 'pending_registration' | 'active' | 'completed' | 'inactive';

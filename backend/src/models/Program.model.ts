@@ -63,7 +63,7 @@ const ProgramSchema = new Schema<IProgramDocument>(
     },
     deletedAt: {
       type: Date,
-      default: null,
+      default: undefined,
     },
   },
   {
