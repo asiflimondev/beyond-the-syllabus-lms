@@ -4,8 +4,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "types": ["node"]
+    "skipDefaultLibCheck": true
   },
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
