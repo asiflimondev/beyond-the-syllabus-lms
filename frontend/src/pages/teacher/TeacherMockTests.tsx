@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import {
   FileText,
   Plus,
-  Edit,
+  // Edit,  // <- REMOVE (not used)
   Eye,
   Calendar,
   Clock,
@@ -39,7 +39,7 @@ const TeacherMockTests: React.FC = () => {
   const navigate = useNavigate();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTest, setEditingTest] = useState<any>(null);
+  // const [editingTest, setEditingTest] = useState<any>(null);  // <- REMOVE if not used
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
   const [formData, setFormData] = useState<MockTestFormData>({
     title: '',
@@ -106,7 +106,7 @@ const TeacherMockTests: React.FC = () => {
       speaking: { enabled: true, description: 'Speaking assessment' },
       presentation: { enabled: true, totalMarks: 20, description: 'Presentation' },
     });
-    setEditingTest(null);
+    // setEditingTest(null);
     setSelectedProgramId('');
   };
 
@@ -161,7 +161,6 @@ const TeacherMockTests: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // 🔥 CRITICAL: Build submit data with ONLY enabled sections
     const submitData: any = {
       programId: selectedProgramId,
       title: formData.title,
@@ -169,47 +168,35 @@ const TeacherMockTests: React.FC = () => {
       testDate: formData.testDate,
     };
 
-    // 🔥 ONLY add sections that are ENABLED
-    // Reading
-    if (formData.reading.enabled) {
+    if (formData.reading.enabled && formData.reading.totalMarks > 0) {
       submitData.reading = {
-        totalMarks: formData.reading.totalMarks || 40,
+        totalMarks: formData.reading.totalMarks,
         description: formData.reading.description || 'Reading comprehension',
       };
     }
-
-    // Writing
-    if (formData.writing.enabled) {
+    if (formData.writing.enabled && formData.writing.totalMarks > 0) {
       submitData.writing = {
-        totalMarks: formData.writing.totalMarks || 40,
+        totalMarks: formData.writing.totalMarks,
         description: formData.writing.description || 'Writing tasks',
       };
     }
-
-    // Listening
-    if (formData.listening.enabled) {
+    if (formData.listening.enabled && formData.listening.totalMarks > 0) {
       submitData.listening = {
-        totalMarks: formData.listening.totalMarks || 40,
+        totalMarks: formData.listening.totalMarks,
         description: formData.listening.description || 'Listening comprehension',
       };
     }
-
-    // Speaking
     if (formData.speaking.enabled) {
       submitData.speaking = {
         description: formData.speaking.description || 'Speaking assessment',
       };
     }
-
-    // Presentation
-    if (formData.presentation.enabled) {
+    if (formData.presentation.enabled && formData.presentation.totalMarks > 0) {
       submitData.presentation = {
-        totalMarks: formData.presentation.totalMarks || 20,
+        totalMarks: formData.presentation.totalMarks,
         description: formData.presentation.description || 'Presentation',
       };
     }
-
-    console.log('📤 Submitting ONLY enabled sections:', JSON.stringify(submitData, null, 2));
 
     try {
       await createMutation.mutateAsync(submitData);
@@ -304,12 +291,12 @@ const TeacherMockTests: React.FC = () => {
         </div>
       )}
 
-      {/* Create Mock Test Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="fixed inset-0 bg-black/50" onClick={() => { setIsFormOpen(false); resetForm(); }} />
           <div className="relative min-h-screen flex items-center justify-center p-4">
             <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              {/* ... rest of modal code ... */}
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Create Mock Test</h3>
                 <button onClick={() => { setIsFormOpen(false); resetForm(); }} className="p-1 rounded-lg hover:bg-gray-100">
@@ -318,7 +305,7 @@ const TeacherMockTests: React.FC = () => {
               </div>
 
               <div className="p-6 space-y-6">
-                {/* Select Program */}
+                {/* ... form fields ... */}
                 <div>
                   <label className="label">Select Program *</label>
                   <select 
@@ -335,7 +322,6 @@ const TeacherMockTests: React.FC = () => {
                   </select>
                 </div>
 
-                {/* Basic Info */}
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700 mb-4">Basic Information</h4>
                   <div className="space-y-4">

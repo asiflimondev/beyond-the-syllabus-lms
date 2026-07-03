@@ -36,6 +36,19 @@ export interface Student {
   updatedAt: string;
 }
 
+export interface StudentsResponse {
+  success: boolean;
+  data: {
+    students: Student[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
+}
+
 export const admissionApi = {
   admitStudent: (data: AdmitStudentRequest) =>
     apiClient.post('/admission/admit', data),
@@ -53,10 +66,10 @@ export const admissionApi = {
     apiClient.get(`/admission/student/${admissionId}`),
   
   getAllStudents: (params?: { page?: number; limit?: number; search?: string; status?: string; programId?: string }) =>
-    apiClient.get('/admission/students', { params }),
+    apiClient.get<StudentsResponse>('/admission/students', { params }),
   
   getRecentAdmissions: (limit?: number) =>
-    apiClient.get('/admission/students', { 
+    apiClient.get<StudentsResponse>('/admission/students', { 
       params: { 
         limit: limit || 10,
         page: 1,

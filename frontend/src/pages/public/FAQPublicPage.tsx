@@ -8,11 +8,8 @@ import {
   BookOpen,
   Users,
   DollarSign,
-  Clock,
-  FileText,
   GraduationCap,
   Award,
-  Globe,
   Mail,
   Phone,
   MapPin

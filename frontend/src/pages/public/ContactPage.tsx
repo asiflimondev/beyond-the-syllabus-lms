@@ -16,7 +16,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
 
-// SVG Social Media Icons (no import issues)
+// SVG Social Media Icons
 const FacebookIcon = () => (
   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
     <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
@@ -35,7 +35,6 @@ const LinkedinIcon = () => (
   </svg>
 );
 
-// Contact form validation schema
 const contactSchema = yup.object({
   name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
   email: yup.string().email('Please enter a valid email').required('Email is required'),
@@ -110,7 +109,6 @@ const ContactPage: React.FC = () => {
 
   return (
     <PublicLayout>
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -122,7 +120,6 @@ const ContactPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Contact Grid */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -140,7 +137,6 @@ const ContactPage: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                  {/* Name */}
                   <div>
                     <label htmlFor="name" className="label flex items-center">
                       <User className="w-4 h-4 mr-2 text-gray-400" />
@@ -161,7 +157,6 @@ const ContactPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Email */}
                   <div>
                     <label htmlFor="email" className="label flex items-center">
                       <Mail className="w-4 h-4 mr-2 text-gray-400" />
@@ -182,7 +177,6 @@ const ContactPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Phone */}
                   <div>
                     <label htmlFor="phone" className="label flex items-center">
                       <Phone className="w-4 h-4 mr-2 text-gray-400" />
@@ -197,7 +191,6 @@ const ContactPage: React.FC = () => {
                     />
                   </div>
 
-                  {/* Subject */}
                   <div>
                     <label htmlFor="subject" className="label flex items-center">
                       <MessageSquare className="w-4 h-4 mr-2 text-gray-400" />
@@ -218,7 +211,6 @@ const ContactPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Message */}
                   <div>
                     <label htmlFor="message" className="label flex items-center">
                       <MessageSquare className="w-4 h-4 mr-2 text-gray-400" />
@@ -239,7 +231,6 @@ const ContactPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
                     className="btn-primary w-full py-3 flex items-center justify-center space-x-2"
@@ -267,7 +258,6 @@ const ContactPage: React.FC = () => {
 
             {/* Contact Information */}
             <div className="space-y-8">
-              {/* Contact Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {contactInfo.map((info, index) => (
                   <div
@@ -292,7 +282,6 @@ const ContactPage: React.FC = () => {
                 ))}
               </div>
 
-              {/* Social Media */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Connect With Us</h3>
                 <div className="flex space-x-4">
@@ -311,7 +300,6 @@ const ContactPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Map Section */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -337,7 +325,6 @@ const ContactPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Quick Contact - Call to Action */}
       <section className="py-16 bg-primary-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>

@@ -26,7 +26,7 @@ const TeacherManagement: React.FC = () => {
   const [showDeleted, setShowDeleted] = useState(false);
 
   // Fetch teachers
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['teachers', page, limit, search, showDeleted],
     queryFn: () =>
       teacherManagementApi.getAllTeachers({

@@ -71,7 +71,7 @@ const StudentsManagement: React.FC = () => {
   const programs = programsData?.data?.data?.programs || [];
 
   // Fetch students
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['admin-students', page, limit, search, showDeleted, statusFilter],
     queryFn: () =>
       studentManagementApi.getAll({

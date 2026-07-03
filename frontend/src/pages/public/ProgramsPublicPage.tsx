@@ -10,7 +10,6 @@ import {
   Award, 
   Users,
   ChevronRight,
-  Calendar,
   Star,
   GraduationCap
 } from 'lucide-react';

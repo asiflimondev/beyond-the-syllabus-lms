@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@context/AuthContext';
 import Layout from '@components/layout/Layout';
-import PublicLayout from '@components/layout/PublicLayout';
 
 // Public Pages
 import HomePage from '@pages/public/HomePage';
@@ -63,7 +62,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return <Navigate to="/login" />;
   }
 
-  // Role-based redirection for root paths
   if (location === '/' || location === '/admin' || location === '/teacher' || location === '/student' || location === '/office') {
     const role = user?.role;
     if (role === 'admin') return <Navigate to="/admin/dashboard" />;
@@ -90,197 +88,34 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* ==========================================
-                PROTECTED ROUTES (Require Login)
-                ========================================== */}
-            
-            {/* Admin Routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/programs"
-              element={
-                <ProtectedRoute>
-                  <ProgramsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/admission"
-              element={
-                <ProtectedRoute>
-                  <AdmissionPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/students"
-              element={
-                <ProtectedRoute>
-                  <StudentsManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/teachers"
-              element={
-                <ProtectedRoute>
-                  <TeacherManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/settings"
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Protected Routes */}
+            <Route path="/admin" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/admin/programs" element={<ProtectedRoute><ProgramsPage /></ProtectedRoute>} />
+            <Route path="/admin/admission" element={<ProtectedRoute><AdmissionPage /></ProtectedRoute>} />
+            <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
+            <Route path="/admin/teachers" element={<ProtectedRoute><TeacherManagement /></ProtectedRoute>} />
+            <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-            {/* Teacher Routes */}
-            <Route
-              path="/teacher"
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/teacher/dashboard" />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/dashboard"
-              element={
-                <ProtectedRoute>
-                  <TeacherDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/programs"
-              element={
-                <ProtectedRoute>
-                  <TeacherPrograms />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/students"
-              element={
-                <ProtectedRoute>
-                  <TeacherStudents />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/mock-tests"
-              element={
-                <ProtectedRoute>
-                  <TeacherMockTests />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/mark-entry/:mockTestId"
-              element={
-                <ProtectedRoute>
-                  <TeacherMarkEntry />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/settings"
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/teacher" element={<ProtectedRoute><Navigate to="/teacher/dashboard" /></ProtectedRoute>} />
+            <Route path="/teacher/dashboard" element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>} />
+            <Route path="/teacher/programs" element={<ProtectedRoute><TeacherPrograms /></ProtectedRoute>} />
+            <Route path="/teacher/students" element={<ProtectedRoute><TeacherStudents /></ProtectedRoute>} />
+            <Route path="/teacher/mock-tests" element={<ProtectedRoute><TeacherMockTests /></ProtectedRoute>} />
+            <Route path="/teacher/mark-entry/:mockTestId" element={<ProtectedRoute><TeacherMarkEntry /></ProtectedRoute>} />
+            <Route path="/teacher/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-            {/* Student Routes */}
-            <Route
-              path="/student"
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/student/dashboard" />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/student/dashboard"
-              element={
-                <ProtectedRoute>
-                  <StudentDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/student/mock-tests"
-              element={
-                <ProtectedRoute>
-                  <MockTestsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/student/mock-tests/:id"
-              element={
-                <ProtectedRoute>
-                  <div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/student/profile"
-              element={
-                <ProtectedRoute>
-                  <StudentProfile />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/student" element={<ProtectedRoute><Navigate to="/student/dashboard" /></ProtectedRoute>} />
+            <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+            <Route path="/student/mock-tests" element={<ProtectedRoute><MockTestsPage /></ProtectedRoute>} />
+            <Route path="/student/mock-tests/:id" element={<ProtectedRoute><div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div></ProtectedRoute>} />
+            <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
 
-            {/* Office Routes */}
-            <Route
-              path="/office"
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/office/dashboard" />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/office/dashboard"
-              element={
-                <ProtectedRoute>
-                  <OfficeDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/office/settings"
-              element={
-                <ProtectedRoute>
-                  <SettingsPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/office" element={<ProtectedRoute><Navigate to="/office/dashboard" /></ProtectedRoute>} />
+            <Route path="/office/dashboard" element={<ProtectedRoute><OfficeDashboard /></ProtectedRoute>} />
+            <Route path="/office/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-            {/* ==========================================
-                PUBLIC ROUTES (No Login Required)
-                ========================================== */}
+            {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/programs" element={<ProgramsPublicPage />} />
@@ -288,16 +123,11 @@ function App() {
             <Route path="/faq" element={<FAQPublicPage />} />
             <Route path="/contact" element={<ContactPage />} />
 
-            {/* ==========================================
-                AUTH ROUTES
-                ========================================== */}
+            {/* Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/student-register" element={<StudentRegisterPage />} />
 
-            {/* ==========================================
-                CATCH ALL
-                ========================================== */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           

@@ -1,91 +1,79 @@
 import React, { useState } from 'react';
 import { UserPlus, Users, Search, Clock, CheckCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { admissionApi } from '@api/admission.api';
+import { admissionApi, Student } from '@api/admission.api';
 import AdmissionForm from '@components/admission/AdmissionForm';
 
 const AdmissionPage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  // Fetch admission settings
   const { data: settingsData } = useQuery({
     queryKey: ['admission-settings'],
     queryFn: () => admissionApi.getSettings(),
   });
 
-  // Fetch recent admissions
   const { data: recentData, isLoading, refetch } = useQuery({
     queryKey: ['recent-admissions'],
     queryFn: () => admissionApi.getRecentAdmissions(10),
   });
 
-  // Get students array safely
-  const getStudents = () => {
+  const { data: statsData } = useQuery({
+    queryKey: ['admission-stats'],
+    queryFn: () => admissionApi.getAllStudents({ limit: 1 }),
+  });
+
+  const extractStudents = (): Student[] => {
     if (!recentData) return [];
+    const responseData = recentData.data;
+    if (!responseData) return [];
     
-    try {
-      const responseData = recentData.data;
-      if (!responseData) return [];
-      
-      if (responseData.data?.students && Array.isArray(responseData.data.students)) {
-        return responseData.data.students;
-      }
-      
-      if (responseData.students && Array.isArray(responseData.students)) {
-        return responseData.students;
-      }
-      
-      if (Array.isArray(responseData)) {
-        return responseData;
-      }
-      
-      return [];
-    } catch (error) {
-      console.error('Error extracting students:', error);
-      return [];
+    // Fix: Use optional chaining and proper type checking
+    if (responseData.data?.students && Array.isArray(responseData.data.students)) {
+      return responseData.data.students;
     }
+    
+    // Remove the problematic line
+    // if (responseData.students && Array.isArray(responseData.students)) {
+    //   return responseData.students;
+    // }
+    
+    if (Array.isArray(responseData)) {
+      return responseData;
+    }
+    
+    return [];
   };
 
-  // Get total count safely
-  const getTotal = () => {
-    if (!recentData) return 0;
+  const extractTotal = (): number => {
+    if (!statsData) return 0;
+    const responseData = statsData.data;
+    if (!responseData) return 0;
     
-    try {
-      const responseData = recentData.data;
-      if (!responseData) return 0;
-      
-      if (responseData.data?.pagination?.total !== undefined) {
-        return responseData.data.pagination.total;
-      }
-      
-      if (responseData.pagination?.total !== undefined) {
-        return responseData.pagination.total;
-      }
-      
-      const students = getStudents();
-      return students.length;
-    } catch (error) {
-      console.error('Error extracting total:', error);
-      return 0;
+    if (responseData.data?.pagination?.total !== undefined) {
+      return responseData.data.pagination.total;
     }
+    
+    // Remove the problematic line
+    // if (responseData.pagination?.total !== undefined) {
+    //   return responseData.pagination.total;
+    // }
+    
+    if (responseData.data?.students && Array.isArray(responseData.data.students)) {
+      return responseData.data.students.length;
+    }
+    
+    return 0;
   };
 
-  const recentAdmissions = getStudents();
-  const totalStudents = getTotal();
+  const recentAdmissions = extractStudents();
+  const totalStudents = extractTotal();
   
-  // Calculate pending students
   const pendingStudents = recentAdmissions.filter(
-    (s: any) => s.status === 'pending_registration'
+    (s: Student) => s.status === 'pending_registration'
   ).length;
 
-  // Helper function to get program name
-  const getProgramName = (program: any): string => {
-    if (!program) return 'N/A';
-    if (typeof program === 'string') return program;
-    if (typeof program === 'object') {
-      return program.name || program.displayName?.en || 'N/A';
-    }
-    return 'N/A';
+  const handleAdmissionSuccess = () => {
+    refetch();
   };
 
   return (
@@ -139,7 +127,7 @@ const AdmissionPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Total Students</p>
-              <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
+              <p className="text-2xl font-bold text-gray-900">{totalStudents || 0}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
               <Users className="w-5 h-5 text-blue-600" />
@@ -150,7 +138,7 @@ const AdmissionPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Pending Registration</p>
-              <p className="text-2xl font-bold text-orange-600">{pendingStudents}</p>
+              <p className="text-2xl font-bold text-orange-600">{pendingStudents || 0}</p>
             </div>
             <div className="p-3 bg-orange-100 rounded-lg">
               <Clock className="w-5 h-5 text-orange-600" />
@@ -162,7 +150,7 @@ const AdmissionPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500">Active Students</p>
               <p className="text-2xl font-bold text-green-600">
-                {totalStudents - pendingStudents}
+                {(totalStudents || 0) - pendingStudents}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -212,7 +200,7 @@ const AdmissionPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {recentAdmissions.map((student: any) => (
+                {recentAdmissions.map((student: Student) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
                       {student.admissionId}
@@ -221,7 +209,7 @@ const AdmissionPage: React.FC = () => {
                       {student.fullName}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {getProgramName(student.programId)}
+                      {student.programId || 'N/A'}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -255,9 +243,7 @@ const AdmissionPage: React.FC = () => {
       <AdmissionForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSuccess={() => {
-          refetch();
-        }}
+        onSuccess={handleAdmissionSuccess}
       />
     </div>
   );

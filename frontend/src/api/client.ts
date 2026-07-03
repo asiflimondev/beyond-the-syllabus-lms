@@ -9,7 +9,6 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
@@ -23,7 +22,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -50,7 +48,6 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Refresh failed - logout user
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';

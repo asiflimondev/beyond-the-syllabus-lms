@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   Award, 
   Users, 
-  BookOpen, 
-  Star, 
+  BookOpen,
   ArrowRight,
   GraduationCap,
   Clock,

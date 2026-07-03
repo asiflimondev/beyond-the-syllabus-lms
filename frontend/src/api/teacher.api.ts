@@ -19,104 +19,34 @@ export interface TeacherProfile {
   updatedAt: string;
 }
 
-export interface MockTest {
-  id: string;
-  programId: string;
-  title: string;
-  description?: string;
-  testNumber: number;
-  testDate: string;
-  reading: {
-    totalMarks: number;
-    description?: string;
-  };
-  writing: {
-    totalMarks: number;
-    description?: string;
-  };
-  listening: {
-    totalMarks: number;
-    description?: string;
-  };
-  speaking: {
-    description?: string;
-  };
-  presentation: {
-    totalMarks: number;
-    description?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StudentResult {
-  id: string;
-  studentId: {
-    id: string;
-    fullName: string;
-    admissionId: string;
-    email: string;
-  };
-  reading: {
-    obtained: number;
-    total: number;
-  };
-  writing: {
-    obtained: number;
-    total: number;
-  };
-  listening: {
-    obtained: number;
-    total: number;
-  };
-  speaking: {
-    grade: string;
-    comment: string;
-  };
-  presentation: {
-    marks: number;
-    total: number;
-    comment: string;
-  };
-  totalMarks: number;
-  percentage: number;
-  grade: string;
-}
-
 export const teacherApi = {
-  // Profile
   getProfile: () =>
     apiClient.get('/teacher/profile'),
   
   updateProfile: (data: Partial<TeacherProfile>) =>
     apiClient.put('/teacher/profile', data),
   
-  // Programs
   getPrograms: () =>
     apiClient.get('/teacher/programs'),
   
-  // Students
   getStudentsByProgram: (programId: string, params?: { page?: number; limit?: number; search?: string }) =>
     apiClient.get(`/teacher/programs/${programId}/students`, { params }),
   
-  // Mock Tests
   getMockTestsByProgram: (programId: string) =>
     apiClient.get(`/teacher/programs/${programId}/mock-tests`),
   
-  createMockTest: (data: Partial<MockTest>) =>
+  createMockTest: (data: any) =>
     apiClient.post('/teacher/mock-tests', data),
   
-  updateMockTest: (id: string, data: Partial<MockTest>) =>
+  updateMockTest: (id: string, data: any) =>
     apiClient.put(`/teacher/mock-tests/${id}`, data),
   
   getMockTestResults: (mockTestId: string) =>
     apiClient.get(`/teacher/mock-tests/${mockTestId}/results`),
+  
+  getMarkEntryData: (mockTestId: string) =>
+    apiClient.get(`/teacher/mock-tests/${mockTestId}/mark-entry`),
 
-  // Get mark entry data
-getMarkEntryData: (mockTestId: string) =>
-  apiClient.get(`/teacher/mock-tests/${mockTestId}/mark-entry`),
-
-// Save marks
-saveMarks: (mockTestId: string, data: { marks: any[] }) =>
-  apiClient.post(`/teacher/mock-tests/${mockTestId}/mark-entry`, data),
+  saveMarks: (mockTestId: string, data: { marks: any[] }) =>
+    apiClient.post(`/teacher/mock-tests/${mockTestId}/mark-entry`, data),
 };

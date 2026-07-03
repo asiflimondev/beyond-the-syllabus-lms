@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { toast } from 'react-hot-toast';
 import { X } from 'lucide-react';
 import { Program } from '@api/programs.api';
 

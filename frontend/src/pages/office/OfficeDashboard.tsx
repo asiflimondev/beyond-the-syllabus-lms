@@ -8,8 +8,7 @@ import {
   FileText,
   Clock,
   CheckCircle,
-  Calendar,
-  Settings
+  Calendar
 } from 'lucide-react';
 
 const OfficeDashboard: React.FC = () => {

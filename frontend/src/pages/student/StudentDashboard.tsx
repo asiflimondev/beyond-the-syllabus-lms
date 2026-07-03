@@ -1,18 +1,16 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@context/AuthContext';
 import { studentApi } from '@api/student.api';
+import { Link } from 'react-router-dom';
 import {
-  BookOpen,
   FileText,
-  Award,
   Clock,
   TrendingUp,
   Calendar,
   User,
+  CheckCircle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth();

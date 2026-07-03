@@ -8,14 +8,10 @@ import {
   Target,
   Eye,
   Heart,
-  Lightbulb,
-  GraduationCap,
   Globe,
   CheckCircle,
   ArrowRight,
   Clock,
-  Calendar,
-  Star,
   Trophy,
   UserCheck
 } from 'lucide-react';

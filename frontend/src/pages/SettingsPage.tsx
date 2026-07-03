@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '@context/AuthContext';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { 
   User, 
@@ -13,20 +12,15 @@ import {
   Key,
   UserCircle,
   Phone,
-  CheckCircle,
-  XCircle,
   Loader2
 } from 'lucide-react';
 
-// ============================================
-// PROFILE UPDATE SECTION
-// ============================================
+// Profile Section
 const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
   const [fullName, setFullName] = useState(user?.profile?.fullName || '');
   const [phone, setPhone] = useState(user?.profile?.phone || '');
   const [isEditing, setIsEditing] = useState(false);
 
-  // This would connect to your API
   const handleSave = async () => {
     toast.success('Profile updated successfully!');
     setIsEditing(false);
@@ -53,7 +47,6 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
       </div>
 
       <div className="space-y-4">
-        {/* Email - Read Only */}
         <div>
           <label className="label flex items-center">
             <Mail className="w-4 h-4 mr-2 text-gray-400" />
@@ -68,7 +61,6 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
           <p className="text-xs text-gray-400 mt-1">Email cannot be changed</p>
         </div>
 
-        {/* Full Name */}
         <div>
           <label className="label flex items-center">
             <UserCircle className="w-4 h-4 mr-2 text-gray-400" />
@@ -84,7 +76,6 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
           />
         </div>
 
-        {/* Phone */}
         <div>
           <label className="label flex items-center">
             <Phone className="w-4 h-4 mr-2 text-gray-400" />
@@ -114,9 +105,7 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
   );
 };
 
-// ============================================
-// PASSWORD CHANGE SECTION
-// ============================================
+// Password Section
 const PasswordSection: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -124,7 +113,6 @@ const PasswordSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChangePassword = async () => {
-    // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       toast.error('All password fields are required');
       return;
@@ -142,7 +130,6 @@ const PasswordSection: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // This would connect to your API
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success('Password changed successfully!');
       setCurrentPassword('');
@@ -220,9 +207,7 @@ const PasswordSection: React.FC = () => {
   );
 };
 
-// ============================================
-// NOTIFICATION SECTION
-// ============================================
+// Notification Section
 const NotificationSection: React.FC = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
@@ -314,9 +299,7 @@ const NotificationSection: React.FC = () => {
   );
 };
 
-// ============================================
-// LANGUAGE SECTION
-// ============================================
+// Language Section
 const LanguageSection: React.FC = () => {
   const [language, setLanguage] = useState<'en' | 'bn'>('en');
 
@@ -371,12 +354,8 @@ const LanguageSection: React.FC = () => {
   );
 };
 
-// ============================================
-// DANGER ZONE (Admin Only)
-// ============================================
+// Danger Zone (Admin only)
 const DangerZone: React.FC = () => {
-  const [isConfirming, setIsConfirming] = useState(false);
-
   const handleClearData = () => {
     if (window.confirm('Are you sure you want to clear all data? This action is irreversible!')) {
       toast.error('This feature is not yet implemented');
@@ -416,45 +395,30 @@ const DangerZone: React.FC = () => {
   );
 };
 
-// ============================================
 // MAIN SETTINGS PAGE
-// ============================================
 const SettingsPage: React.FC = () => {
   const { user } = useAuth();
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
         <p className="text-sm text-gray-500">Manage your account settings and preferences</p>
       </div>
 
-      {/* Role-based sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column */}
         <div className="space-y-6">
-          {/* Profile - All roles */}
           <ProfileSection user={user} />
-          
-          {/* Password - All roles */}
           <PasswordSection />
         </div>
 
-        {/* Right Column */}
         <div className="space-y-6">
-          {/* Notifications - All roles */}
           <NotificationSection />
-          
-          {/* Language - All roles */}
           <LanguageSection />
         </div>
       </div>
 
-      {/* Danger Zone - Admin only */}
-      {user?.role === 'admin' && (
-        <DangerZone />
-      )}
+      {user?.role === 'admin' && <DangerZone />}
     </div>
   );
 };

@@ -34,22 +34,8 @@ export interface CreateProgramRequest {
   teacherIds?: string[];
 }
 
-export interface ProgramsResponse {
-  success: boolean;
-  data: {
-    programs: Program[];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
-  };
-}
-
 export const programsApi = {
-  getAll: async (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
-    // Build query parameters - only include defined values
+  getAll: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const queryParams: Record<string, string | number | boolean> = {};
     
     if (params?.page !== undefined) queryParams.page = params.page;
@@ -57,14 +43,7 @@ export const programsApi = {
     if (params?.search) queryParams.search = params.search;
     if (params?.isActive !== undefined) queryParams.isActive = params.isActive;
     
-    console.log('📡 Fetching programs with params:', queryParams);
-    
-    const response = await apiClient.get('/programs', { params: queryParams });
-    
-    console.log('📦 Programs API response status:', response.status);
-    console.log('📦 Programs API response data:', response.data);
-    
-    return response;
+    return apiClient.get('/programs', { params: queryParams });
   },
   
   getById: (id: string) =>

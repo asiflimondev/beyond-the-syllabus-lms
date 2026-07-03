@@ -11,7 +11,6 @@ import {
   LogOut,
   UserPlus,
   User,
-  School,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,7 +34,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const getMenuItems = () => {
     const items = [];
 
-    // Dashboard - role-specific (ONLY ONE)
     let dashboardPath = '/';
     if (user?.role === 'admin') dashboardPath = '/admin/dashboard';
     else if (user?.role === 'teacher') dashboardPath = '/teacher/dashboard';
@@ -48,7 +46,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       label: 'Dashboard',
     });
 
-    // Admin Menu Items
     if (user?.role === 'admin') {
       items.push({
         path: '/admin/programs',
@@ -72,7 +69,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       });
     }
 
-    // Office Menu Items
     if (user?.role === 'office') {
       items.push({
         path: '/admin/programs',
@@ -91,7 +87,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       });
     }
 
-    // Teacher Menu Items - ONLY ONE DASHBOARD
     if (user?.role === 'teacher') {
       items.push({
         path: '/teacher/programs',
@@ -110,7 +105,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       });
     }
 
-    // Student Menu Items
     if (user?.role === 'student') {
       items.push({
         path: '/student/mock-tests',
@@ -124,7 +118,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       });
     }
 
-    // Settings - All roles
     let settingsPath = '/admin/settings';
     if (user?.role === 'student') settingsPath = '/student/profile';
     else if (user?.role === 'teacher') settingsPath = '/teacher/settings';
@@ -143,7 +136,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -151,14 +143,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200">
             <div className="flex items-center space-x-2">
               <GraduationCap className="w-8 h-8 text-primary-600" />
@@ -168,7 +158,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* User Info */}
           <div className="px-4 py-4 border-b border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
@@ -189,7 +178,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {menuItems.map((item) => (
@@ -213,7 +201,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </ul>
           </nav>
 
-          {/* Logout Button */}
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={handleLogout}

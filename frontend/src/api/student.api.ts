@@ -39,44 +39,6 @@ export interface StudentProfile {
   updatedAt: string;
 }
 
-export interface MockTestResult {
-  _id: string;
-  title: string;
-  description?: string;
-  testNumber: number;
-  testDate: string;
-  reading: {
-    totalMarks: number;
-    description?: string;
-  };
-  writing: {
-    totalMarks: number;
-    description?: string;
-  };
-  listening: {
-    totalMarks: number;
-    description?: string;
-  };
-  speaking: {
-    description?: string;
-  };
-  presentation: {
-    totalMarks: number;
-    description?: string;
-  };
-  result?: {
-    reading: { obtained: number; total: number };
-    writing: { obtained: number; total: number };
-    listening: { obtained: number; total: number };
-    speaking: { grade: string; comment: string };
-    presentation: { marks: number; total: number; comment: string };
-    totalMarks: number;
-    percentage: number;
-    grade: string;
-  };
-  hasResult: boolean;
-}
-
 export interface StudentStats {
   totalMockTests: number;
   completedTests: number;
@@ -96,29 +58,24 @@ export interface StudentStats {
 }
 
 export const studentApi = {
-  // Profile
   getProfile: () =>
     apiClient.get('/student/profile'),
 
   updateProfile: (data: Partial<StudentProfile>) =>
     apiClient.put('/student/profile', data),
 
-  // Program
   getProgram: () =>
     apiClient.get('/student/program'),
 
-  // Mock Tests
   getMockTests: () =>
     apiClient.get('/student/mock-tests'),
 
   getResult: (mockTestId: string) =>
     apiClient.get(`/student/results/${mockTestId}`),
 
-  // Statistics
   getStats: () =>
     apiClient.get('/student/stats'),
 
-  // Password
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     apiClient.post('/student/change-password', data),
 };

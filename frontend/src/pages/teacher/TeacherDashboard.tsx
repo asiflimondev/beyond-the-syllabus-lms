@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@context/AuthContext';
 import { teacherApi } from '@api/teacher.api';
@@ -8,25 +8,10 @@ import {
   Users,
   FileText,
   Calendar,
-  Clock,
   ChevronRight,
-  User,
-  TrendingUp,
-  Award,
+  User
 } from 'lucide-react';
 
-interface Program {
-  _id: string;
-  name: string;
-  displayName: {
-    en: string;
-    bn: string;
-  };
-  duration: number;
-  fee: number;
-  studentCount?: number;
-  mockTestCount?: number;
-}
 
 const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
