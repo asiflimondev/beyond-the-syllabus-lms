@@ -27,19 +27,8 @@ const app: Express = express();
 // ============================================
 app.use(helmet());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-});
-app.use('/api', limiter as any);
-
-// Compression
-app.use(compression() as any);
-
 // ============================================
-// CORS CONFIGURATION - FIXED
+// CORS CONFIGURATION
 // ============================================
 const allowedOrigins = [
   'http://localhost:5173',
@@ -50,7 +39,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
@@ -64,6 +52,23 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
+
+// ============================================
+// RATE LIMITING - FIXED
+// ============================================
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 50,
+  message: 'Too many requests, please try again later.',
+  skipSuccessfulRequests: true,
+});
+
+app.use('/api', limiter as any);
+
+// ============================================
+// COMPRESSION
+// ============================================
+app.use(compression() as any);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
