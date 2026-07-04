@@ -1,21 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Award, 
   Users, 
   BookOpen, 
   ArrowRight,
-  GraduationCap,
   Clock,
   DollarSign,
   Star,
   ChevronLeft,
   ChevronRight,
-  CheckCircle,
   PlayCircle,
   TrendingUp,
-  Globe,
-  Calendar,
   UserCheck,
   Sparkles
 } from 'lucide-react';
