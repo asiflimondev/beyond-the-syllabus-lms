@@ -14,7 +14,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
     { path: '/programs', label: 'Programs' },
-    { path: '/teachers', label: 'Teachers' },
+    // Teachers tab removed
     { path: '/gallery', label: 'Gallery' },
     { path: '/faq', label: 'FAQ' },
     { path: '/contact', label: 'Contact' },

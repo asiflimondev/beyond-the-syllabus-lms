@@ -88,7 +88,28 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Protected Routes */}
+            {/* ==========================================
+                PUBLIC ROUTES - NO LOGIN REQUIRED
+                ========================================== */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/programs" element={<ProgramsPublicPage />} />
+            <Route path="/gallery" element={<GalleryPublicPage />} />
+            <Route path="/faq" element={<FAQPublicPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+
+            {/* ==========================================
+                AUTH ROUTES - PUBLIC
+                ========================================== */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/student-register" element={<StudentRegisterPage />} />
+
+            {/* ==========================================
+                PROTECTED ROUTES - LOGIN REQUIRED
+                ========================================== */}
+            
+            {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin/programs" element={<ProtectedRoute><ProgramsPage /></ProtectedRoute>} />
@@ -97,6 +118,7 @@ function App() {
             <Route path="/admin/teachers" element={<ProtectedRoute><TeacherManagement /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
+            {/* Teacher Routes */}
             <Route path="/teacher" element={<ProtectedRoute><Navigate to="/teacher/dashboard" /></ProtectedRoute>} />
             <Route path="/teacher/dashboard" element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>} />
             <Route path="/teacher/programs" element={<ProtectedRoute><TeacherPrograms /></ProtectedRoute>} />
@@ -105,29 +127,19 @@ function App() {
             <Route path="/teacher/mark-entry/:mockTestId" element={<ProtectedRoute><TeacherMarkEntry /></ProtectedRoute>} />
             <Route path="/teacher/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
+            {/* Student Routes */}
             <Route path="/student" element={<ProtectedRoute><Navigate to="/student/dashboard" /></ProtectedRoute>} />
             <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/mock-tests" element={<ProtectedRoute><MockTestsPage /></ProtectedRoute>} />
             <Route path="/student/mock-tests/:id" element={<ProtectedRoute><div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div></ProtectedRoute>} />
             <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
 
+            {/* Office Routes */}
             <Route path="/office" element={<ProtectedRoute><Navigate to="/office/dashboard" /></ProtectedRoute>} />
             <Route path="/office/dashboard" element={<ProtectedRoute><OfficeDashboard /></ProtectedRoute>} />
             <Route path="/office/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
-            {/* Public Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/programs" element={<ProgramsPublicPage />} />
-            <Route path="/gallery" element={<GalleryPublicPage />} />
-            <Route path="/faq" element={<FAQPublicPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-
-            {/* Auth Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/student-register" element={<StudentRegisterPage />} />
-
+            {/* Catch All */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           

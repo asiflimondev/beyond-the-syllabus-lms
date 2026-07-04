@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@context/AuthContext';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 // Validation schema
 const loginSchema = yup.object({
@@ -24,6 +25,7 @@ const LoginPage: React.FC = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -37,14 +39,11 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      toast.success('Login successful! Redirecting...');
+      toast.success('Login successful!');
       
-      // Get the user role from the auth context
-      // The user object is updated after login
-      const role = user?.role || 'student';
-      
-      // Redirect based on role
+      // Wait a moment, then redirect based on role
       setTimeout(() => {
+        const role = user?.role;
         switch (role) {
           case 'admin':
             navigate('/admin/dashboard');
@@ -53,7 +52,7 @@ const LoginPage: React.FC = () => {
             navigate('/teacher/dashboard');
             break;
           case 'office':
-            navigate('/admin/dashboard');
+            navigate('/office/dashboard');
             break;
           case 'student':
             navigate('/student/dashboard');
@@ -61,7 +60,7 @@ const LoginPage: React.FC = () => {
           default:
             navigate('/');
         }
-      }, 1000);
+      }, 500);
     } catch (error: any) {
       console.error('Login error:', error);
       const message = error.response?.data?.message || 'Failed to login. Please try again.';
@@ -72,14 +71,29 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <Link
+            to="/"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-primary-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Logo and Title */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary-600">Beyond the Syllabus</h1>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">Sign in to your account</h2>
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-2xl font-bold text-white">B</span>
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Welcome back! Please enter your credentials.
+            Sign in to your account to continue
           </p>
         </div>
 
@@ -88,16 +102,21 @@ const LoginPage: React.FC = () => {
           <div className="space-y-4">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="label">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-                {...register('email')}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className={`pl-10 w-full px-3 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  {...register('email')}
+                />
+              </div>
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
               )}
@@ -105,54 +124,78 @@ const LoginPage: React.FC = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="label">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                className={`input-field ${errors.password ? 'border-red-500' : ''}`}
-                {...register('password')}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  className={`pl-10 pr-10 w-full px-3 py-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
               )}
             </div>
+
+            {/* Forgot Password */}
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary-600 hover:text-primary-700"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              className="btn-primary w-full py-3"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing in...
+              </span>
+            ) : (
+              'Sign In'
+            )}
+          </button>
 
-          {/* Register Links */}
+          {/* Register Link */}
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                Register here
+              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
+                Create one now
               </Link>
             </p>
             <p className="text-sm text-gray-600">
               Are you a student?{' '}
-              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-500">
+              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-700">
                 Register with Admission ID
               </Link>
             </p>
