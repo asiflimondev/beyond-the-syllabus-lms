@@ -41,7 +41,10 @@ app.use(compression() as any);
 // CORS
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',
+      'https://beyondthesyllabus.vercel.app'
+    ],
     credentials: true,
   })
 );
