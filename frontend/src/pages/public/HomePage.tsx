@@ -12,7 +12,7 @@ import {
   ChevronRight,
   PlayCircle,
   TrendingUp,
-  UserCheck,
+  UserCheck, 
   Sparkles
 } from 'lucide-react';
 import PublicLayout from '@components/layout/PublicLayout';
