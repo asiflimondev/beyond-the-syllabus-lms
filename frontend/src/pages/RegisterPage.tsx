@@ -5,7 +5,20 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@context/AuthContext';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff,
+  GraduationCap,
+  Check,
+  X,
+  BookOpen,
+  Users,
+  Award,
+  Globe
+} from 'lucide-react';
 
 // Validation schema
 const registerSchema = yup.object({
@@ -40,6 +53,7 @@ const RegisterPage: React.FC = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: yupResolver(registerSchema),
@@ -47,6 +61,9 @@ const RegisterPage: React.FC = () => {
       role: 'student',
     },
   });
+
+  const passwordValue = watch('password');
+  const confirmPasswordValue = watch('confirmPassword');
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -65,132 +82,236 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Back Button */}
-        <div className="flex items-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-primary-600 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
+  const features = [
+    { icon: BookOpen, text: 'Cambridge English Preparation' },
+    { icon: Users, text: 'Expert Teachers & Mentors' },
+    { icon: Award, text: 'Globally Recognized Certification' },
+    { icon: Globe, text: 'Join 200+ Successful Students' },
+  ];
 
-        {/* Logo and Title */}
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-2xl font-bold text-white">B</span>
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Side - Illustration / Brand Section */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-900 text-white flex-col justify-between p-12 lg:p-16 relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary-400/10 rounded-full blur-3xl"></div>
+
+        {/* Back Button */}
+        <Link
+          to="/"
+          className="relative z-10 inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm group w-fit"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          Back to Home
+        </Link>
+
+        {/* Main Content */}
+        <div className="relative z-10 flex-1 flex flex-col justify-center max-w-lg mx-auto">
+          <div className="mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4 tracking-tight">
+              Start Your Learning Journey
+            </h1>
+            <p className="text-lg text-white/80 leading-relaxed">
+              Join Beyond the Syllabus and access world-class Cambridge English preparation courses taught by expert instructors.
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <feature.icon className="w-5 h-5 text-white/80 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-white/90 leading-tight">{feature.text}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust Badge */}
+          <div className="mt-8 flex items-center gap-6 text-white/60 text-sm">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span>200+ Students</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              <span>95% Success Rate</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              <span>Cambridge Affiliated</span>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Join Beyond the Syllabus today
-          </p>
         </div>
 
-        {/* Registration Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
+        {/* Footer */}
+        <div className="relative z-10 text-white/40 text-sm">
+          © {new Date().getFullYear()} Beyond the Syllabus. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Registration Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white">
+        <div className="w-full max-w-md">
+          {/* Mobile Header */}
+          <div className="lg:hidden mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors group mb-4"
+            >
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Back to Home
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm">
+                <GraduationCap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
+                <p className="text-sm text-gray-500">Join our learning community</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Create Account</h2>
+            <p className="text-sm text-gray-500 mt-1">Join Beyond the Syllabus today</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="label">
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className={`pl-10 w-full px-3 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  className={`input pl-12 ${errors.email ? 'input-error' : ''}`}
                   {...register('email')}
                 />
+                {watch('email') && !errors.email && (
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                    <Check className="w-4 h-4 text-green-500" />
+                  </div>
+                )}
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                  <X className="w-3.5 h-3.5" />
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="label">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Create a password (min 6 characters)"
-                  className={`pl-10 pr-10 w-full px-3 py-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  className={`input pl-12 pr-12 ${errors.password ? 'input-error' : ''}`}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="w-5 h-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="w-5 h-5" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                  <X className="w-3.5 h-3.5" />
+                  {errors.password.message}
+                </p>
+              )}
+              {passwordValue && passwordValue.length > 0 && !errors.password && (
+                <div className="mt-2 flex items-center gap-4 text-xs">
+                  <span className={`flex items-center gap-1 ${passwordValue.length >= 6 ? 'text-green-600' : 'text-gray-400'}`}>
+                    <Check className={`w-3.5 h-3.5 ${passwordValue.length >= 6 ? 'text-green-600' : 'text-gray-400'}`} />
+                    Min 6 chars
+                  </span>
+                  <span className={`flex items-center gap-1 ${/(?=.*[A-Za-z])(?=.*\d)/.test(passwordValue) ? 'text-green-600' : 'text-gray-400'}`}>
+                    <Check className={`w-3.5 h-3.5 ${/(?=.*[A-Za-z])(?=.*\d)/.test(passwordValue) ? 'text-green-600' : 'text-gray-400'}`} />
+                    Letter + number
+                  </span>
+                </div>
               )}
             </div>
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className="label">
                 Confirm Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm your password"
-                  className={`pl-10 pr-10 w-full px-3 py-3 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  className={`input pl-12 pr-12 ${errors.confirmPassword ? 'input-error' : ''}`}
                   {...register('confirmPassword')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="w-5 h-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="w-5 h-5" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                  <X className="w-3.5 h-3.5" />
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+              {confirmPasswordValue && passwordValue && !errors.confirmPassword && (
+                <p className="mt-1.5 text-sm text-green-600 flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5" />
+                  Passwords match
+                </p>
               )}
             </div>
 
             {/* Role Selection */}
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="role" className="label">
                 Account Type
               </label>
               <select
                 id="role"
-                className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                className="input"
                 {...register('role')}
               >
                 <option value="student">Student</option>
@@ -202,43 +323,40 @@ const RegisterPage: React.FC = () => {
                 Select the appropriate role for this account
               </p>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 px-4 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating account...
-              </span>
-            ) : (
-              'Create Account'
-            )}
-          </button>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="btn-primary w-full py-3 text-base font-semibold rounded-xl"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="spinner spinner-md border-white/30 border-t-white" />
+                  Creating account...
+                </span>
+              ) : (
+                'Create Account'
+              )}
+            </button>
 
-          {/* Login Link */}
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700">
-                Sign in here
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600">
-              Are you a student?{' '}
-              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-700">
-                Register with Admission ID
-              </Link>
-            </p>
-          </div>
-        </form>
+            {/* Login Links */}
+            <div className="text-center space-y-2 pt-2">
+              <p className="text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  Sign in here
+                </Link>
+              </p>
+              <p className="text-sm text-gray-500">
+                Are you a student?{' '}
+                <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  Register with Admission ID
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

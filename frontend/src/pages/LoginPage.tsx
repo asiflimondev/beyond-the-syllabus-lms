@@ -5,9 +5,24 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@context/AuthContext';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  Phone,
+  GraduationCap,
+  Users,
+  Award,
+  Globe,
+  Check,
+  X,
+  BookOpen,
+  TrendingUp
+} from 'lucide-react';
 
-// ✅ Updated validation: accepts email OR phone
+// Validation schema
 const loginSchema = yup.object({
   identifier: yup
     .string()
@@ -46,7 +61,6 @@ const LoginPage: React.FC = () => {
 
   const identifierValue = watch('identifier');
 
-  // Detect identifier type for icon display
   useEffect(() => {
     if (!identifierValue) {
       setIdentifierType(null);
@@ -70,177 +84,242 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     try {
       const user = await login(data.identifier, data.password);
-      
-      toast.success('Login successful!');
+      toast.success('Welcome back!');
       
       const role = user?.role || 'student';
       let redirectPath = '/';
       
       switch (role) {
-        case 'admin':
-          redirectPath = '/admin/dashboard';
-          break;
-        case 'teacher':
-          redirectPath = '/teacher/dashboard';
-          break;
-        case 'office':
-          redirectPath = '/office/dashboard';
-          break;
-        case 'student':
-          redirectPath = '/student/dashboard';
-          break;
-        default:
-          redirectPath = '/';
+        case 'admin': redirectPath = '/admin/dashboard'; break;
+        case 'teacher': redirectPath = '/teacher/dashboard'; break;
+        case 'office': redirectPath = '/office/dashboard'; break;
+        case 'student': redirectPath = '/student/dashboard'; break;
+        default: redirectPath = '/';
       }
       
       setRedirectAfterAuth(redirectPath);
-      
     } catch (error: any) {
-      console.error('Login error:', error);
-      const message = error.response?.data?.message || 'Invalid credentials. Please try again.';
-      toast.error(message);
+      toast.error(error.response?.data?.message || 'Invalid credentials');
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Back Button */}
-        <div className="flex items-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-primary-600 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
+  const features = [
+    { icon: BookOpen, text: 'Access Your Learning Dashboard' },
+    { icon: Users, text: 'Connect with Expert Teachers' },
+    { icon: Award, text: 'Track Your Progress' },
+    { icon: TrendingUp, text: 'View Your Results' },
+  ];
 
-        {/* Logo and Title */}
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-2xl font-bold text-white">B</span>
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Side - Illustration / Brand Section */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-900 text-white flex-col justify-between p-12 lg:p-16 relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary-400/10 rounded-full blur-3xl"></div>
+
+        {/* Back Button */}
+        <Link
+          to="/"
+          className="relative z-10 inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm group w-fit"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          Back to Home
+        </Link>
+
+        {/* Main Content */}
+        <div className="relative z-10 flex-1 flex flex-col justify-center max-w-lg mx-auto">
+          <div className="mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4 tracking-tight">
+              Welcome Back
+            </h1>
+            <p className="text-lg text-white/80 leading-relaxed">
+              Sign in to continue your learning journey and access your Cambridge English preparation courses.
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <feature.icon className="w-5 h-5 text-white/80 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-white/90 leading-tight">{feature.text}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust Badge */}
+          <div className="mt-8 flex items-center gap-6 text-white/60 text-sm">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span>200+ Students</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              <span>95% Success Rate</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              <span>Cambridge Affiliated</span>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account to continue
-          </p>
         </div>
 
-        {/* Login Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            {/* ✅ Single field: Email or Phone Number */}
+        {/* Footer */}
+        <div className="relative z-10 text-white/40 text-sm">
+          © {new Date().getFullYear()} Beyond the Syllabus. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white">
+        <div className="w-full max-w-md">
+          {/* Mobile Header */}
+          <div className="lg:hidden mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors group mb-4"
+            >
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Back to Home
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm">
+                <GraduationCap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Welcome Back</h2>
+                <p className="text-sm text-gray-500">Sign in to your account</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome Back</h2>
+            <p className="text-sm text-gray-500 mt-1">Sign in to continue learning</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Identifier Field */}
             <div>
-              <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="identifier" className="label">
                 Email or Phone Number
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   {identifierType === 'email' ? (
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="w-5 h-5 text-gray-400" />
                   ) : identifierType === 'phone' ? (
-                    <Phone className="h-5 w-5 text-gray-400" />
+                    <Phone className="w-5 h-5 text-gray-400" />
                   ) : (
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
                 <input
                   id="identifier"
                   type="text"
                   placeholder="Enter your email or phone number"
-                  className={`pl-10 w-full px-3 py-3 border ${errors.identifier ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  className={`input pl-12 ${errors.identifier ? 'input-error' : ''}`}
                   {...register('identifier')}
                 />
+                {identifierValue && !errors.identifier && (
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                    <Check className="w-4 h-4 text-green-500" />
+                  </div>
+                )}
               </div>
               {errors.identifier && (
-                <p className="mt-1 text-sm text-red-600">{errors.identifier.message}</p>
+                <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                  <X className="w-3.5 h-3.5" />
+                  {errors.identifier.message}
+                </p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="password" className="label mb-0">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="w-5 h-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  className={`pl-10 pr-10 w-full px-3 py-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  className={`input pl-12 pr-12 ${errors.password ? 'input-error' : ''}`}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="w-5 h-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="w-5 h-5" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                  <X className="w-3.5 h-3.5" />
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
-            {/* Forgot Password */}
-            <div className="text-right">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary-600 hover:text-primary-700"
-              >
-                Forgot password?
-              </Link>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="btn-primary w-full py-3 text-base font-semibold rounded-xl"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="spinner spinner-md border-white/30 border-t-white" />
+                  Signing in...
+                </span>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+
+            {/* Register Links */}
+            <div className="text-center space-y-2 pt-2">
+              <p className="text-sm text-gray-600">
+                Don't have an account?{' '}
+                <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  Create one now
+                </Link>
+              </p>
+              <p className="text-sm text-gray-500">
+                Are you a student?{' '}
+                <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  Register with Admission ID
+                </Link>
+              </p>
             </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 px-4 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Signing in...
-              </span>
-            ) : (
-              'Sign In'
-            )}
-          </button>
-
-          {/* Register Link */}
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
-                Create one now
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600">
-              Are you a student?{' '}
-              <Link to="/student-register" className="font-medium text-primary-600 hover:text-primary-700">
-                Register with Admission ID
-              </Link>
-            </p>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

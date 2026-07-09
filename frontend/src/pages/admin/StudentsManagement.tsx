@@ -16,12 +16,18 @@ import {
   Key,
   X,
   Save,
+  UserPlus,
+  CheckCircle,
+  AlertCircle,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { studentManagementApi, Student } from '@api/admin/student.api';
 import { programsApi } from '@api/programs.api';
+import { Link } from 'react-router-dom';
 
 // ============================================
-// STATUS OPTIONS
+// CONSTANTS
 // ============================================
 const statusOptions = [
   { value: 'pending_registration', label: 'Pending Registration', color: 'bg-yellow-100 text-yellow-800' },
@@ -40,6 +46,9 @@ const getStatusLabel = (status: string) => {
   return found?.label || status;
 };
 
+// ============================================
+// MAIN COMPONENT
+// ============================================
 const StudentsManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
@@ -48,7 +57,7 @@ const StudentsManagement: React.FC = () => {
   const [showDeleted, setShowDeleted] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
 
-  // View/Edit modal state
+  // Modal states
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -155,6 +164,7 @@ const StudentsManagement: React.FC = () => {
     },
   });
 
+  // Handlers
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this student?')) {
       deleteMutation.mutate(id);
@@ -206,86 +216,93 @@ const StudentsManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
-          <p className="text-sm text-gray-500">Manage all students and their accounts</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Students</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Manage all students and their accounts</p>
         </div>
+        <Link
+          to="/admin/admission"
+          className="btn-primary flex items-center gap-2"
+        >
+          <UserPlus className="w-4 h-4" />
+          Admit New Student
+        </Link>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="bg-white rounded-xl border border-gray-200/50 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-xs text-gray-500">Total</p>
+              <p className="text-xl font-bold text-gray-900">{stats.total}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+              <Users className="w-4 h-4 text-blue-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl border border-gray-200/50 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+              <p className="text-xs text-gray-500">Pending</p>
+              <p className="text-xl font-bold text-yellow-600">{stats.pending}</p>
             </div>
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600" />
+            <div className="w-9 h-9 rounded-xl bg-yellow-100 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-yellow-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl border border-gray-200/50 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Active</p>
-              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+              <p className="text-xs text-gray-500">Active</p>
+              <p className="text-xl font-bold text-green-600">{stats.active}</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <UserCheck className="w-5 h-5 text-green-600" />
+            <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center">
+              <UserCheck className="w-4 h-4 text-green-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl border border-gray-200/50 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Completed</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.completed}</p>
+              <p className="text-xs text-gray-500">Completed</p>
+              <p className="text-xl font-bold text-blue-600">{stats.completed}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <UserCheck className="w-5 h-5 text-blue-600" />
+            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+              <CheckCircle className="w-4 h-4 text-blue-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl border border-gray-200/50 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Inactive</p>
-              <p className="text-2xl font-bold text-gray-600">{stats.inactive}</p>
+              <p className="text-xs text-gray-500">Inactive</p>
+              <p className="text-xl font-bold text-gray-600">{stats.inactive}</p>
             </div>
-            <div className="p-3 bg-gray-100 rounded-lg">
-              <UserX className="w-5 h-5 text-gray-600" />
+            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+              <UserX className="w-4 h-4 text-gray-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name, admission ID, email, or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="input pl-10"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="input sm:w-40"
         >
           <option value="">All Status</option>
           {statusOptions.map((opt) => (
@@ -294,200 +311,212 @@ const StudentsManagement: React.FC = () => {
             </option>
           ))}
         </select>
-        <label className="flex items-center space-x-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap">
           <input
             type="checkbox"
             checked={showDeleted}
             onChange={(e) => setShowDeleted(e.target.checked)}
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
-          <span>Show deleted</span>
+          Show deleted
         </label>
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-          <span className="ml-3 text-gray-600">Loading students...</span>
+      {/* Content */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="spinner spinner-lg text-primary-600" />
         </div>
-      )}
-
-      {/* Error State */}
-      {isError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p>Failed to load students: {(error as any)?.message || 'Unknown error'}</p>
+      ) : isError ? (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <span>Failed to load students: {(error as any)?.message || 'Unknown error'}</span>
         </div>
-      )}
-
-      {/* Students Table */}
-      {!isLoading && !isError && (
+      ) : students.length > 0 ? (
         <>
-          {students.length > 0 ? (
-            <>
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Admission ID
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Program
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Account
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {students.map((student: Student) => (
-                        <tr key={student.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                            {student.admissionId}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {student.fullName}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
+          <div className="bg-white rounded-2xl border border-gray-200/50 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50/80 border-b border-gray-200/50">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Admission ID
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Program
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Account
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {students.map((student: Student) => (
+                    <tr key={student.id} className="hover:bg-gray-50/50 transition-colors duration-150">
+                      <td className="px-4 py-3 font-mono text-xs font-medium text-gray-900">
+                        {student.admissionId}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-medium">
+                            {student.fullName?.charAt(0).toUpperCase() || 'S'}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{student.fullName}</p>
+                            <p className="text-xs text-gray-400">{student.user?.email || 'No email'}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="flex items-center gap-1 text-xs text-gray-600">
+                            <Phone className="w-3 h-3 text-gray-400" />
+                            {student.phone}
+                          </span>
+                          <span className="flex items-center gap-1 text-xs text-gray-600">
+                            <Mail className="w-3 h-3 text-gray-400" />
                             {student.email}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {student.program?.displayName?.en || student.program?.name || 'N/A'}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                student.status
-                              )}`}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {student.program?.displayName?.en || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`badge ${getStatusColor(student.status)}`}>
+                          {getStatusLabel(student.status)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {student.user ? (
+                          <span className="badge badge-success">Registered</span>
+                        ) : (
+                          <span className="badge badge-warning">Pending</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setIsViewModalOpen(true);
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="View"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(student)}
+                            className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          {student.user && (
+                            <button
+                              onClick={() => handleResetPassword(student)}
+                              className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="Reset Password"
                             >
-                              {getStatusLabel(student.status)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            {student.user ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Registered
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                Not Registered
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end space-x-2">
-                              {!student.isDeleted ? (
-                                <>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedStudent(student);
-                                      setIsViewModalOpen(true);
-                                    }}
-                                    className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                    title="View"
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleEdit(student)}
-                                    className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                                    title="Edit"
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </button>
-                                  {student.user && (
-                                    <button
-                                      onClick={() => handleResetPassword(student)}
-                                      className="p-1 text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                                      title="Reset Password"
-                                    >
-                                      <Key className="w-4 h-4" />
-                                    </button>
-                                  )}
-                                  <button
-                                    onClick={() => handleDelete(student.id)}
-                                    className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                    title="Delete"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </>
-                              ) : (
-                                <button
-                                  onClick={() => handleRestore(student.id)}
-                                  className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
-                                  title="Restore"
-                                >
-                                  <RotateCcw className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Showing {students.length} of {total} students
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No students found</p>
+                              <Key className="w-4 h-4" />
+                            </button>
+                          )}
+                          {!student.isDeleted ? (
+                            <button
+                              onClick={() => handleDelete(student.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleRestore(student.id)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              title="Restore"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="text-sm text-gray-500">
+              Showing <span className="font-medium text-gray-900">{students.length}</span> of{' '}
+              <span className="font-medium text-gray-900">{total}</span> students
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 border border-gray-200 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-gray-600" />
+              </button>
+              <span className="text-sm text-gray-600 px-2">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-2 border border-gray-200 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+          </div>
         </>
+      ) : (
+        <div className="bg-white rounded-2xl border border-gray-200/50 shadow-sm p-16 text-center">
+          <div className="flex flex-col items-center">
+            <Users className="w-16 h-16 text-gray-300 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900">No students found</h3>
+            <p className="text-sm text-gray-500 mt-1">Get started by admitting your first student.</p>
+            <Link
+              to="/admin/admission"
+              className="btn-primary mt-4 flex items-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              Admit New Student
+            </Link>
+          </div>
+        </div>
       )}
 
-      {/* View Student Modal */}
+      {/* ==========================================
+          VIEW STUDENT MODAL
+          ========================================== */}
       {isViewModalOpen && selectedStudent && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setIsViewModalOpen(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
           <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+              <div className="sticky top-0 bg-white border-b border-gray-200/50 px-6 py-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Student Details</h3>
                 <button
                   onClick={() => setIsViewModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-gray-100"
+                  className="p-1.5 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -495,40 +524,40 @@ const StudentsManagement: React.FC = () => {
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Admission ID</p>
-                    <p className="font-medium">{selectedStudent.admissionId}</p>
+                    <p className="text-xs text-gray-500">Admission ID</p>
+                    <p className="font-mono text-sm font-medium text-gray-900">{selectedStudent.admissionId}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="font-medium">{selectedStudent.fullName}</p>
+                    <p className="text-xs text-gray-500">Full Name</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.fullName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{selectedStudent.email}</p>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="font-medium">{selectedStudent.phone}</p>
+                    <p className="text-xs text-gray-500">Phone</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.phone}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Program</p>
-                    <p className="font-medium">{selectedStudent.program?.displayName?.en || 'N/A'}</p>
+                    <p className="text-xs text-gray-500">Program</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.program?.displayName?.en || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedStudent.status)}`}>
+                    <p className="text-xs text-gray-500">Status</p>
+                    <span className={`badge ${getStatusColor(selectedStudent.status)}`}>
                       {getStatusLabel(selectedStudent.status)}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Account Status</p>
-                    <p className="font-medium">
+                    <p className="text-xs text-gray-500">Account Status</p>
+                    <span className={`badge ${selectedStudent.user ? 'badge-success' : 'badge-warning'}`}>
                       {selectedStudent.user ? 'Registered' : 'Not Registered'}
-                    </p>
+                    </span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Admission Date</p>
-                    <p className="font-medium">
+                    <p className="text-xs text-gray-500">Admission Date</p>
+                    <p className="text-sm font-medium text-gray-900">
                       {new Date(selectedStudent.admissionDate).toLocaleDateString()}
                     </p>
                   </div>
@@ -539,17 +568,19 @@ const StudentsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Edit Student Modal */}
+      {/* ==========================================
+          EDIT STUDENT MODAL
+          ========================================== */}
       {isEditModalOpen && selectedStudent && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setIsEditModalOpen(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)} />
           <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full animate-scale-in">
+              <div className="sticky top-0 bg-white border-b border-gray-200/50 px-6 py-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Edit Student</h3>
                 <button
                   onClick={() => setIsEditModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-gray-100"
+                  className="p-1.5 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -559,7 +590,7 @@ const StudentsManagement: React.FC = () => {
                   <label className="label">Full Name</label>
                   <input
                     type="text"
-                    className="input-field"
+                    className="input"
                     value={editFormData.fullName || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
                   />
@@ -568,7 +599,7 @@ const StudentsManagement: React.FC = () => {
                   <label className="label">Phone</label>
                   <input
                     type="text"
-                    className="input-field"
+                    className="input"
                     value={editFormData.phone || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
                   />
@@ -576,7 +607,7 @@ const StudentsManagement: React.FC = () => {
                 <div>
                   <label className="label">Status</label>
                   <select
-                    className="input-field"
+                    className="input"
                     value={editFormData.status || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
                   >
@@ -590,7 +621,7 @@ const StudentsManagement: React.FC = () => {
                 <div>
                   <label className="label">Program</label>
                   <select
-                    className="input-field"
+                    className="input"
                     value={editFormData.programId || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, programId: e.target.value })}
                   >
@@ -602,7 +633,7 @@ const StudentsManagement: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200/50">
                   <button
                     onClick={() => setIsEditModalOpen(false)}
                     className="btn-secondary"
@@ -611,11 +642,11 @@ const StudentsManagement: React.FC = () => {
                   </button>
                   <button
                     onClick={handleUpdateSubmit}
-                    className="btn-primary flex items-center space-x-2"
+                    className="btn-primary flex items-center gap-2"
                     disabled={updateMutation.isPending}
                   >
                     {updateMutation.isPending ? (
-                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span className="spinner spinner-sm border-white/30 border-t-white" />
                     ) : (
                       <Save className="w-4 h-4" />
                     )}
@@ -628,36 +659,38 @@ const StudentsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Reset Password Modal */}
+      {/* ==========================================
+          RESET PASSWORD MODAL
+          ========================================== */}
       {isPasswordModalOpen && selectedStudent && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setIsPasswordModalOpen(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsPasswordModalOpen(false)} />
           <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+              <div className="sticky top-0 bg-white border-b border-gray-200/50 px-6 py-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Reset Password</h3>
                 <button
                   onClick={() => setIsPasswordModalOpen(false)}
-                  className="p-1 rounded-lg hover:bg-gray-100"
+                  className="p-1.5 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
               <div className="p-6 space-y-4">
                 <p className="text-sm text-gray-600">
-                  Reset password for <strong>{selectedStudent.fullName}</strong> ({selectedStudent.email})
+                  Reset password for <strong>{selectedStudent.fullName}</strong>
                 </p>
                 <div>
                   <label className="label">New Password</label>
                   <input
                     type="text"
-                    className="input-field"
+                    className="input"
                     placeholder="Enter new password (min 6 characters)"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                 </div>
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200/50">
                   <button
                     onClick={() => setIsPasswordModalOpen(false)}
                     className="btn-secondary"
@@ -666,11 +699,11 @@ const StudentsManagement: React.FC = () => {
                   </button>
                   <button
                     onClick={handleSubmitPasswordReset}
-                    className="btn-primary flex items-center space-x-2"
+                    className="btn-primary flex items-center gap-2"
                     disabled={resetPasswordMutation.isPending}
                   >
                     {resetPasswordMutation.isPending ? (
-                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span className="spinner spinner-sm border-white/30 border-t-white" />
                     ) : (
                       <Key className="w-4 h-4" />
                     )}

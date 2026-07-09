@@ -10,19 +10,19 @@ import {
   Calendar,
   ChevronRight,
   User,
+  ArrowUpRight,
 } from 'lucide-react';
 
 const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch teacher profile
+  // Fetch data
   const profileQuery: any = useQuery({
     queryKey: ['teacher-profile'],
     queryFn: () => teacherApi.getProfile(),
   });
 
-  // Fetch teacher's programs
   const programsQuery: any = useQuery({
     queryKey: ['teacher-programs'],
     queryFn: () => teacherApi.getPrograms(),
@@ -31,21 +31,16 @@ const TeacherDashboard: React.FC = () => {
   const profile = profileQuery?.data?.data?.data || null;
   const programs = programsQuery?.data?.data?.data || [];
 
-  // ❌ REMOVED: Separate API calls for each program (causing 429)
-  // We'll calculate students and mock tests from the programs data
-
-  // Calculate totals from programs
-  const totalStudents = programs.reduce((acc: number, p: any) => acc + (p.studentCount || 0), 0);
-  const totalMockTests = programs.reduce((acc: number, p: any) => acc + (p.mockTestCount || 0), 0);
-
   if (profileQuery.isLoading || programsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+        <div className="spinner spinner-lg text-primary-600" />
       </div>
     );
   }
+
+  const totalStudents = programs.reduce((acc: number, p: any) => acc + (p.studentCount || 0), 0);
+  const totalMockTests = programs.reduce((acc: number, p: any) => acc + (p.mockTestCount || 0), 0);
 
   const stats = [
     { 
@@ -53,66 +48,62 @@ const TeacherDashboard: React.FC = () => {
       value: programs.length, 
       icon: BookOpen, 
       color: 'bg-blue-500',
-      description: 'Programs assigned to you'
+      description: 'Assigned to you'
     },
     { 
       title: 'My Students', 
       value: totalStudents, 
       icon: Users, 
       color: 'bg-green-500',
-      description: 'Total students in your programs'
+      description: 'In your programs'
     },
     { 
       title: 'Mock Tests', 
       value: totalMockTests, 
       icon: FileText, 
       color: 'bg-purple-500',
-      description: 'Tests created by you'
+      description: 'Created by you'
     },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      {/* Welcome */}
+      <div className="bg-white rounded-2xl border border-gray-200/50 p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Welcome, {profile?.fullName || user?.email}!
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+              Welcome back, {profile?.fullName || user?.email?.split('@')[0]}!
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
               Employee ID: {profile?.employeeId || 'N/A'}
             </p>
-            <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <User className="w-4 h-4 mr-1" />
+            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+              <span className="flex items-center gap-1.5">
+                <User className="w-4 h-4 text-gray-400" />
                 {user?.email}
               </span>
-              <span className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" />
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
                 {new Date().toLocaleDateString()}
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
-              Teacher
-            </span>
-          </div>
+          <span className="badge badge-primary">Teacher</span>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((stat) => (
-          <div key={stat.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+          <div key={stat.title} className="stat-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">{stat.title}</p>
                 <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-xs text-gray-400 mt-1">{stat.description}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{stat.description}</p>
               </div>
-              <div className={`p-3 rounded-lg ${stat.color}`}>
+              <div className={`stat-card-icon ${stat.color}`}>
                 <stat.icon className="w-5 h-5 text-white" />
               </div>
             </div>
@@ -122,77 +113,57 @@ const TeacherDashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button
-          onClick={() => navigate('/teacher/programs')}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow hover:border-primary-300 text-left"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary-600" />
+        {[
+          { label: 'My Programs', icon: BookOpen, path: '/teacher/programs', color: 'bg-blue-100 text-blue-600' },
+          { label: 'My Students', icon: Users, path: '/teacher/students', color: 'bg-green-100 text-green-600' },
+          { label: 'Mock Tests', icon: FileText, path: '/teacher/mock-tests', color: 'bg-purple-100 text-purple-600' },
+        ].map((action) => (
+          <button
+            key={action.label}
+            onClick={() => navigate(action.path)}
+            className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-200/50 shadow-sm hover:shadow-md hover:border-primary-200 transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center`}>
+                <action.icon className="w-5 h-5" />
+              </div>
+              <span className="font-medium text-gray-900">{action.label}</span>
             </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">My Programs</h4>
-              <p className="text-sm text-gray-500">View all your assigned programs</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
-          </div>
-        </button>
-
-        <button
-          onClick={() => navigate('/teacher/students')}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow hover:border-primary-300 text-left"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">My Students</h4>
-              <p className="text-sm text-gray-500">View all students in your programs</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
-          </div>
-        </button>
-
-        <button
-          onClick={() => navigate('/teacher/mock-tests')}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow hover:border-primary-300 text-left"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Mock Tests</h4>
-              <p className="text-sm text-gray-500">View all your mock tests</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
-          </div>
-        </button>
+            <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </button>
+        ))}
       </div>
 
-      {/* Recent Mock Tests Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Mock Tests</h3>
-          <Link
-            to="/teacher/mock-tests"
-            className="text-sm text-primary-600 hover:text-primary-700"
-          >
+      {/* Recent Programs */}
+      <div className="bg-white rounded-2xl border border-gray-200/50 shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-gray-900">My Assigned Programs</h3>
+          <Link to="/teacher/programs" className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
             View All
           </Link>
         </div>
-        {totalMockTests === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No mock tests created yet</p>
-            <p className="text-sm text-gray-400">Create your first mock test</p>
+        {programs.length === 0 ? (
+          <div className="empty-state py-12">
+            <BookOpen className="w-12 h-12 text-gray-300 mb-3" />
+            <p className="text-gray-500">No programs assigned yet</p>
+            <p className="text-sm text-gray-400 mt-1">Contact admin for program assignments</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
-            <p className="px-6 py-4 text-sm text-gray-500">
-              {totalMockTests} mock tests available
-            </p>
+          <div className="divide-y divide-gray-100">
+            {programs.slice(0, 3).map((program: any) => (
+              <div key={program._id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors cursor-pointer" onClick={() => navigate(`/teacher/students?program=${program._id}`)}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">{program.displayName?.en || program.name}</h4>
+                    <p className="text-sm text-gray-500">{program.name} • {program.duration} months</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-500">{program.studentCount || 0} students</span>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
