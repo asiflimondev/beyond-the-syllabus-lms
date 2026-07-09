@@ -1,13 +1,20 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser } from '../types/index.js';
 
-// Define the interface that extends both IUser and Document
-export interface IUserDocument extends Document, IUser {
+export interface IUser {
+  email: string;
+  password: string;
+  role: 'admin' | 'teacher' | 'office' | 'student';
+  isActive: boolean;
+  lastLogin?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IUserDocument extends IUser, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-// Define the schema
 const UserSchema = new Schema<IUserDocument>(
   {
     email: {
@@ -25,7 +32,7 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false,
+      select: false, // Don't return password by default
     },
     role: {
       type: String,
@@ -57,6 +64,7 @@ const UserSchema = new Schema<IUserDocument>(
 
 // Hash password before saving
 UserSchema.pre<IUserDocument>('save', async function (next) {
+  // Only hash if password is modified (or new)
   if (!this.isModified('password')) return next();
 
   try {
@@ -68,10 +76,15 @@ UserSchema.pre<IUserDocument>('save', async function (next) {
   }
 });
 
-// Method to compare password
+// ✅ FIXED: Method to compare password
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
+  // ✅ Check if password exists
+  if (!this.password) {
+    console.error('❌ No password found for user');
+    return false;
+  }
   return bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -80,5 +93,4 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 UserSchema.index({ isActive: 1 });
 
-// Create and export the model
 export const User = mongoose.model<IUserDocument>('User', UserSchema);

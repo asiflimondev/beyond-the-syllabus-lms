@@ -32,8 +32,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   };
 
   const getMenuItems = () => {
-    const items = [];
+    const items: { path: string; icon: any; label: string }[] = [];
 
+    // ✅ Dashboard - role-specific (ONLY ONE)
     let dashboardPath = '/';
     if (user?.role === 'admin') dashboardPath = '/admin/dashboard';
     else if (user?.role === 'teacher') dashboardPath = '/teacher/dashboard';
@@ -46,6 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       label: 'Dashboard',
     });
 
+    // Admin Menu Items
     if (user?.role === 'admin') {
       items.push({
         path: '/admin/programs',
@@ -67,8 +69,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         icon: Users,
         label: 'Teachers',
       });
+      items.push({
+        path: '/admin/settings',
+        icon: Settings,
+        label: 'Settings',
+      });
     }
 
+    // Office Menu Items
     if (user?.role === 'office') {
       items.push({
         path: '/admin/programs',
@@ -85,8 +93,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         icon: UserPlus,
         label: 'Admission',
       });
+      items.push({
+        path: '/office/settings',
+        icon: Settings,
+        label: 'Settings',
+      });
     }
 
+    // ✅ Teacher Menu Items (NO Dashboard here, already added above)
     if (user?.role === 'teacher') {
       items.push({
         path: '/teacher/programs',
@@ -103,9 +117,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         icon: FileText,
         label: 'Mock Tests',
       });
+      items.push({
+        path: '/teacher/settings',
+        icon: Settings,
+        label: 'Settings',
+      });
     }
 
+    // ✅ Student Menu Items (NO Dashboard here, already added above)
     if (user?.role === 'student') {
+      // ✅ Dashboard is ALREADY added above - DON'T add it again!
+      // Only add student-specific items
       items.push({
         path: '/student/mock-tests',
         icon: FileText,
@@ -117,17 +139,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         label: 'Profile',
       });
     }
-
-    let settingsPath = '/admin/settings';
-    if (user?.role === 'student') settingsPath = '/student/profile';
-    else if (user?.role === 'teacher') settingsPath = '/teacher/settings';
-    else if (user?.role === 'office') settingsPath = '/office/settings';
-
-    items.push({
-      path: settingsPath,
-      icon: Settings,
-      label: 'Settings',
-    });
 
     return items;
   };

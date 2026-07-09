@@ -11,17 +11,23 @@ import connectDB from './config/database.js';
 
 import authRoutes from './routes/auth.routes.js';
 import admissionRoutes from './routes/admission.routes.js';
-import publicRoutes from './routes/public.routes.js';
 import programRoutes from './routes/program.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import adminTeacherRoutes from './routes/admin/teacherManagement.routes.js';
 import adminStudentRoutes from './routes/admin/studentManagement.routes.js';
+import publicRoutes from './routes/public.routes.js';
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
 
 const app: Express = express();
+
+// ============================================
+// BODY PARSER - CRITICAL!
+// ============================================
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ============================================
 // SECURITY MIDDLEWARE
@@ -55,7 +61,7 @@ app.use(
 );
 
 // ============================================
-// RATE LIMITING - FIXED
+// RATE LIMITING
 // ============================================
 const limiter = rateLimit({
   windowMs: 60 * 1000,
@@ -70,10 +76,6 @@ app.use('/api', limiter as any);
 // COMPRESSION
 // ============================================
 app.use(compression() as any);
-
-// Body parsing
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ============================================
 // HEALTH CHECK
@@ -148,6 +150,7 @@ const startServer = async (): Promise<void> => {
       console.log(`   👨‍🏫 /api/teacher   - Teacher Dashboard`);
       console.log(`   🧑‍🎓 /api/student   - Student Dashboard`);
       console.log(`   👑 /api/admin     - Admin Management`);
+      console.log(`   🌐 /api/public    - Public Routes`);
       console.log('=================================\n');
     });
   } catch (error: any) {

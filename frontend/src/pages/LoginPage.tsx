@@ -5,14 +5,20 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@context/AuthContext';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
 
-// Validation schema
+// ✅ Updated validation: accepts email OR phone
 const loginSchema = yup.object({
-  email: yup
+  identifier: yup
     .string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
+    .required('Email or phone number is required')
+    .trim()
+    .test('is-email-or-phone', 'Please enter a valid email or phone number', (value) => {
+      if (!value) return false;
+      const isEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value);
+      const isPhone = /^01[3-9]\d{8}$/.test(value);
+      return isEmail || isPhone;
+    }),
   password: yup
     .string()
     .min(6, 'Password must be at least 6 characters')
@@ -22,38 +28,52 @@ const loginSchema = yup.object({
 type LoginFormData = yup.InferType<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
+  const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
   });
 
-  // ✅ Wait for authentication state to confirm before redirecting
+  const identifierValue = watch('identifier');
+
+  // Detect identifier type for icon display
   useEffect(() => {
-    if (isAuthenticated && redirectAfterAuth) {
+    if (!identifierValue) {
+      setIdentifierType(null);
+      return;
+    }
+    const isEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(identifierValue);
+    const isPhone = /^01[3-9]\d{8}$/.test(identifierValue);
+    if (isEmail) setIdentifierType('email');
+    else if (isPhone) setIdentifierType('phone');
+    else setIdentifierType(null);
+  }, [identifierValue]);
+
+  useEffect(() => {
+    if (redirectAfterAuth) {
       navigate(redirectAfterAuth);
       setRedirectAfterAuth(null);
     }
-  }, [isAuthenticated, redirectAfterAuth, navigate]);
+  }, [redirectAfterAuth, navigate]);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      // Login and get the user object directly
-      const userData = await login(data.email, data.password);
+      const user = await login(data.identifier, data.password);
       
       toast.success('Login successful!');
       
-      // ✅ Determine redirect path based on role
-      const role = userData?.role || 'student';
+      const role = user?.role || 'student';
       let redirectPath = '/';
       
       switch (role) {
@@ -73,12 +93,11 @@ const LoginPage: React.FC = () => {
           redirectPath = '/';
       }
       
-      // ✅ Store the redirect path - navigation will happen in useEffect
       setRedirectAfterAuth(redirectPath);
       
     } catch (error: any) {
       console.error('Login error:', error);
-      const message = error.response?.data?.message || 'Failed to login. Please try again.';
+      const message = error.response?.data?.message || 'Invalid credentials. Please try again.';
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -115,25 +134,31 @@ const LoginPage: React.FC = () => {
         {/* Login Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            {/* Email Field */}
+            {/* ✅ Single field: Email or Phone Number */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
+              <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
+                Email or Phone Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  {identifierType === 'email' ? (
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  ) : identifierType === 'phone' ? (
+                    <Phone className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  )}
                 </div>
                 <input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className={`pl-10 w-full px-3 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
-                  {...register('email')}
+                  id="identifier"
+                  type="text"
+                  placeholder="Enter your email or phone number"
+                  className={`pl-10 w-full px-3 py-3 border ${errors.identifier ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors`}
+                  {...register('identifier')}
                 />
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              {errors.identifier && (
+                <p className="mt-1 text-sm text-red-600">{errors.identifier.message}</p>
               )}
             </div>
 

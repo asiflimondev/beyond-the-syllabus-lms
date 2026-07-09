@@ -1,6 +1,5 @@
 import { body, ValidationChain } from 'express-validator';
 
-// Register validation
 export const registerValidation: ValidationChain[] = [
   body('email')
     .isEmail()
@@ -24,20 +23,23 @@ export const registerValidation: ValidationChain[] = [
     .withMessage('Invalid role provided'),
 ];
 
-// Login validation
+// ✅ Updated: Supports both 'email' and 'identifier'
 export const loginValidation: ValidationChain[] = [
-  body('email')
-    .isEmail()
-    .withMessage('Please provide a valid email address')
-    .normalizeEmail()
+  body('identifier')
+    .optional()
+    .notEmpty()
+    .withMessage('Email or phone number is required')
     .trim(),
-  
+  body('email')
+    .optional()
+    .notEmpty()
+    .withMessage('Email or phone number is required')
+    .trim(),
   body('password')
     .notEmpty()
     .withMessage('Password is required'),
 ];
 
-// Refresh token validation
 export const refreshTokenValidation: ValidationChain[] = [
   body('refreshToken')
     .notEmpty()

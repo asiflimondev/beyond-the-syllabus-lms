@@ -3,7 +3,7 @@ import { User, AuthState } from '@/types';
 import { authApi } from '@api/auth.api';
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<User>;
+  login: (identifier: string, password: string) => Promise<User>;
   register: (email: string, password: string, confirmPassword: string, role?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<User | null>;
@@ -61,9 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string): Promise<User> => {
+  const login = async (identifier: string, password: string): Promise<User> => {
     try {
-      const response = await authApi.login({ email, password });
+      console.log('🔐 Login attempt with identifier:', identifier);
+      
+      const response = await authApi.login({ identifier, password });
+      
+      console.log('📦 Login response:', response);
       
       if (response.data.success && response.data.data) {
         const { accessToken, refreshToken, user: userData } = response.data.data;
@@ -81,19 +85,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           profile: userData.profile || null,
         };
         
-        // ✅ Update state atomically - this will trigger re-render and useEffect in LoginPage
         setState({
           user,
           isAuthenticated: true,
           isLoading: false,
         });
         
+        console.log('✅ Login successful for:', user.email);
         return user;
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
