@@ -43,6 +43,16 @@ const StudentDashboard: React.FC = () => {
     );
   }
 
+  // ✅ FIXED: Safely get program name
+  const getProgramName = (program: any): string => {
+    if (!program) return 'N/A';
+    if (typeof program === 'string') return program;
+    if (typeof program === 'object') {
+      return program.displayName?.en || program.name || 'N/A';
+    }
+    return 'N/A';
+  };
+
   const program = profile?.programId;
 
   return (
@@ -151,8 +161,9 @@ const StudentDashboard: React.FC = () => {
           <div className="p-6">
             <div className="flex items-start justify-between">
               <div>
+                {/* ✅ FIXED: Safe rendering */}
                 <h4 className="text-xl font-bold text-gray-900">
-                  {program.displayName?.en || program.name}
+                  {getProgramName(program)}
                 </h4>
                 <p className="text-sm text-gray-500 mt-1">
                   {program.name} • {program.duration} months

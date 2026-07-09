@@ -9,9 +9,8 @@ import {
   FileText,
   Calendar,
   ChevronRight,
-  User
+  User,
 } from 'lucide-react';
-
 
 const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -29,54 +28,24 @@ const TeacherDashboard: React.FC = () => {
     queryFn: () => teacherApi.getPrograms(),
   });
 
-  // Fetch all students for all programs
-  const studentsQuery: any = useQuery({
-    queryKey: ['teacher-all-students'],
-    queryFn: async () => {
-      // Get all programs first
-      const programsRes = await teacherApi.getPrograms();
-      const programs = programsRes?.data?.data || [];
-      
-      // Fetch students for each program
-      let allStudents: any[] = [];
-      for (const program of programs) {
-        const studentsRes = await teacherApi.getStudentsByProgram(program._id, { limit: 100 });
-        const students = studentsRes?.data?.data?.students || [];
-        allStudents = [...allStudents, ...students.map((s: any) => ({ ...s, programName: program.displayName?.en || program.name }))];
-      }
-      
-      return { data: { data: { students: allStudents, total: allStudents.length } } };
-    },
-  });
-
-  // Fetch all mock tests
-  const mockTestsQuery: any = useQuery({
-    queryKey: ['teacher-all-mocktests'],
-    queryFn: async () => {
-      const programsRes = await teacherApi.getPrograms();
-      const programs = programsRes?.data?.data || [];
-      
-      let allMockTests: any[] = [];
-      for (const program of programs) {
-        const mockTestsRes = await teacherApi.getMockTestsByProgram(program._id);
-        const mockTests = mockTestsRes?.data?.data || [];
-        allMockTests = [...allMockTests, ...mockTests.map((m: any) => ({ ...m, programName: program.displayName?.en || program.name }))];
-      }
-      
-      return { data: { data: allMockTests } };
-    },
-  });
-
   const profile = profileQuery?.data?.data?.data || null;
   const programs = programsQuery?.data?.data?.data || [];
-  const students = studentsQuery?.data?.data?.data?.students || [];
-  const mockTests = mockTestsQuery?.data?.data?.data || [];
 
-  const isLoading = profileQuery.isLoading || programsQuery.isLoading;
+  // ❌ REMOVED: Separate API calls for each program (causing 429)
+  // We'll calculate students and mock tests from the programs data
 
-  // Stats
-  const totalStudents = students.length;
-  const totalMockTests = mockTests.length;
+  // Calculate totals from programs
+  const totalStudents = programs.reduce((acc: number, p: any) => acc + (p.studentCount || 0), 0);
+  const totalMockTests = programs.reduce((acc: number, p: any) => acc + (p.mockTestCount || 0), 0);
+
+  if (profileQuery.isLoading || programsQuery.isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+      </div>
+    );
+  }
 
   const stats = [
     { 
@@ -101,15 +70,6 @@ const TeacherDashboard: React.FC = () => {
       description: 'Tests created by you'
     },
   ];
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-        <span className="ml-3 text-gray-600">Loading dashboard...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -142,7 +102,7 @@ const TeacherDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards - Now with Real Data */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((stat) => (
           <div key={stat.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
@@ -222,7 +182,7 @@ const TeacherDashboard: React.FC = () => {
             View All
           </Link>
         </div>
-        {mockTests.length === 0 ? (
+        {totalMockTests === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No mock tests created yet</p>
@@ -230,26 +190,9 @@ const TeacherDashboard: React.FC = () => {
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {mockTests.slice(0, 3).map((test: any) => (
-              <div key={test._id} className="px-6 py-4 hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/teacher/mark-entry/${test._id}`)}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      {test.title || `Mock Test ${test.testNumber}`}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      {test.programName || 'Unknown Program'} • Test #{test.testNumber}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-500">
-                      {new Date(test.testDate).toLocaleDateString()}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            ))}
+            <p className="px-6 py-4 text-sm text-gray-500">
+              {totalMockTests} mock tests available
+            </p>
           </div>
         )}
       </div>

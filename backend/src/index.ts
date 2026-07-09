@@ -11,6 +11,7 @@ import connectDB from './config/database.js';
 
 import authRoutes from './routes/auth.routes.js';
 import admissionRoutes from './routes/admission.routes.js';
+import publicRoutes from './routes/public.routes.js';
 import programRoutes from './routes/program.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import studentRoutes from './routes/student.routes.js';
@@ -109,6 +110,9 @@ console.log('✅ Admin Teacher routes mounted at /api/admin/teachers');
 
 app.use('/api/admin/students', adminStudentRoutes);
 console.log('✅ Admin Student routes mounted at /api/admin/students');
+
+app.use('/api/public', publicRoutes);
+console.log('✅ Public routes mounted at /api/public');
 
 // ============================================
 // ERROR HANDLING

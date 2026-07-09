@@ -68,6 +68,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     if (role === 'office') return <Navigate to="/office/dashboard" />;
     if (role === 'teacher') return <Navigate to="/teacher/dashboard" />;
     if (role === 'student') return <Navigate to="/student/dashboard" />;
+    return <Navigate to="/" />;
   }
   
   return <Layout>{children}</Layout>;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -22,10 +22,11 @@ const loginSchema = yup.object({
 type LoginFormData = yup.InferType<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
-  const { login, user } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [redirectAfterAuth, setRedirectAfterAuth] = useState<string | null>(null);
 
   const {
     register,
@@ -35,32 +36,46 @@ const LoginPage: React.FC = () => {
     resolver: yupResolver(loginSchema),
   });
 
+  // ✅ Wait for authentication state to confirm before redirecting
+  useEffect(() => {
+    if (isAuthenticated && redirectAfterAuth) {
+      navigate(redirectAfterAuth);
+      setRedirectAfterAuth(null);
+    }
+  }, [isAuthenticated, redirectAfterAuth, navigate]);
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.password);
+      // Login and get the user object directly
+      const userData = await login(data.email, data.password);
+      
       toast.success('Login successful!');
       
-      // Wait a moment, then redirect based on role
-      setTimeout(() => {
-        const role = user?.role;
-        switch (role) {
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-          case 'teacher':
-            navigate('/teacher/dashboard');
-            break;
-          case 'office':
-            navigate('/office/dashboard');
-            break;
-          case 'student':
-            navigate('/student/dashboard');
-            break;
-          default:
-            navigate('/');
-        }
-      }, 500);
+      // ✅ Determine redirect path based on role
+      const role = userData?.role || 'student';
+      let redirectPath = '/';
+      
+      switch (role) {
+        case 'admin':
+          redirectPath = '/admin/dashboard';
+          break;
+        case 'teacher':
+          redirectPath = '/teacher/dashboard';
+          break;
+        case 'office':
+          redirectPath = '/office/dashboard';
+          break;
+        case 'student':
+          redirectPath = '/student/dashboard';
+          break;
+        default:
+          redirectPath = '/';
+      }
+      
+      // ✅ Store the redirect path - navigation will happen in useEffect
+      setRedirectAfterAuth(redirectPath);
+      
     } catch (error: any) {
       console.error('Login error:', error);
       const message = error.response?.data?.message || 'Failed to login. Please try again.';

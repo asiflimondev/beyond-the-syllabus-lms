@@ -27,15 +27,9 @@ const AdmissionPage: React.FC = () => {
     const responseData = recentData.data;
     if (!responseData) return [];
     
-    // Fix: Use optional chaining and proper type checking
     if (responseData.data?.students && Array.isArray(responseData.data.students)) {
       return responseData.data.students;
     }
-    
-    // Remove the problematic line
-    // if (responseData.students && Array.isArray(responseData.students)) {
-    //   return responseData.students;
-    // }
     
     if (Array.isArray(responseData)) {
       return responseData;
@@ -53,11 +47,6 @@ const AdmissionPage: React.FC = () => {
       return responseData.data.pagination.total;
     }
     
-    // Remove the problematic line
-    // if (responseData.pagination?.total !== undefined) {
-    //   return responseData.pagination.total;
-    // }
-    
     if (responseData.data?.students && Array.isArray(responseData.data.students)) {
       return responseData.data.students.length;
     }
@@ -71,6 +60,16 @@ const AdmissionPage: React.FC = () => {
   const pendingStudents = recentAdmissions.filter(
     (s: Student) => s.status === 'pending_registration'
   ).length;
+
+  // Helper function to safely get program name
+  const getProgramName = (program: any): string => {
+    if (!program) return 'N/A';
+    if (typeof program === 'string') return program;
+    if (typeof program === 'object') {
+      return program.displayName?.en || program.name || 'N/A';
+    }
+    return 'N/A';
+  };
 
   const handleAdmissionSuccess = () => {
     refetch();
@@ -208,8 +207,9 @@ const AdmissionPage: React.FC = () => {
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {student.fullName}
                     </td>
+                    {/* ✅ FIXED: Program column - safe object rendering */}
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {student.programId || 'N/A'}
+                      {getProgramName(student.programId)}
                     </td>
                     <td className="px-4 py-3">
                       <span

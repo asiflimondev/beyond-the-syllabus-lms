@@ -3,10 +3,10 @@ import { User, AuthState } from '@/types';
 import { authApi } from '@api/auth.api';
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (email: string, password: string, confirmPassword: string, role?: string) => Promise<void>;
   logout: () => void;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = async (): Promise<User | null> => {
     try {
       const response = await authApi.getCurrentUser();
       if (response.data.success && response.data.data) {
@@ -45,20 +45,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isAuthenticated: true,
           isLoading: false,
         });
+        return user;
       } else {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setState({ user: null, isAuthenticated: false, isLoading: false });
+        return null;
       }
     } catch (error) {
       console.error('Refresh user error:', error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       setState({ user: null, isAuthenticated: false, isLoading: false });
+      return null;
     }
   };
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, password: string): Promise<User> => {
     try {
       const response = await authApi.login({ email, password });
       
@@ -78,11 +81,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           profile: userData.profile || null,
         };
         
+        // ✅ Update state atomically - this will trigger re-render and useEffect in LoginPage
         setState({
           user,
           isAuthenticated: true,
           isLoading: false,
         });
+        
+        return user;
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
@@ -145,16 +151,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const value: AuthContextType = {
+    ...state,
+    login,
+    register,
+    logout,
+    refreshUser,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        login,
-        register,
-        logout,
-        refreshUser,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
