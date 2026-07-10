@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PublicLayout from '@components/layout/PublicLayout';
+import AnimatedSection from '@components/AnimatedSection';
 import {
   Search,
   ChevronDown,
@@ -27,7 +29,6 @@ const FAQPublicPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // FAQ Data
   const faqData: FAQItem[] = [
     // General FAQs
     {
@@ -48,7 +49,6 @@ const FAQPublicPage: React.FC = () => {
       answer: 'We are located in Dhaka, Bangladesh. Our center is easily accessible and equipped with modern facilities including smart classrooms, a library, and a student lounge.',
       category: 'general'
     },
-
     // Admission FAQs
     {
       id: 'a1',
@@ -68,7 +68,6 @@ const FAQPublicPage: React.FC = () => {
       answer: 'Yes, all new students take a placement test to ensure they are placed in the appropriate level. This helps us provide the most effective learning experience tailored to your needs.',
       category: 'admission'
     },
-
     // Programs FAQs
     {
       id: 'p1',
@@ -94,7 +93,6 @@ const FAQPublicPage: React.FC = () => {
       answer: 'Yes, we offer both in-person and online classes. Our online classes use interactive platforms that allow students to participate in real-time with their teachers and classmates.',
       category: 'programs'
     },
-
     // Exam FAQs
     {
       id: 'e1',
@@ -114,7 +112,6 @@ const FAQPublicPage: React.FC = () => {
       answer: 'Cambridge English exams use a standardized scoring system. Scores are reported as Cambridge English Scale scores, which align with the Common European Framework of Reference for Languages (CEFR).',
       category: 'exam'
     },
-
     // Fees FAQs
     {
       id: 'f1',
@@ -136,7 +133,6 @@ const FAQPublicPage: React.FC = () => {
     }
   ];
 
-  // Category configuration
   const categories = [
     { id: 'all', label: 'All', icon: HelpCircle },
     { id: 'general', label: 'General', icon: BookOpen },
@@ -146,7 +142,6 @@ const FAQPublicPage: React.FC = () => {
     { id: 'fees', label: 'Fees', icon: DollarSign },
   ];
 
-  // Filter FAQs based on search and category
   const filteredFAQs = faqData.filter((faq) => {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
@@ -154,12 +149,10 @@ const FAQPublicPage: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Toggle expand/collapse
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  // Get category icon
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'general': return <BookOpen className="w-4 h-4 text-primary-600" />;
@@ -171,7 +164,6 @@ const FAQPublicPage: React.FC = () => {
     }
   };
 
-  // Get category badge color
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
       general: 'bg-blue-100 text-blue-800',
@@ -194,7 +186,6 @@ const FAQPublicPage: React.FC = () => {
     return labels[category] || category;
   };
 
-  // Get count for each category
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') return faqData.length;
     return faqData.filter(faq => faq.category === categoryId).length;
@@ -202,23 +193,24 @@ const FAQPublicPage: React.FC = () => {
 
   return (
     <PublicLayout>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-            <p className="text-lg text-primary-100 max-w-3xl mx-auto">
-              Find answers to common questions about our programs, admission process, exams, and more.
-            </p>
+      {/* Hero */}
+      <AnimatedSection>
+        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
+              <p className="text-lg text-primary-100 max-w-3xl mx-auto">
+                Find answers to common questions about our programs, admission process, exams, and more.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
-      {/* Search and Filter Section */}
+      {/* Search and Filter */}
       <section className="py-8 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search Bar */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -226,17 +218,15 @@ const FAQPublicPage: React.FC = () => {
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
-
-            {/* Category Filter - Desktop */}
             <div className="hidden md:flex flex-wrap gap-2">
               {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                     selectedCategory === category.id
                       ? 'bg-primary-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -246,13 +236,11 @@ const FAQPublicPage: React.FC = () => {
                 </button>
               ))}
             </div>
-
-            {/* Category Filter - Mobile Dropdown */}
             <div className="md:hidden">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -268,19 +256,15 @@ const FAQPublicPage: React.FC = () => {
       {/* FAQ List */}
       <section className="py-12 bg-gray-50 min-h-[400px]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Results Count */}
           <div className="text-sm text-gray-500 mb-6">
             {filteredFAQs.length} {filteredFAQs.length === 1 ? 'question' : 'questions'} found
           </div>
 
-          {/* FAQ Items */}
           {filteredFAQs.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
               <HelpCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-700">No Questions Found</h3>
-              <p className="text-gray-500 mt-2">
-                Try adjusting your search or filter criteria.
-              </p>
+              <p className="text-gray-500 mt-2">Try adjusting your search or filter criteria.</p>
               <button
                 onClick={() => {
                   setSearchTerm('');
@@ -293,49 +277,46 @@ const FAQPublicPage: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredFAQs.map((faq) => (
-                <div
-                  key={faq.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md"
-                >
-                  {/* Question */}
-                  <button
-                    onClick={() => toggleExpand(faq.id)}
-                    className="w-full px-6 py-4 flex items-start justify-between text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-1">
-                        {getCategoryIcon(faq.category)}
+              {filteredFAQs.map((faq, index) => (
+                <AnimatedSection key={faq.id} delay={index * 50}>
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md">
+                    <button
+                      onClick={() => toggleExpand(faq.id)}
+                      className="w-full px-6 py-4 flex items-start justify-between text-left hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 mt-1">
+                          {getCategoryIcon(faq.category)}
+                        </div>
+                        <div>
+                          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${getCategoryBadge(faq.category)} mb-1`}>
+                            {getCategoryLabel(faq.category)}
+                          </span>
+                          <h3 className="text-base font-medium text-gray-900">
+                            {faq.question}
+                          </h3>
+                        </div>
                       </div>
-                      <div>
-                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${getCategoryBadge(faq.category)} mb-1`}>
-                          {getCategoryLabel(faq.category)}
-                        </span>
-                        <h3 className="text-base font-medium text-gray-900">
-                          {faq.question}
-                        </h3>
+                      <div className="flex-shrink-0 ml-4">
+                        {expandedId === faq.id ? (
+                          <ChevronUp className="w-5 h-5 text-primary-600" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                        )}
                       </div>
-                    </div>
-                    <div className="flex-shrink-0 ml-4">
-                      {expandedId === faq.id ? (
-                        <ChevronUp className="w-5 h-5 text-primary-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                      )}
-                    </div>
-                  </button>
+                    </button>
 
-                  {/* Answer */}
-                  {expandedId === faq.id && (
-                    <div className="px-6 pb-4 pt-0 border-t border-gray-100">
-                      <div className="pt-3 pl-9">
-                        <p className="text-gray-600 leading-relaxed">
-                          {faq.answer}
-                        </p>
+                    {expandedId === faq.id && (
+                      <div className="px-6 pb-4 pt-0 border-t border-gray-100">
+                        <div className="pt-3 pl-9">
+                          <p className="text-gray-600 leading-relaxed">
+                            {faq.answer}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </AnimatedSection>
               ))}
             </div>
           )}
@@ -345,35 +326,37 @@ const FAQPublicPage: React.FC = () => {
       {/* Still Have Questions? */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Still Have Questions?</h2>
-          <p className="text-gray-600 mb-8">
-            We're here to help! Contact us and we'll get back to you as soon as possible.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Phone className="w-8 h-8 text-primary-600 mb-2" />
-              <h4 className="font-medium text-gray-900">Call Us</h4>
-              <p className="text-sm text-gray-600">+880 1712 345 678</p>
+          <AnimatedSection>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Still Have Questions?</h2>
+            <p className="text-gray-600 mb-8">
+              We're here to help! Contact us and we'll get back to you as soon as possible.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
+                <Phone className="w-8 h-8 text-primary-600 mb-2" />
+                <h4 className="font-medium text-gray-900">Call Us</h4>
+                <p className="text-sm text-gray-600">+880 1712 345 678</p>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
+                <Mail className="w-8 h-8 text-primary-600 mb-2" />
+                <h4 className="font-medium text-gray-900">Email Us</h4>
+                <p className="text-sm text-gray-600">info@beyondsyllabus.com</p>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
+                <MapPin className="w-8 h-8 text-primary-600 mb-2" />
+                <h4 className="font-medium text-gray-900">Visit Us</h4>
+                <p className="text-sm text-gray-600">Dhaka, Bangladesh</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Mail className="w-8 h-8 text-primary-600 mb-2" />
-              <h4 className="font-medium text-gray-900">Email Us</h4>
-              <p className="text-sm text-gray-600">info@beyondsyllabus.com</p>
+            <div className="mt-8">
+              <Link
+                to="/contact"
+                className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
+              >
+                Contact Us
+              </Link>
             </div>
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <MapPin className="w-8 h-8 text-primary-600 mb-2" />
-              <h4 className="font-medium text-gray-900">Visit Us</h4>
-              <p className="text-sm text-gray-600">Dhaka, Bangladesh</p>
-            </div>
-          </div>
-          <div className="mt-8">
-            <a
-              href="/contact"
-              className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
-            >
-              Contact Us
-            </a>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
     </PublicLayout>
