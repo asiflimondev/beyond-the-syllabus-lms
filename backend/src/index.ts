@@ -40,6 +40,8 @@ app.use(helmet());
 const allowedOrigins = [
   'http://localhost:5173',
   'https://beyondthesyllabus.vercel.app',
+  'https://www.beyondthesyllabus.org',
+  'https://beyondthesyllabus.org',
   'https://beyond-the-syllabus-lms-qwox.onrender.com'
 ];
 
