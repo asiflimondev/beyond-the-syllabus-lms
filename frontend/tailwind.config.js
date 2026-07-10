@@ -8,16 +8,17 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a5f',
+          50: '#e8edf5',
+          100: '#d1dbea',
+          200: '#a3b7d5',
+          300: '#7593c0',
+          400: '#476fab',
+          500: '#1a4b96',
+          600: '#152238',  // ✅ YOUR COLOR
+          700: '#111c2d',
+          800: '#0d1622',
+          900: '#080f17',
+          950: '#04080c',
         },
         gray: {
           50: '#f8fafc',
@@ -49,11 +50,10 @@ export default {
         '3xl': '1.5rem',
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.6s ease-out forwards',
+        'slide-up': 'slideUp 0.6s ease-out forwards',
+        'slide-down': 'slideDown 0.3s ease-out forwards',
+        'scale-in': 'scaleIn 0.3s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
@@ -61,7 +61,7 @@ export default {
           to: { opacity: '1' },
         },
         slideUp: {
-          from: { opacity: '0', transform: 'translateY(20px)' },
+          from: { opacity: '0', transform: 'translateY(40px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         slideDown: {

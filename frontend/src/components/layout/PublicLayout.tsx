@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { GraduationCap, Menu, X } from 'lucide-react';
 import btsLogo from '/bts-logo.png';
 import cambridgeLogo from '/cambridge-logo.png';
 
@@ -44,15 +44,13 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* ✅ Increased height from h-16 to h-20 */}
           <div className="flex items-center justify-between h-20">
             {/* Left: BTS Logo + Brand Name */}
             <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
-              {/* ✅ Bigger logo */}
               <img 
                 src={btsLogo} 
                 alt="BTS Logo" 
-                className="w-12 h-12 object-contain" 
+                className="w-12 h-12 object-contain"
               />
               <span className="text-xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
                 Beyond the Syllabus
@@ -76,18 +74,17 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
               ))}
             </nav>
 
-            {/* Right: Cambridge Logo + Login Button */}
+            {/* Right: Cambridge Logo + Login */}
             <div className="flex items-center gap-4 flex-shrink-0">
-              {/* ✅ Bigger Cambridge Logo */}
+              {/* Cambridge Logo */}
               <div className="hidden sm:flex items-center">
                 <img 
                   src={cambridgeLogo} 
                   alt="Cambridge English" 
-                  className="h-10 w-auto object-contain" 
+                  className="h-10 w-auto object-contain"
                 />
               </div>
 
-              {/* ✅ Login Button - Separate from Cambridge Logo */}
               <Link
                 to="/login"
                 className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all duration-200 shadow-sm shadow-primary-500/20 hover:shadow-primary-500/30"
@@ -95,7 +92,6 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 Login
               </Link>
 
-              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
@@ -138,7 +134,6 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         )}
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 pt-20">
         {children}
       </main>
@@ -148,11 +143,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2.5 mb-4">
-                <img 
-                  src={btsLogo} 
-                  alt="BTS Logo" 
-                  className="w-10 h-10 object-contain"
-                />
+                <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-white" />
+                </div>
                 <span className="text-lg font-bold tracking-tight">
                   Beyond the Syllabus
                 </span>
