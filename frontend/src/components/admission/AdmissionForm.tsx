@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-hot-toast';
-import { X, UserPlus, Sparkles } from 'lucide-react';
+import { X, UserPlus, Sparkles, User, Phone, Mail, Calendar, MapPin, School, Users, Hash, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { programsApi, Program } from '@api/programs.api';
 import { admissionApi } from '@api/admission.api';
@@ -135,307 +135,418 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
 
   return createPortal(
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+      {/* Backdrop with blur */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <UserPlus className="w-5 h-5 text-primary-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Admit New Student</h3>
+        <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+          
+          {/* Header - Fixed with proper z-index and background */}
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-5 flex items-center justify-between rounded-t-2xl flex-shrink-0">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <UserPlus className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Admit New Student</h3>
+                <p className="text-sm text-primary-100">Register a new student for a program</p>
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105 flex-shrink-0"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Admission Mode Banner */}
-          <div className="bg-blue-50 border-b border-blue-200 px-6 py-3 flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-sm text-blue-700">
-              <Sparkles className="w-4 h-4" />
-              <span>
-                Admission Mode: <strong className="uppercase">{admissionMode}</strong>
-                {admissionMode === 'automatic' && ' - IDs will be auto-generated'}
-                {admissionMode === 'manual' && ' - You need to enter Admission ID manually'}
-              </span>
-            </div>
-          </div>
-
-          {/* Show error if programs fail to load */}
-          {programsError && (
-            <div className="mx-6 mt-4 bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-              Failed to load programs: {(programsError as any)?.message || 'Unknown error'}
-            </div>
-          )}
-
-          {/* Loading State for Programs */}
-          {programsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-              <span className="ml-3 text-gray-600">Loading programs...</span>
-            </div>
-          ) : (
-            /* Form */
-            <form onSubmit={handleSubmit(handleSubmitForm)} className="p-6 space-y-6">
-              {/* Personal Information Section */}
-              <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-4">Personal Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <label htmlFor="fullName" className="label">
-                      Full Name *
-                    </label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      placeholder="Enter full name"
-                      className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
-                      {...register('fullName')}
-                    />
-                    {errors.fullName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="label">
-                      Phone Number *
-                    </label>
-                    <input
-                      id="phone"
-                      type="text"
-                      placeholder="017XXXXXXXX"
-                      className={`input-field ${errors.phone ? 'border-red-500' : ''}`}
-                      {...register('phone')}
-                    />
-                    {errors.phone && (
-                      <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="parentPhone" className="label">
-                      Parent Phone
-                    </label>
-                    <input
-                      id="parentPhone"
-                      type="text"
-                      placeholder="017XXXXXXXX"
-                      className="input-field"
-                      {...register('parentPhone')}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label htmlFor="email" className="label">
-                      Email Address *
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="student@example.com"
-                      className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-                      {...register('email')}
-                    />
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="fatherName" className="label">
-                      Father's Name
-                    </label>
-                    <input
-                      id="fatherName"
-                      type="text"
-                      placeholder="Enter father's name"
-                      className="input-field"
-                      {...register('fatherName')}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="motherName" className="label">
-                      Mother's Name
-                    </label>
-                    <input
-                      id="motherName"
-                      type="text"
-                      placeholder="Enter mother's name"
-                      className="input-field"
-                      {...register('motherName')}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="dateOfBirth" className="label">
-                      Date of Birth
-                    </label>
-                    <input
-                      id="dateOfBirth"
-                      type="date"
-                      className="input-field"
-                      {...register('dateOfBirth')}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="gender" className="label">
-                      Gender
-                    </label>
-                    <select
-                      id="gender"
-                      className="input-field"
-                      {...register('gender')}
-                    >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="bloodGroup" className="label">
-                      Blood Group
-                    </label>
-                    <select
-                      id="bloodGroup"
-                      className="input-field"
-                      {...register('bloodGroup')}
-                    >
-                      <option value="">Select</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label htmlFor="address" className="label">
-                      Address
-                    </label>
-                    <input
-                      id="address"
-                      type="text"
-                      placeholder="Enter address"
-                      className="input-field"
-                      {...register('address')}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label htmlFor="schoolCollege" className="label">
-                      School/College
-                    </label>
-                    <input
-                      id="schoolCollege"
-                      type="text"
-                      placeholder="Enter school or college name"
-                      className="input-field"
-                      {...register('schoolCollege')}
-                    />
-                  </div>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 pb-6">
+            {/* Admission Mode Banner - Now scrollable (removed sticky) */}
+            <div className={`mt-4 rounded-xl p-4 flex items-center justify-between ${
+              admissionMode === 'automatic' 
+                ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200' 
+                : 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200'
+            }`}>
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-lg ${
+                  admissionMode === 'automatic' ? 'bg-blue-100' : 'bg-amber-100'
+                }`}>
+                  <Sparkles className={`w-4 h-4 ${
+                    admissionMode === 'automatic' ? 'text-blue-600' : 'text-amber-600'
+                  }`} />
+                </div>
+                <div>
+                  <p className={`text-sm font-medium ${
+                    admissionMode === 'automatic' ? 'text-blue-800' : 'text-amber-800'
+                  }`}>
+                    Admission Mode: <strong className="uppercase">{admissionMode}</strong>
+                  </p>
+                  <p className={`text-xs ${
+                    admissionMode === 'automatic' ? 'text-blue-600' : 'text-amber-600'
+                  }`}>
+                    {admissionMode === 'automatic' 
+                      ? 'IDs will be auto-generated for each student' 
+                      : 'You need to enter Admission ID manually'}
+                  </p>
                 </div>
               </div>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                admissionMode === 'automatic' 
+                  ? 'bg-blue-200 text-blue-800' 
+                  : 'bg-amber-200 text-amber-800'
+              }`}>
+                {admissionMode === 'automatic' ? 'Auto' : 'Manual'}
+              </div>
+            </div>
 
-              {/* Program & Admission Section */}
-              <div className="border-t border-gray-200 pt-6">
-                <h4 className="text-sm font-semibold text-gray-700 mb-4">Program & Admission</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="programId" className="label">
-                      Program *
-                    </label>
-                    <select
-                      id="programId"
-                      className={`input-field ${errors.programId ? 'border-red-500' : ''}`}
-                      {...register('programId')}
-                    >
-                      <option value="">Select a program</option>
-                      {programs && programs.length > 0 ? (
-                        programs.map((program: Program) => (
-                          <option key={program.id} value={program.id}>
-                            {program.displayName?.en || program.name} ({program.name})
-                          </option>
-                        ))
-                      ) : (
-                        <option value="" disabled>No active programs available</option>
+            {/* Show error if programs fail to load */}
+            {programsError && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-800">Failed to load programs</p>
+                  <p className="text-sm text-red-600">{(programsError as any)?.message || 'Unknown error'}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Loading State for Programs */}
+            {programsLoading ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+                <span className="mt-4 text-gray-600 font-medium">Loading programs...</span>
+              </div>
+            ) : (
+              /* Form - Enhanced */
+              <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-8 mt-4">
+                {/* Personal Information Section */}
+                <div>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-700">Personal Information</h4>
+                    <span className="text-xs text-gray-400 ml-auto">All fields with * are required</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="md:col-span-2">
+                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <User className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="fullName"
+                          type="text"
+                          placeholder="Enter full name"
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${errors.fullName ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none`}
+                          {...register('fullName')}
+                        />
+                      </div>
+                      {errors.fullName && (
+                        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {errors.fullName.message}
+                        </p>
                       )}
-                    </select>
-                    {errors.programId && (
-                      <p className="mt-1 text-sm text-red-600">{errors.programId.message}</p>
-                    )}
-                    {programs && programs.length === 0 && !programsLoading && (
-                      <p className="mt-1 text-sm text-amber-600">
-                        No active programs found. Please create a program first.
-                      </p>
-                    )}
-                  </div>
+                    </div>
 
-                  <div>
-                    <label htmlFor="admissionId" className="label">
-                      {admissionMode === 'automatic' ? 'Admission ID (Auto-generated)' : 'Admission ID *'}
-                    </label>
-                    <input
-                      id="admissionId"
-                      type="text"
-                      placeholder={admissionMode === 'automatic' ? 'Will be auto-generated' : 'Enter Admission ID'}
-                      className={`input-field ${errors.admissionId ? 'border-red-500' : ''}`}
-                      {...register('admissionId')}
-                      disabled={admissionMode === 'automatic'}
-                      readOnly={admissionMode === 'automatic'}
-                    />
-                    {errors.admissionId && (
-                      <p className="mt-1 text-sm text-red-600">{errors.admissionId.message}</p>
-                    )}
-                    {admissionMode === 'automatic' && (
-                      <p className="mt-1 text-xs text-gray-500">ID will be generated automatically when you submit</p>
-                    )}
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Phone className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="phone"
+                          type="text"
+                          placeholder="017XXXXXXXX"
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${errors.phone ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none`}
+                          {...register('phone')}
+                        />
+                      </div>
+                      {errors.phone && (
+                        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {errors.phone.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="parentPhone" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Parent Phone
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Users className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="parentPhone"
+                          type="text"
+                          placeholder="017XXXXXXXX"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                          {...register('parentPhone')}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Mail className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="student@example.com"
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${errors.email ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none`}
+                          {...register('email')}
+                        />
+                      </div>
+                      {errors.email && (
+                        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="fatherName" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Father's Name
+                      </label>
+                      <input
+                        id="fatherName"
+                        type="text"
+                        placeholder="Enter father's name"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                        {...register('fatherName')}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="motherName" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Mother's Name
+                      </label>
+                      <input
+                        id="motherName"
+                        type="text"
+                        placeholder="Enter mother's name"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                        {...register('motherName')}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Date of Birth
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="dateOfBirth"
+                          type="date"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                          {...register('dateOfBirth')}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Gender
+                      </label>
+                      <select
+                        id="gender"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none bg-white"
+                        {...register('gender')}
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Blood Group
+                      </label>
+                      <select
+                        id="bloodGroup"
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none bg-white"
+                        {...register('bloodGroup')}
+                      >
+                        <option value="">Select</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="address"
+                          type="text"
+                          placeholder="Enter address"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                          {...register('address')}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label htmlFor="schoolCollege" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        School/College
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <School className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="schoolCollege"
+                          type="text"
+                          placeholder="Enter school or college name"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none"
+                          {...register('schoolCollege')}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary flex items-center space-x-2"
-                  disabled={isSubmitting || programs.length === 0}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center">
-                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                      Admitting...
-                    </span>
-                  ) : (
-                    <>
-                      <UserPlus className="w-4 h-4" />
-                      <span>Admit Student</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
+                {/* Program & Admission Section - Enhanced */}
+                <div className="border-t-2 border-gray-100 pt-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-700">Program & Admission</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="programId" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Program <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="programId"
+                        className={`w-full px-4 py-2.5 rounded-xl border ${errors.programId ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none bg-white`}
+                        {...register('programId')}
+                      >
+                        <option value="">Select a program</option>
+                        {programs && programs.length > 0 ? (
+                          programs.map((program: Program) => (
+                            <option key={program.id} value={program.id}>
+                              {program.displayName?.en || program.name} ({program.name})
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>No active programs available</option>
+                        )}
+                      </select>
+                      {errors.programId && (
+                        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {errors.programId.message}
+                        </p>
+                      )}
+                      {programs && programs.length === 0 && !programsLoading && (
+                        <p className="mt-1.5 text-sm text-amber-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          No active programs found. Please create a program first.
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="admissionId" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {admissionMode === 'automatic' ? 'Admission ID' : 'Admission ID *'}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Hash className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          id="admissionId"
+                          type="text"
+                          placeholder={admissionMode === 'automatic' ? 'Will be auto-generated' : 'Enter Admission ID'}
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${errors.admissionId ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none ${admissionMode === 'automatic' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
+                          {...register('admissionId')}
+                          disabled={admissionMode === 'automatic'}
+                          readOnly={admissionMode === 'automatic'}
+                        />
+                      </div>
+                      {errors.admissionId && (
+                        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {errors.admissionId.message}
+                        </p>
+                      )}
+                      {admissionMode === 'automatic' && (
+                        <p className="mt-1.5 text-xs text-gray-500 flex items-center gap-1.5">
+                          <CheckCircle className="w-3 h-3 text-green-500" />
+                          ID will be generated automatically when you submit
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions - Enhanced */}
+                <div className="flex items-center justify-end space-x-3 pt-6 border-t-2 border-gray-100">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:shadow-md"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isSubmitting || programs.length === 0}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center">
+                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        Admitting...
+                      </span>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4" />
+                        <span>Admit Student</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>,
