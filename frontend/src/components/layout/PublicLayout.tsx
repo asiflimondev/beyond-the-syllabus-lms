@@ -43,55 +43,55 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             : 'bg-white/80 backdrop-blur-sm border-b border-gray-200/30'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+        {/* Main container with max width */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="flex items-center justify-between h-24">
             {/* Left: BTS Logo + Brand Name */}
-            <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+            <Link to="/" className="flex items-center gap-4 group flex-shrink-0">
               <img 
                 src={btsLogo} 
                 alt="BTS Logo" 
-                className="w-12 h-12 object-contain"
+                className="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-105"
               />
-              <span className="text-xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
+              <span className="text-2xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
                 Beyond the Syllabus
               </span>
             </Link>
 
-            {/* Middle: Navigation - Centered */}
+            {/* Middle: Navigation */}
             <nav className="hidden md:flex items-center gap-1 absolute left-1/2 transform -translate-x-1/2">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  className={`px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-300 relative ${
                     location.pathname === item.path
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'text-primary-700'
+                      : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {item.label}
+                  {location.pathname === item.path && (
+                    <span className="absolute inset-0 bg-primary-50 rounded-xl -z-10" />
+                  )}
+                  <span className="relative z-10">{item.label}</span>
+                  <span className={`absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-primary-600 rounded-full transition-all duration-300 ${
+                    location.pathname === item.path ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`} />
                 </Link>
               ))}
             </nav>
 
-            {/* Right: Cambridge Logo + Login */}
+            {/* Right: Cambridge Logo + Mobile Menu */}
             <div className="flex items-center gap-4 flex-shrink-0">
-              {/* Cambridge Logo */}
               <div className="hidden sm:flex items-center">
                 <img 
                   src={cambridgeLogo} 
                   alt="Cambridge English" 
-                  className="h-10 w-auto object-contain"
+                  className="h-12 w-auto object-contain"
                 />
               </div>
 
-              <Link
-                to="/login"
-                className="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all duration-200 shadow-sm shadow-primary-500/20 hover:shadow-primary-500/30"
-              >
-                Login
-              </Link>
-
+              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
@@ -105,6 +105,14 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             </div>
           </div>
         </div>
+
+        {/* ✅ Login Button - Fixed hover animation */}
+        <Link
+          to="/login"
+          className="hidden md:inline-flex fixed top-1/2 -translate-y-1/2 right-4 lg:right-8 px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-300 shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 active:scale-95 z-50"
+        >
+          Login
+        </Link>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
@@ -125,7 +133,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
               ))}
               <Link
                 to="/login"
-                className="block px-3 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors text-center mt-2"
+                className="block px-3 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-200 text-center mt-2"
               >
                 Login
               </Link>
@@ -134,7 +142,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         )}
       </header>
 
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-24">
         {children}
       </main>
 
