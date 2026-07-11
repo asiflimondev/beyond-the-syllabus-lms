@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import {
   LayoutDashboard,
-  GraduationCap,
   Users,
   FileText,
   BookOpen,
@@ -29,6 +28,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  // Get user's display name (first part of email or fallback)
+  const getDisplayName = () => {
+    if (!user?.email) return 'User';
+    // Get the part before @ and capitalize first letter
+    const name = user.email.split('@')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1);
   };
 
   const getMenuItems = () => {
@@ -98,20 +105,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center h-16 px-6 border-b border-gray-200/50">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900 tracking-tight">
-                Beyond the Syllabus
-              </span>
-            </div>
-          </div>
+          {/* Logo Section - REMOVED */}
+          {/* Removed the Beyond the Syllabus logo/brand from sidebar */}
 
-          {/* User Info */}
-          <div className="px-6 py-4 border-b border-gray-200/50">
+          {/* User Info - Updated to show only name */}
+          <div className="px-6 py-4 border-b border-gray-200/50 mt-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shadow-sm">
                 <span className="text-primary-700 font-semibold text-lg">
@@ -120,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.email}
+                  {getDisplayName()}
                 </p>
                 <p className="text-xs text-gray-500 capitalize">
                   {user?.role}

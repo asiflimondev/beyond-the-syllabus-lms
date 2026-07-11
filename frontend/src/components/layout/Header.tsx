@@ -26,6 +26,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     navigate('/login');
   };
 
+  // Get the correct settings path based on user role
+  const getSettingsPath = () => {
+    const role = user?.role;
+    if (role === 'admin') return '/admin/settings';
+    if (role === 'teacher') return '/teacher/settings';
+    if (role === 'student') return '/student/settings';
+    if (role === 'office') return '/office/settings';
+    return '/settings'; // fallback
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -109,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   <button
                     onClick={() => {
                       setIsDropdownOpen(false);
-                      navigate('/settings');
+                      navigate(getSettingsPath());
                     }}
                     className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   >
