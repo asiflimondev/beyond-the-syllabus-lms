@@ -4,12 +4,12 @@ import {
   User, 
   Settings, 
   LogOut, 
-  ChevronDown,
-  Bell,
-  Search
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import btsLogo from '/bts-logo.png';
+import cambridgeLogo from '/cambridge-logo.png';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
       <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {/* Left section */}
+        {/* Left section - Logo and Brand */}
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
@@ -49,29 +49,28 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <MenuIcon className="w-5 h-5" />
           </button>
           
-          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
-            Dashboard
-          </h1>
+          {/* BTS Logo */}
+          <img 
+            src={btsLogo} 
+            alt="BTS Logo" 
+            className="h-8 w-auto object-contain"
+          />
+          
+          <span className="text-lg font-bold text-gray-900 tracking-tight">
+            Beyond the Syllabus
+          </span>
         </div>
 
-        {/* Right section */}
-        <div className="flex items-center gap-3">
-          {/* Search */}
-          <button className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm text-gray-500 bg-gray-100/80 rounded-xl hover:bg-gray-200/80 transition-all duration-200">
-            <Search className="w-4 h-4" />
-            <span className="hidden md:inline">Search...</span>
-            <span className="text-xs text-gray-400 bg-white px-1.5 py-0.5 rounded-md border border-gray-200">
-              ⌘K
-            </span>
-          </button>
+        {/* Right section - Cambridge Logo + User Dropdown */}
+        <div className="flex items-center gap-4">
+          {/* Cambridge Logo */}
+          <img 
+            src={cambridgeLogo} 
+            alt="Cambridge English" 
+            className="h-10 w-auto object-contain"
+          />
 
-          {/* Notifications */}
-          <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-all duration-200">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
-          </button>
-
-          {/* User dropdown - Custom implementation */}
+          {/* User dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}

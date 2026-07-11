@@ -12,7 +12,6 @@ import {
   Eye, 
   EyeOff, 
   Phone,
-  GraduationCap,
   Users,
   Award,
   Globe,
@@ -21,6 +20,8 @@ import {
   BookOpen,
   TrendingUp
 } from 'lucide-react';
+import btsLogo from '/bts-logo.png';
+import cambridgeLogo from '/cambridge-logo.png';
 
 // Validation schema
 const loginSchema = yup.object({
@@ -133,8 +134,19 @@ const LoginPage: React.FC = () => {
         {/* Main Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center max-w-lg mx-auto">
           <div className="mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-              <GraduationCap className="w-8 h-8 text-white" />
+            {/* Logos Section */}
+            <div className="flex items-center gap-4 mb-6">
+              <img 
+                src={btsLogo} 
+                alt="BTS Logo" 
+                className="h-14 w-auto object-contain"
+              />
+              <div className="w-px h-12 bg-white/30"></div>
+              <img 
+                src={cambridgeLogo} 
+                alt="Cambridge English" 
+                className="h-14 w-auto object-contain"
+              />
             </div>
             <h1 className="text-4xl font-bold mb-4 tracking-tight">
               Welcome Back
@@ -189,18 +201,27 @@ const LoginPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
               Back to Home
             </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Welcome Back</h2>
-                <p className="text-sm text-gray-500">Sign in to your account</p>
-              </div>
+            {/* Mobile Logos */}
+            <div className="flex items-center gap-3 mb-3">
+              <img 
+                src={btsLogo} 
+                alt="BTS Logo" 
+                className="h-8 w-auto object-contain"
+              />
+              <div className="w-px h-8 bg-gray-300"></div>
+              <img 
+                src={cambridgeLogo} 
+                alt="Cambridge English" 
+                className="h-8 w-auto object-contain"
+              />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Welcome Back</h2>
+              <p className="text-sm text-gray-500">Sign in to your account</p>
             </div>
           </div>
 
-          {/* Desktop Header */}
+          {/* Desktop Header - Removed duplicate welcome text since logos are now above */}
           <div className="hidden lg:block mb-8">
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome Back</h2>
             <p className="text-sm text-gray-500 mt-1">Sign in to continue learning</p>
