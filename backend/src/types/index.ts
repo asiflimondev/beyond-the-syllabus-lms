@@ -197,6 +197,28 @@ export interface IResult {
 }
 
 // ============================================
+// RECEIPT TYPES - NEW
+// ============================================
+export interface IReceipt {
+  receiptNumber: string;
+  studentId: Types.ObjectId;
+  studentName: string;
+  studentAdmissionId: string;
+  studentPhone: string;
+  studentEmail: string;
+  programId: Types.ObjectId;
+  programName: string;
+  paymentAmount: number;
+  paymentMethod: 'Cash' | 'bKash' | 'Nagad' | 'Card' | 'Bank Transfer';
+  receiptDate: Date;
+  generatedBy: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+  deletedAt?: Date;
+}
+
+// ============================================
 // API RESPONSE TYPES
 // ============================================
 export interface ApiResponse<T = any> {

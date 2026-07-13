@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { teacherApi } from '@api/teacher.api';
+import { officeMockTestApi } from '@api/admin/mockTest.api';
+import { programsApi } from '@api/programs.api';
 import { useNavigate } from 'react-router-dom';
 import {
   FileText,
@@ -9,28 +10,33 @@ import {
   Clock,
 } from 'lucide-react';
 
-const TeacherMockTests: React.FC = () => {
+const OfficeMockTests: React.FC = () => {
   const navigate = useNavigate();
 
+  // Fetch ALL programs using programsApi (for Office)
   const programsQuery: any = useQuery({
-    queryKey: ['teacher-programs'],
-    queryFn: () => teacherApi.getPrograms(),
+    queryKey: ['office-programs'],
+    queryFn: () => programsApi.getAll({ isActive: true, limit: 100 }),
   });
 
-
+  // Fetch mock tests using office API
   const mockTestsQuery: any = useQuery({
-    queryKey: ['teacher-all-mocktests'],
+    queryKey: ['office-all-mocktests'],
     queryFn: async () => {
-      const programsRes = await teacherApi.getPrograms();
-      const programsData = programsRes?.data?.data || [];
+      const programsRes = await programsApi.getAll({ isActive: true, limit: 100 });
+      const programsData = programsRes?.data?.data?.programs || [];
       let allMockTests: any[] = [];
       for (const program of programsData) {
-        const mockTestsRes = await teacherApi.getMockTestsByProgram(program._id);
-        const mockTests = mockTestsRes?.data?.data || [];
-        allMockTests = [...allMockTests, ...mockTests.map((m: any) => ({
-          ...m,
-          programName: program.displayName?.en || program.name,
-        }))];
+        try {
+          const mockTestsRes = await officeMockTestApi.getMockTestsByProgram(program.id);
+          const mockTests = mockTestsRes?.data?.data || [];
+          allMockTests = [...allMockTests, ...mockTests.map((m: any) => ({
+            ...m,
+            programName: program.displayName?.en || program.name,
+          }))];
+        } catch (error) {
+          console.error(`Error fetching mock tests for program ${program.id}:`, error);
+        }
       }
       return { data: { data: allMockTests } };
     },
@@ -76,7 +82,7 @@ const TeacherMockTests: React.FC = () => {
               <div
                 key={test._id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/teacher/mark-entry/${test._id}`)}
+                onClick={() => navigate(`/office/mark-entry/${test._id}`)}
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -106,7 +112,7 @@ const TeacherMockTests: React.FC = () => {
                   className="mt-4 w-full px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors text-sm flex items-center justify-center space-x-2"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/teacher/mark-entry/${test._id}`);
+                    navigate(`/office/mark-entry/${test._id}`);
                   }}
                 >
                   <Eye className="w-4 h-4" />
@@ -121,4 +127,4 @@ const TeacherMockTests: React.FC = () => {
   );
 };
 
-export default TeacherMockTests;
+export default OfficeMockTests;

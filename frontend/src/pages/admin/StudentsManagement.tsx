@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Mail,
   Phone,
+  AlertTriangle,
 } from 'lucide-react';
 import { studentManagementApi, Student } from '@api/admin/student.api';
 import { programsApi } from '@api/programs.api';
@@ -123,7 +124,7 @@ const StudentsManagement: React.FC = () => {
     },
   });
 
-  // Delete mutation
+  // Delete mutation (soft delete)
   const deleteMutation = useMutation({
     mutationFn: (id: string) => studentManagementApi.delete(id),
     onSuccess: () => {
@@ -146,6 +147,21 @@ const StudentsManagement: React.FC = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to restore student');
+    },
+  });
+
+  // Permanent Delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: (id: string) => studentManagementApi.permanentDelete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-students'] });
+      queryClient.invalidateQueries({ queryKey: ['student-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['admission-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['all-students-for-id'] });
+      toast.success('Student permanently deleted. Admission ID is now available.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to permanently delete student');
     },
   });
 
@@ -177,6 +193,28 @@ const StudentsManagement: React.FC = () => {
     }
   };
 
+  const handlePermanentDelete = (student: Student) => {
+    // First confirmation with detailed warning
+    if (window.confirm(
+      `⚠️ PERMANENT DELETE\n\n` +
+      `Are you sure you want to permanently delete "${student.fullName}" (${student.admissionId})?\n\n` +
+      `This action CANNOT be undone!\n` +
+      `• The student record will be permanently removed\n` +
+      `• The Admission ID "${student.admissionId}" will become available for reuse\n` +
+      `• Any associated user account will also be deleted`
+    )) {
+      // Second confirmation with text input for safety
+      const confirmText = window.prompt(
+        `Type "PERMANENT" to confirm permanent deletion of ${student.admissionId}:`
+      );
+      if (confirmText === 'PERMANENT') {
+        permanentDeleteMutation.mutate(student.id);
+      } else if (confirmText !== null) {
+        toast.error('Confirmation text did not match. Deletion cancelled.');
+      }
+    }
+  };
+
   const handleResetPassword = (student: Student) => {
     setSelectedStudent(student);
     setNewPassword('');
@@ -201,6 +239,7 @@ const StudentsManagement: React.FC = () => {
       parentPhone: '',
       status: student.status,
       programId: student.program?.id || '',
+      admissionId: student.admissionId,
     });
     setIsEditModalOpen(true);
   };
@@ -210,6 +249,9 @@ const StudentsManagement: React.FC = () => {
       updateMutation.mutate({ id: selectedStudent.id, data: editFormData });
     }
   };
+
+  // Check if permanent delete is loading
+  const isPermanentDeleting = permanentDeleteMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -443,13 +485,23 @@ const StudentsManagement: React.FC = () => {
                               <Trash2 className="w-4 h-4" />
                             </button>
                           ) : (
-                            <button
-                              onClick={() => handleRestore(student.id)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                              title="Restore"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleRestore(student.id)}
+                                className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Restore"
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handlePermanentDelete(student)}
+                                disabled={isPermanentDeleting}
+                                className="p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Permanently Delete (irreversible)"
+                              >
+                                <AlertTriangle className="w-4 h-4" />
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -618,6 +670,21 @@ const StudentsManagement: React.FC = () => {
                     ))}
                   </select>
                 </div>
+
+                <div>
+                  <label className="label">Admission ID</label>
+                  <input
+                    type="text"
+                    className="input bg-gray-50"
+                    value={editFormData.admissionId || ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, admissionId: e.target.value })}
+                    placeholder="Enter Admission ID"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Changing the Admission ID will free up the old ID and make it available for reuse
+                  </p>
+                </div>
+
                 <div>
                   <label className="label">Program</label>
                   <select

@@ -10,6 +10,7 @@ import {
   LogOut,
   UserPlus,
   User,
+  Receipt,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -59,6 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programs' });
       items.push({ path: '/admin/students', icon: Users, label: 'Students' });
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
+      items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
+      items.push({ path: '/admin/mock-tests', icon: FileText, label: 'Mock Tests' });
       items.push({ path: '/admin/teachers', icon: Users, label: 'Teachers' });
       items.push({ path: '/admin/settings', icon: Settings, label: 'Settings' });
     }
@@ -68,6 +71,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programs' });
       items.push({ path: '/admin/students', icon: Users, label: 'Students' });
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
+      items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
+      items.push({ path: '/office/mock-tests', icon: FileText, label: 'Mock Tests' });
       items.push({ path: '/office/settings', icon: Settings, label: 'Settings' });
     }
 

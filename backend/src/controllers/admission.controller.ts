@@ -11,7 +11,7 @@ import { Student } from '../models/Student.model.js';
 import { User } from '../models/User.model.js';
 
 // ============================================
-// ADMIT STUDENT
+// ADMIT STUDENT - UPDATED WITH PAYMENT & RECEIPT
 // ============================================
 export const admitStudentController = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -22,6 +22,8 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       email,
       programId,
       admissionId: manualAdmissionId,
+      paymentAmount,
+      paymentMethod,
       fatherName,
       motherName,
       dateOfBirth,
@@ -42,8 +44,25 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       return;
     }
 
-    // Admit student
-    const student = await admitStudent({
+    // Validate payment amount
+    if (paymentAmount === undefined || paymentAmount === null) {
+      res.status(400).json({
+        success: false,
+        message: 'Payment amount is required',
+      });
+      return;
+    }
+
+    if (isNaN(paymentAmount) || paymentAmount < 0) {
+      res.status(400).json({
+        success: false,
+        message: 'Payment amount must be a valid positive number',
+      });
+      return;
+    }
+
+    // Admit student with receipt
+    const result = await admitStudent({
       fullName,
       phone,
       parentPhone,
@@ -52,6 +71,8 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       admittedBy: userId,
       createdBy: userId,
       admissionId: manualAdmissionId,
+      paymentAmount: Number(paymentAmount),
+      paymentMethod: paymentMethod || 'Cash',
       fatherName,
       motherName,
       dateOfBirth,
@@ -61,7 +82,7 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       schoolCollege,
     });
 
-    const studentData = student as any;
+    const studentData = result.student as any;
 
     res.status(201).json({
       success: true,
@@ -69,15 +90,17 @@ export const admitStudentController = async (req: Request, res: Response): Promi
       data: {
         student: {
           id: studentData._id,
-          fullName: student.fullName,
-          admissionId: student.admissionId,
-          email: student.email,
-          phone: student.phone,
-          programId: student.programId,
-          status: student.status,
+          fullName: result.student.fullName,
+          admissionId: result.student.admissionId,
+          email: result.student.email,
+          phone: result.student.phone,
+          programId: result.student.programId,
+          status: result.student.status,
         },
-        admissionId: student.admissionId,
-        status: student.status,
+        admissionId: result.student.admissionId,
+        status: result.student.status,
+        receiptId: result.receiptId,
+        receiptNumber: result.receiptNumber,
       },
     });
   } catch (error: any) {

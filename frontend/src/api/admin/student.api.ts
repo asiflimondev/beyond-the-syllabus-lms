@@ -47,6 +47,9 @@ export const studentManagementApi = {
   delete: (id: string) =>
     apiClient.delete(`/admin/students/${id}`),
 
+  permanentDelete: (id: string) => // NEW
+    apiClient.delete(`/admin/students/${id}/permanent`),
+
   restore: (id: string) =>
     apiClient.patch(`/admin/students/${id}/restore`),
 

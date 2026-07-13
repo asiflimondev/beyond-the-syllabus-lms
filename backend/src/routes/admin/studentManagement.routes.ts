@@ -7,6 +7,7 @@ import {
   restoreStudent,
   resetStudentPassword,
   getStudentStats,
+  permanentlyDeleteStudent, // NEW
 } from '../../controllers/admin/studentManagement.controller.js';
 import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 
@@ -21,6 +22,7 @@ router.get('/', getAllStudents);
 router.get('/:id', getStudentById);
 router.put('/:id', updateStudent);
 router.delete('/:id', deleteStudent);
+router.delete('/:id/permanent', permanentlyDeleteStudent); // NEW - Permanent delete
 router.patch('/:id/restore', restoreStudent);
 router.post('/:id/reset-password', resetStudentPassword);
 

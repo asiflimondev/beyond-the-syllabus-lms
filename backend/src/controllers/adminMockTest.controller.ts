@@ -1,145 +1,30 @@
 import { Request, Response } from 'express';
-import { Teacher } from '../models/Teacher.model.js';
-import { Student } from '../models/Student.model.js';
-import { Program } from '../models/Program.model.js';
 import { MockTest } from '../models/MockTest.model.js';
+import { Student } from '../models/Student.model.js';
 import { Result } from '../models/Result.model.js';
+import { Program } from '../models/Program.model.js';
 
 // ============================================
-// GET TEACHER PROFILE
+// GET MOCK TESTS BY PROGRAM (Admin)
 // ============================================
-export const getTeacherProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId }).populate('programIds', 'name displayName duration fee');
-    if (!teacher) {
-      res.status(404).json({ success: false, message: 'Teacher profile not found' });
-      return;
-    }
-    res.status(200).json({ success: true, data: teacher });
-  } catch (error: any) {
-    console.error('Get teacher profile error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get teacher profile', error: error.message });
-  }
-};
-
-// ============================================
-// UPDATE TEACHER PROFILE
-// ============================================
-export const updateTeacherProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId = (req as any).user?.id;
-    const { fullName, phone, dateOfBirth, gender, bloodGroup, address } = req.body;
-    const teacher = await Teacher.findOne({ userId });
-    if (!teacher) {
-      res.status(404).json({ success: false, message: 'Teacher profile not found' });
-      return;
-    }
-    const updateData: any = {};
-    if (fullName !== undefined) updateData.fullName = fullName;
-    if (phone !== undefined) updateData.phone = phone;
-    if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth;
-    if (gender !== undefined) updateData.gender = gender;
-    if (bloodGroup !== undefined) updateData.bloodGroup = bloodGroup;
-    if (address !== undefined) updateData.address = address;
-    const updatedTeacher = await Teacher.findOneAndUpdate({ userId }, updateData, { new: true, runValidators: true });
-    res.status(200).json({ success: true, message: 'Profile updated successfully', data: updatedTeacher });
-  } catch (error: any) {
-    console.error('Update teacher profile error:', error);
-    res.status(500).json({ success: false, message: 'Failed to update teacher profile', error: error.message });
-  }
-};
-
-// ============================================
-// GET TEACHER'S PROGRAMS
-// ============================================
-export const getTeacherPrograms = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId }).populate('programIds');
-    if (!teacher) {
-      res.status(404).json({ success: false, message: 'Teacher profile not found' });
-      return;
-    }
-    res.status(200).json({ success: true, data: teacher.programIds });
-  } catch (error: any) {
-    console.error('Get teacher programs error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get teacher programs', error: error.message });
-  }
-};
-
-// ============================================
-// GET STUDENTS BY PROGRAM
-// ============================================
-export const getStudentsByProgram = async (req: Request, res: Response): Promise<void> => {
+export const getMockTestsByProgramAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { programId } = req.params;
-    const { page = 1, limit = 10, search } = req.query;
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId, programIds: programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
-    const filter: any = { programId, isDeleted: false };
-    if (search) {
-      filter.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { admissionId: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-      ];
-    }
-    const skip = (Number(page) - 1) * Number(limit);
-    const students = await Student.find(filter).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)).populate('userId', 'email isActive');
-    const total = await Student.countDocuments(filter);
-    res.status(200).json({
-      success: true,
-      data: {
-        students: students.map((s: any) => ({
-          id: s._id,
-          fullName: s.fullName,
-          admissionId: s.admissionId,
-          email: s.email,
-          phone: s.phone,
-          status: s.status,
-          userId: s.userId,
-        })),
-        pagination: { total, page: Number(page), limit: Number(limit), totalPages: Math.ceil(total / Number(limit)) },
-      },
-    });
-  } catch (error: any) {
-    console.error('Get students by program error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get students', error: error.message });
-  }
-};
 
-// ============================================
-// GET MOCK TESTS BY PROGRAM
-// ============================================
-export const getMockTestsByProgram = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { programId } = req.params;
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId, programIds: programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
+    // No teacher check - Admin has full access
     const mockTests = await MockTest.find({ programId, isActive: true }).sort({ testNumber: 1 });
     res.status(200).json({ success: true, data: mockTests });
   } catch (error: any) {
-    console.error('Get mock tests error:', error);
+    console.error('Get mock tests admin error:', error);
     res.status(500).json({ success: false, message: 'Failed to get mock tests', error: error.message });
   }
 };
 
 // ============================================
-// CREATE MOCK TEST
+// CREATE MOCK TEST (Admin)
 // ============================================
-export const createMockTest = async (req: Request, res: Response): Promise<void> => {
+export const createMockTestAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('📥 Received body:', JSON.stringify(req.body, null, 2));
-
     const { programId, title, description, testDate, reading, writing, listening, speaking, presentation } = req.body;
     const userId = (req as any).user?.id;
 
@@ -157,18 +42,10 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Verify teacher has access
-    const teacher = await Teacher.findOne({ userId, programIds: programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
-
     // Get next test number
     const lastTest = await MockTest.findOne({ programId }).sort({ testNumber: -1 });
     const testNumber = lastTest ? lastTest.testNumber + 1 : 1;
 
-    // Build mock test data - start with required fields
     const mockTestData: any = {
       programId,
       title,
@@ -180,13 +57,11 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
       isActive: true,
     };
 
-    // ONLY add sections that exist in the request
     if (req.body.hasOwnProperty('reading') && reading && reading.totalMarks && reading.totalMarks > 0) {
       mockTestData.reading = {
         totalMarks: reading.totalMarks,
         description: reading.description || 'Reading comprehension',
       };
-      console.log('✅ Added Reading section');
     }
 
     if (req.body.hasOwnProperty('writing') && writing && writing.totalMarks && writing.totalMarks > 0) {
@@ -194,7 +69,6 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
         totalMarks: writing.totalMarks,
         description: writing.description || 'Writing tasks',
       };
-      console.log('✅ Added Writing section');
     }
 
     if (req.body.hasOwnProperty('listening') && listening && listening.totalMarks && listening.totalMarks > 0) {
@@ -202,14 +76,12 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
         totalMarks: listening.totalMarks,
         description: listening.description || 'Listening comprehension',
       };
-      console.log('✅ Added Listening section');
     }
 
     if (req.body.hasOwnProperty('speaking') && speaking && speaking.description) {
       mockTestData.speaking = {
         description: speaking.description || 'Speaking assessment',
       };
-      console.log('✅ Added Speaking section');
     }
 
     if (req.body.hasOwnProperty('presentation') && presentation && presentation.totalMarks && presentation.totalMarks > 0) {
@@ -217,10 +89,8 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
         totalMarks: presentation.totalMarks,
         description: presentation.description || 'Presentation',
       };
-      console.log('✅ Added Presentation section');
     }
 
-    // Check if at least one section was added
     const hasSection =
       mockTestData.reading ||
       mockTestData.writing ||
@@ -236,8 +106,6 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    console.log('✅ Creating mock test with:', JSON.stringify(mockTestData, null, 2));
-
     const mockTest = await MockTest.create(mockTestData);
     res.status(201).json({
       success: true,
@@ -245,34 +113,27 @@ export const createMockTest = async (req: Request, res: Response): Promise<void>
       data: mockTest,
     });
   } catch (error: any) {
-    console.error('❌ Create mock test error:', error);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create mock test',
-      error: error.message,
-    });
+    console.error('Create mock test admin error:', error);
+    res.status(500).json({ success: false, message: 'Failed to create mock test', error: error.message });
   }
 };
 
 // ============================================
-// UPDATE MOCK TEST
+// UPDATE MOCK TEST (Admin)
 // ============================================
-export const updateMockTest = async (req: Request, res: Response): Promise<void> => {
+export const updateMockTestAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { title, description, testDate, reading, writing, listening, speaking, presentation } = req.body;
     const userId = (req as any).user?.id;
+
     const mockTest = await MockTest.findById(id);
     if (!mockTest) {
       res.status(404).json({ success: false, message: 'Mock test not found' });
       return;
     }
-    const teacher = await Teacher.findOne({ userId, programIds: mockTest.programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
+
+    // Admin has full access - no teacher check
     if (title) mockTest.title = title;
     if (description) mockTest.description = description;
     if (testDate) mockTest.testDate = testDate;
@@ -283,17 +144,18 @@ export const updateMockTest = async (req: Request, res: Response): Promise<void>
     if (presentation) mockTest.presentation = presentation;
     mockTest.updatedBy = userId;
     await mockTest.save();
+
     res.status(200).json({ success: true, message: 'Mock test updated successfully', data: mockTest });
   } catch (error: any) {
-    console.error('Update mock test error:', error);
+    console.error('Update mock test admin error:', error);
     res.status(500).json({ success: false, message: 'Failed to update mock test', error: error.message });
   }
 };
 
 // ============================================
-// DELETE MOCK TEST (Admin only)
+// DELETE MOCK TEST (Admin)
 // ============================================
-export const deleteMockTest = async (req: Request, res: Response): Promise<void> => {
+export const deleteMockTestAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = (req as any).user?.id;
@@ -304,13 +166,13 @@ export const deleteMockTest = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Soft delete - mark as inactive
+    // Soft delete
     mockTest.isActive = false;
     mockTest.deletedAt = new Date();
     mockTest.updatedBy = userId;
     await mockTest.save();
 
-    // Also soft delete all results for this mock test
+    // Soft delete all results
     await Result.updateMany(
       { mockTestId: id },
       { isDeleted: true, deletedAt: new Date() }
@@ -321,63 +183,33 @@ export const deleteMockTest = async (req: Request, res: Response): Promise<void>
       message: 'Mock test deleted successfully',
     });
   } catch (error: any) {
-    console.error('Delete mock test error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete mock test',
-      error: error.message,
-    });
+    console.error('Delete mock test admin error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete mock test', error: error.message });
   }
 };
 
 // ============================================
-// GET STUDENT RESULTS FOR MOCK TEST
+// GET STUDENTS FOR MARK ENTRY (Admin)
 // ============================================
-export const getMockTestResults = async (req: Request, res: Response): Promise<void> => {
+export const getMarkEntryDataAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { mockTestId } = req.params;
+
     const mockTest = await MockTest.findById(mockTestId);
     if (!mockTest) {
       res.status(404).json({ success: false, message: 'Mock test not found' });
       return;
     }
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId, programIds: mockTest.programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
-    const results = await Result.find({ mockTestId }).populate('studentId', 'fullName admissionId email');
-    res.status(200).json({ success: true, data: results });
-  } catch (error: any) {
-    console.error('Get mock test results error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get results', error: error.message });
-  }
-};
 
-// ============================================
-// GET STUDENTS FOR MARK ENTRY
-// ============================================
-export const getStudentsForMarkEntry = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { mockTestId } = req.params;
-    const mockTest = await MockTest.findById(mockTestId);
-    if (!mockTest) {
-      res.status(404).json({ success: false, message: 'Mock test not found' });
-      return;
-    }
-    const userId = (req as any).user?.id;
-    const teacher = await Teacher.findOne({ userId, programIds: mockTest.programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
+    // Admin has full access - no teacher check
     const students = await Student.find({
       programId: mockTest.programId,
       isDeleted: false,
       status: 'active',
     }).select('_id fullName admissionId email phone');
+
     const results = await Result.find({ mockTestId });
+
     const studentsWithResults = students.map((student) => {
       const existingResult = results.find((r) => r.studentId.toString() === student._id.toString());
       return {
@@ -389,6 +221,7 @@ export const getStudentsForMarkEntry = async (req: Request, res: Response): Prom
         result: existingResult || null,
       };
     });
+
     res.status(200).json({
       success: true,
       data: {
@@ -407,15 +240,15 @@ export const getStudentsForMarkEntry = async (req: Request, res: Response): Prom
       },
     });
   } catch (error: any) {
-    console.error('Get students for mark entry error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get students for mark entry', error: error.message });
+    console.error('Get mark entry data admin error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get mark entry data', error: error.message });
   }
 };
 
 // ============================================
-// SAVE MARKS
+// SAVE MARKS (Admin)
 // ============================================
-export const saveMarks = async (req: Request, res: Response): Promise<void> => {
+export const saveMarksAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { mockTestId } = req.params;
     const { marks } = req.body;
@@ -432,11 +265,7 @@ export const saveMarks = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const teacher = await Teacher.findOne({ userId, programIds: mockTest.programId });
-    if (!teacher) {
-      res.status(403).json({ success: false, message: 'You do not have access to this program' });
-      return;
-    }
+    // Admin has full access - no teacher check
 
     const results = [];
     for (const markData of marks) {
@@ -559,7 +388,7 @@ export const saveMarks = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({ success: true, message: 'Marks saved successfully', data: results });
   } catch (error: any) {
-    console.error('Save marks error:', error);
+    console.error('Save marks admin error:', error);
     res.status(500).json({ success: false, message: 'Failed to save marks', error: error.message });
   }
 };

@@ -7,6 +7,8 @@ export interface AdmitStudentRequest {
   email: string;
   programId: string;
   admissionId?: string;
+  paymentAmount: number; // NEW - Required
+  paymentMethod?: 'Cash' | 'bKash' | 'Nagad' | 'Card' | 'Bank Transfer'; // NEW - Optional
   fatherName?: string;
   motherName?: string;
   dateOfBirth?: string;
@@ -14,6 +16,26 @@ export interface AdmitStudentRequest {
   bloodGroup?: string;
   address?: string;
   schoolCollege?: string;
+}
+
+export interface AdmitStudentResponse {
+  success: boolean;
+  message: string;
+  data: {
+    student: {
+      id: string;
+      fullName: string;
+      admissionId: string;
+      email: string;
+      phone: string;
+      programId: string;
+      status: string;
+    };
+    admissionId: string;
+    status: string;
+    receiptId: string; // NEW
+    receiptNumber: string; // NEW
+  };
 }
 
 export interface RegisterStudentRequest {
@@ -51,7 +73,7 @@ export interface StudentsResponse {
 
 export const admissionApi = {
   admitStudent: (data: AdmitStudentRequest) =>
-    apiClient.post('/admission/admit', data),
+    apiClient.post<AdmitStudentResponse>('/admission/admit', data),
   
   registerStudent: (data: RegisterStudentRequest) =>
     apiClient.post('/admission/register-student', data),

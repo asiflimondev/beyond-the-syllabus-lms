@@ -3,6 +3,7 @@ import { Student } from '../models/Student.model.js';
 import { Program } from '../models/Program.model.js';
 import { User } from '../models/User.model.js';
 import { IStudent } from '../types/index.js';
+import { generateReceipt } from './receipt.service.js';
 
 // ============================================
 // ADMISSION SETTINGS TYPE
@@ -13,7 +14,7 @@ interface AdmissionSettings {
   currentNumber?: number;
 }
 
-// In production, this would come from a settings collection
+// In-memory cache for settings
 let admissionSettings: AdmissionSettings = {
   mode: 'automatic',
   prefix: 'BTS',
@@ -21,7 +22,7 @@ let admissionSettings: AdmissionSettings = {
 };
 
 // ============================================
-// GENERATE ADMISSION ID
+// GENERATE ADMISSION ID - FIXED for Automatic Mode
 // ============================================
 export const generateAdmissionId = async (): Promise<string> => {
   const settings = admissionSettings;
@@ -30,13 +31,36 @@ export const generateAdmissionId = async (): Promise<string> => {
     throw new Error('Manual mode: Admission ID must be provided manually');
   }
 
-  if (!settings.prefix || settings.currentNumber === undefined) {
-    throw new Error('Prefix and current number must be configured for automatic mode');
+  // Use default prefix if not set
+  const prefix = settings.prefix || 'BTS';
+  
+  // Find the highest existing Admission ID from the database
+  const allStudents = await Student.find({ 
+    isDeleted: false,
+    admissionId: { $regex: `^${prefix}` }
+  }).select('admissionId').lean();
+
+  let maxNumber = 0;
+
+  // Extract the numeric part from each admissionId and find the max
+  for (const student of allStudents) {
+    const match = student.admissionId.match(new RegExp(`^${prefix}(\\d+)$`));
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNumber) {
+        maxNumber = num;
+      }
+    }
   }
 
-  settings.currentNumber += 1;
-  const paddedNumber = String(settings.currentNumber).padStart(3, '0');
-  return `${settings.prefix}${paddedNumber}`;
+  // Use max from DB, or fallback to settings.currentNumber
+  const nextNumber = Math.max(maxNumber + 1, (settings.currentNumber || 100) + 1);
+  
+  // Update the in-memory settings
+  settings.currentNumber = nextNumber;
+  
+  const paddedNumber = String(nextNumber).padStart(3, '0');
+  return `${prefix}${paddedNumber}`;
 };
 
 // ============================================
@@ -51,6 +75,8 @@ export const admitStudent = async (data: {
   admittedBy: string | Types.ObjectId;
   createdBy: string | Types.ObjectId;
   admissionId?: string;
+  paymentAmount: number;
+  paymentMethod?: 'Cash' | 'bKash' | 'Nagad' | 'Card' | 'Bank Transfer';
   fatherName?: string;
   motherName?: string;
   dateOfBirth?: Date;
@@ -58,12 +84,20 @@ export const admitStudent = async (data: {
   bloodGroup?: string;
   address?: string;
   schoolCollege?: string;
-}): Promise<IStudent> => {
+}): Promise<{ student: IStudent; receiptId: Types.ObjectId; receiptNumber: string }> => {
   try {
     // Validate program exists
     const program = await Program.findById(data.programId);
     if (!program) {
       throw new Error('Program not found');
+    }
+
+    // Validate payment amount
+    if (data.paymentAmount === undefined || data.paymentAmount === null) {
+      throw new Error('Payment amount is required');
+    }
+    if (data.paymentAmount < 0) {
+      throw new Error('Payment amount cannot be negative');
     }
 
     // Check if email already exists in Student collection
@@ -82,18 +116,30 @@ export const admitStudent = async (data: {
     let admissionId: string;
 
     if (admissionSettings.mode === 'manual') {
-      if (!data.admissionId) {
+      // ============================================
+      // MANUAL MODE - Simply validate the entered ID
+      // ============================================
+      if (!data.admissionId || data.admissionId.trim() === '') {
         throw new Error('Admission ID is required in manual mode');
       }
 
-      // Check if admission ID already exists
-      const existing = await Student.findOne({ admissionId: data.admissionId });
+      const enteredId = data.admissionId.trim();
+
+      // Check if admission ID already exists - ONE SIMPLE QUERY
+      const existing = await Student.findOne({ 
+        admissionId: enteredId,
+        isDeleted: false 
+      });
+      
       if (existing) {
-        throw new Error('Admission ID already exists');
+        throw new Error(`Admission ID "${enteredId}" already exists. Please use a different ID.`);
       }
 
-      admissionId = data.admissionId;
+      admissionId = enteredId;
     } else {
+      // ============================================
+      // AUTOMATIC MODE - Generate the next ID
+      // ============================================
       admissionId = await generateAdmissionId();
     }
 
@@ -120,7 +166,28 @@ export const admitStudent = async (data: {
       isDeleted: false,
     });
 
-    return student;
+    // Generate receipt
+    const receipt = await generateReceipt({
+      studentId: student._id as Types.ObjectId,
+      studentName: student.fullName,
+      studentAdmissionId: student.admissionId,
+      studentPhone: student.phone,
+      studentEmail: student.email,
+      programId: data.programId as Types.ObjectId,
+      programName: program.name,
+      paymentAmount: data.paymentAmount,
+      paymentMethod: data.paymentMethod || 'Cash',
+      generatedBy: data.admittedBy as Types.ObjectId,
+    });
+
+    // Cast receipt to any to access _id
+    const receiptDoc = receipt as any;
+
+    return {
+      student,
+      receiptId: receiptDoc._id as Types.ObjectId,
+      receiptNumber: receipt.receiptNumber,
+    };
   } catch (error: any) {
     console.error('Admission error:', error);
     throw new Error(`Failed to admit student: ${error.message}`);
@@ -140,7 +207,11 @@ export const getAdmissionSettings = (): AdmissionSettings => {
 export const updateAdmissionSettings = (
   settings: Partial<AdmissionSettings>
 ): AdmissionSettings => {
-  admissionSettings = { ...admissionSettings, ...settings };
+  // Keep existing values if not provided
+  admissionSettings = { 
+    ...admissionSettings, 
+    ...settings 
+  };
   return { ...admissionSettings };
 };
 

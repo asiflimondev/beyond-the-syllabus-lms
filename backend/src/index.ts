@@ -16,6 +16,9 @@ import teacherRoutes from './routes/teacher.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import adminTeacherRoutes from './routes/admin/teacherManagement.routes.js';
 import adminStudentRoutes from './routes/admin/studentManagement.routes.js';
+import adminReceiptRoutes from './routes/admin/receipt.routes.js';
+import adminMockTestRoutes from './routes/admin/mockTest.routes.js'; // NEW
+import officeMockTestRoutes from './routes/office/mockTest.routes.js'; // NEW
 import publicRoutes from './routes/public.routes.js';
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
@@ -115,6 +118,17 @@ console.log('✅ Admin Teacher routes mounted at /api/admin/teachers');
 app.use('/api/admin/students', adminStudentRoutes);
 console.log('✅ Admin Student routes mounted at /api/admin/students');
 
+app.use('/api/admin/receipts', adminReceiptRoutes);
+console.log('✅ Admin Receipt routes mounted at /api/admin/receipts');
+
+// NEW: Admin Mock Test routes
+app.use('/api/admin', adminMockTestRoutes);
+console.log('✅ Admin Mock Test routes mounted at /api/admin');
+
+// NEW: Office Mock Test routes
+app.use('/api/office', officeMockTestRoutes);
+console.log('✅ Office Mock Test routes mounted at /api/office');
+
 app.use('/api/public', publicRoutes);
 console.log('✅ Public routes mounted at /api/public');
 
@@ -146,13 +160,17 @@ const startServer = async (): Promise<void> => {
       console.log(`🔗 API URL: http://localhost:${PORT}/api`);
       console.log('=================================');
       console.log('📌 Available Routes:');
-      console.log(`   🔐 /api/auth      - Authentication`);
-      console.log(`   🎓 /api/admission - Student Admission`);
-      console.log(`   📚 /api/programs  - Program Management`);
-      console.log(`   👨‍🏫 /api/teacher   - Teacher Dashboard`);
-      console.log(`   🧑‍🎓 /api/student   - Student Dashboard`);
-      console.log(`   👑 /api/admin     - Admin Management`);
-      console.log(`   🌐 /api/public    - Public Routes`);
+      console.log(`   🔐 /api/auth              - Authentication`);
+      console.log(`   🎓 /api/admission         - Student Admission`);
+      console.log(`   📚 /api/programs          - Program Management`);
+      console.log(`   👨‍🏫 /api/teacher          - Teacher Dashboard`);
+      console.log(`   🧑‍🎓 /api/student          - Student Dashboard`);
+      console.log(`   👑 /api/admin/teachers    - Admin Teacher Management`);
+      console.log(`   👑 /api/admin/students    - Admin Student Management`);
+      console.log(`   📄 /api/admin/receipts    - Admin Receipt Management`);
+      console.log(`   📝 /api/admin/mock-tests  - Admin Mock Test Management`); // NEW
+      console.log(`   📝 /api/office/mock-tests - Office Mock Test Management`); // NEW
+      console.log(`   🌐 /api/public            - Public Routes`);
       console.log('=================================\n');
     });
   } catch (error: any) {

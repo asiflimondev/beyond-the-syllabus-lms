@@ -24,6 +24,8 @@ import ProgramsPage from '@pages/ProgramsPage';
 import AdmissionPage from '@pages/AdmissionPage';
 import TeacherManagement from '@pages/admin/TeacherManagement';
 import StudentsManagement from '@pages/admin/StudentsManagement';
+import AdminMockTests from '@pages/admin/AdminMockTests';
+import AdminMarkEntry from '@pages/admin/AdminMarkEntry';
 
 // Protected Pages (Teacher)
 import TeacherDashboard from '@pages/teacher/TeacherDashboard';
@@ -39,9 +41,12 @@ import StudentProfile from '@pages/student/StudentProfile';
 
 // Protected Pages (Office)
 import OfficeDashboard from '@pages/office/OfficeDashboard';
+import OfficeMockTests from '@pages/office/OfficeMockTests';
+import OfficeMarkEntry from '@pages/office/OfficeMarkEntry';
 
 // Settings Page
 import SettingsPage from '@pages/SettingsPage';
+import ReceiptHistory from '@pages/admin/ReceiptHistory';
 
 // ✅ ScrollToTop Component
 const ScrollToTop: React.FC = () => {
@@ -99,7 +104,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          {/* ✅ Add ScrollToTop inside Router */}
           <ScrollToTop />
           <Routes>
             {/* Public Routes */}
@@ -115,15 +119,19 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/student-register" element={<StudentRegisterPage />} />
 
-            {/* Protected Routes */}
+            {/* Protected Routes - Admin */}
             <Route path="/admin" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin/programs" element={<ProtectedRoute><ProgramsPage /></ProtectedRoute>} />
             <Route path="/admin/admission" element={<ProtectedRoute><AdmissionPage /></ProtectedRoute>} />
             <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
             <Route path="/admin/teachers" element={<ProtectedRoute><TeacherManagement /></ProtectedRoute>} />
+            <Route path="/admin/receipts" element={<ProtectedRoute><ReceiptHistory /></ProtectedRoute>} />
+            <Route path="/admin/mock-tests" element={<ProtectedRoute><AdminMockTests /></ProtectedRoute>} />
+            <Route path="/admin/mark-entry/:mockTestId" element={<ProtectedRoute><AdminMarkEntry /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
+            {/* Protected Routes - Teacher */}
             <Route path="/teacher" element={<ProtectedRoute><Navigate to="/teacher/dashboard" /></ProtectedRoute>} />
             <Route path="/teacher/dashboard" element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>} />
             <Route path="/teacher/programs" element={<ProtectedRoute><TeacherPrograms /></ProtectedRoute>} />
@@ -132,14 +140,18 @@ function App() {
             <Route path="/teacher/mark-entry/:mockTestId" element={<ProtectedRoute><TeacherMarkEntry /></ProtectedRoute>} />
             <Route path="/teacher/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
+            {/* Protected Routes - Student */}
             <Route path="/student" element={<ProtectedRoute><Navigate to="/student/dashboard" /></ProtectedRoute>} />
             <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/mock-tests" element={<ProtectedRoute><MockTestsPage /></ProtectedRoute>} />
             <Route path="/student/mock-tests/:id" element={<ProtectedRoute><div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div></ProtectedRoute>} />
             <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
 
+            {/* Protected Routes - Office */}
             <Route path="/office" element={<ProtectedRoute><Navigate to="/office/dashboard" /></ProtectedRoute>} />
             <Route path="/office/dashboard" element={<ProtectedRoute><OfficeDashboard /></ProtectedRoute>} />
+            <Route path="/office/mock-tests" element={<ProtectedRoute><OfficeMockTests /></ProtectedRoute>} />
+            <Route path="/office/mark-entry/:mockTestId" element={<ProtectedRoute><OfficeMarkEntry /></ProtectedRoute>} />
             <Route path="/office/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
             <Route path="*" element={<Navigate to="/" />} />

@@ -124,6 +124,7 @@ export const updateStudent = async (req: Request, res: Response): Promise<void> 
       schoolCollege,
       programId,
       status,
+      admissionId,
     } = req.body;
 
     const adminId = (req as any).user?.id;
@@ -137,6 +138,23 @@ export const updateStudent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+
+    // If admissionId is being changed, check if the new one already exists
+    if (admissionId && admissionId !== student.admissionId) {
+      const existingStudent = await Student.findOne({
+        admissionId,
+        _id: { $ne: id },
+        isDeleted: false,
+      });
+      if (existingStudent) {
+        res.status(400).json({
+          success: false,
+          message: `Admission ID "${admissionId}" already exists. Please use a different ID.`,
+        });
+        return;
+      }
+    }
+
     const updateData: any = { updatedBy: adminId };
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phone !== undefined) updateData.phone = phone;
@@ -148,6 +166,7 @@ export const updateStudent = async (req: Request, res: Response): Promise<void> 
     if (schoolCollege !== undefined) updateData.schoolCollege = schoolCollege;
     if (programId !== undefined) updateData.programId = programId;
     if (status !== undefined) updateData.status = status;
+    if (admissionId !== undefined) updateData.admissionId = admissionId;
 
     const updatedStudent = await Student.findByIdAndUpdate(
       id,
@@ -361,6 +380,53 @@ export const getStudentStats = async (req: Request, res: Response): Promise<void
     res.status(500).json({
       success: false,
       message: 'Failed to get student statistics',
+      error: error.message,
+    });
+  }
+};
+
+
+// ============================================
+// PERMANENTLY DELETE STUDENT (Admin)
+// ============================================
+export const permanentlyDeleteStudent = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const student = await Student.findById(id);
+    if (!student) {
+      res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+      return;
+    }
+
+    // Store info for response
+    const studentInfo = {
+      id: student._id,
+      fullName: student.fullName,
+      admissionId: student.admissionId,
+    };
+
+    // If student has a user account, delete it too
+    if (student.userId) {
+      await User.findByIdAndDelete(student.userId);
+    }
+
+    // Permanently delete the student
+    await Student.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: `Student "${studentInfo.fullName}" (${studentInfo.admissionId}) permanently deleted`,
+      data: studentInfo,
+    });
+  } catch (error: any) {
+    console.error('Permanently delete student error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete student',
       error: error.message,
     });
   }

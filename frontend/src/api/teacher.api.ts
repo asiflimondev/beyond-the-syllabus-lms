@@ -40,6 +40,9 @@ export const teacherApi = {
   
   updateMockTest: (id: string, data: any) =>
     apiClient.put(`/teacher/mock-tests/${id}`, data),
+
+   deleteMockTest: (id: string) => // NEW - Add this
+    apiClient.delete(`/teacher/mock-tests/${id}`),
   
   getMockTestResults: (mockTestId: string) =>
     apiClient.get(`/teacher/mock-tests/${mockTestId}/results`),
