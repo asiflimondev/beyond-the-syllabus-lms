@@ -19,6 +19,7 @@ import adminStudentRoutes from './routes/admin/studentManagement.routes.js';
 import adminReceiptRoutes from './routes/admin/receipt.routes.js';
 import adminMockTestRoutes from './routes/admin/mockTest.routes.js'; // NEW
 import officeMockTestRoutes from './routes/office/mockTest.routes.js'; // NEW
+import reportRoutes from './routes/report.routes.js';
 import publicRoutes from './routes/public.routes.js';
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
@@ -128,6 +129,9 @@ console.log('✅ Admin Mock Test routes mounted at /api/admin');
 // NEW: Office Mock Test routes
 app.use('/api/office', officeMockTestRoutes);
 console.log('✅ Office Mock Test routes mounted at /api/office');
+
+app.use('/api/reports', reportRoutes); // NEW
+console.log('✅ Report routes mounted at /api/reports');
 
 app.use('/api/public', publicRoutes);
 console.log('✅ Public routes mounted at /api/public');

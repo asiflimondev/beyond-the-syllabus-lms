@@ -26,6 +26,8 @@ import TeacherManagement from '@pages/admin/TeacherManagement';
 import StudentsManagement from '@pages/admin/StudentsManagement';
 import AdminMockTests from '@pages/admin/AdminMockTests';
 import AdminMarkEntry from '@pages/admin/AdminMarkEntry';
+import BatchReport from '@pages/admin/BatchReport';
+import IndividualReport from '@pages/admin/IndividualReport';
 
 // Protected Pages (Teacher)
 import TeacherDashboard from '@pages/teacher/TeacherDashboard';
@@ -129,6 +131,8 @@ function App() {
             <Route path="/admin/receipts" element={<ProtectedRoute><ReceiptHistory /></ProtectedRoute>} />
             <Route path="/admin/mock-tests" element={<ProtectedRoute><AdminMockTests /></ProtectedRoute>} />
             <Route path="/admin/mark-entry/:mockTestId" element={<ProtectedRoute><AdminMarkEntry /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute><BatchReport /></ProtectedRoute>} />
+            <Route path="/admin/reports/individual" element={<ProtectedRoute><IndividualReport /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
             {/* Protected Routes - Teacher */}
@@ -138,6 +142,8 @@ function App() {
             <Route path="/teacher/students" element={<ProtectedRoute><TeacherStudents /></ProtectedRoute>} />
             <Route path="/teacher/mock-tests" element={<ProtectedRoute><TeacherMockTests /></ProtectedRoute>} />
             <Route path="/teacher/mark-entry/:mockTestId" element={<ProtectedRoute><TeacherMarkEntry /></ProtectedRoute>} />
+            <Route path="/teacher/reports" element={<ProtectedRoute><BatchReport /></ProtectedRoute>} />
+            <Route path="/teacher/reports/individual" element={<ProtectedRoute><IndividualReport /></ProtectedRoute>} />
             <Route path="/teacher/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
             {/* Protected Routes - Student */}

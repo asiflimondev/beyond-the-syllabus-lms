@@ -62,6 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
       items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
       items.push({ path: '/admin/mock-tests', icon: FileText, label: 'Mock Tests' });
+      items.push({ path: '/admin/reports', icon: FileText, label: 'Reports' });
       items.push({ path: '/admin/teachers', icon: Users, label: 'Teachers' });
       items.push({ path: '/admin/settings', icon: Settings, label: 'Settings' });
     }
@@ -81,6 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items.push({ path: '/teacher/programs', icon: BookOpen, label: 'My Programs' });
       items.push({ path: '/teacher/students', icon: Users, label: 'My Students' });
       items.push({ path: '/teacher/mock-tests', icon: FileText, label: 'Mock Tests' });
+      items.push({ path: '/teacher/reports', icon: FileText, label: 'Reports' });
       items.push({ path: '/teacher/settings', icon: Settings, label: 'Settings' });
     }
 
