@@ -5,13 +5,11 @@ import {
   Settings, 
   LogOut, 
   ChevronDown,
-  Bell,
-  Search,
   Sparkles
 } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import btsLogo from '/bts-logo.png';
+import cambridgeLogo from '/cambridge-logo.png';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -77,15 +75,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 <MenuIcon className="w-5 h-5" />
               </button>
               
+              {/* Cambridge Logo instead of BTS Logo */}
               <img 
-                src={btsLogo} 
-                alt="BTS Logo" 
+                src={cambridgeLogo} 
+                alt="Cambridge English" 
                 className="h-8 w-auto object-contain"
               />
               
               <div className="hidden sm:block">
                 <span className="text-sm font-bold text-gray-900 tracking-tight">
-                  Beyond the Syllabus
+                  
                 </span>
                 <span className="ml-2 text-xs font-medium text-gray-400">
                   {getRoleDisplay()} Panel
@@ -93,23 +92,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </div>
             </div>
 
-            {/* Right section */}
+            {/* Right section - Removed Search and Notifications */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Search */}
-              <button className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-500 bg-gray-100/80 rounded-xl hover:bg-gray-200/80 transition-all duration-200">
-                <Search className="w-4 h-4" />
-                <span className="hidden lg:inline">Search...</span>
-                <span className="text-xs text-gray-400 bg-white px-1.5 py-0.5 rounded-md border border-gray-200">
-                  ⌘K
-                </span>
-              </button>
-
-              {/* Notifications */}
-              <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-all duration-200">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
-              </button>
-
               {/* User dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button

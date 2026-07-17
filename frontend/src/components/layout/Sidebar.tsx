@@ -11,9 +11,9 @@ import {
   UserPlus,
   User,
   Receipt,
-  GraduationCap,
   ChevronRight,
 } from 'lucide-react';
+import btsLogo from '/bts-logo.png';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -121,12 +121,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Brand Section */}
+          {/* Brand Section - Now with BTS Logo */}
           <div className="px-6 py-5 border-b border-gray-200/30 bg-gradient-to-r from-primary-50/30 to-transparent">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-primary-500/25">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                src={btsLogo} 
+                alt="Beyond the Syllabus" 
+                className="h-10 w-auto object-contain"
+              />
               <div>
                 <h1 className="text-lg font-bold text-gray-900 tracking-tight leading-tight font-display">
                   Beyond the Syllabus
