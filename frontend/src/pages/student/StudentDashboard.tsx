@@ -9,7 +9,11 @@ import {
   TrendingUp,
   Calendar,
   User,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  GraduationCap,
+  Award,
+  BookOpen
 } from 'lucide-react';
 
 const StudentDashboard: React.FC = () => {
@@ -43,7 +47,6 @@ const StudentDashboard: React.FC = () => {
     );
   }
 
-  // ✅ FIXED: Safely get program name
   const getProgramName = (program: any): string => {
     if (!program) return 'N/A';
     if (typeof program === 'string') return program;
@@ -58,33 +61,38 @@ const StudentDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-start justify-between">
+      <div className="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-xl shadow-primary-500/5 p-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-500/5 to-cyan-500/5 rounded-full blur-2xl" />
+        <div className="relative flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles className="w-5 h-5 text-primary-500" />
+              <span className="text-sm font-medium text-primary-600">Student Dashboard</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 font-display">
               Welcome, {profile?.fullName || user?.email}!
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              Admission ID: {profile?.admissionId}
+              Admission ID: <span className="font-medium font-mono">{profile?.admissionId}</span>
             </p>
             <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
               <span className="flex items-center">
-                <User className="w-4 h-4 mr-1" />
+                <User className="w-4 h-4 mr-1 text-gray-400" />
                 {user?.email}
               </span>
               <span className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" />
+                <Calendar className="w-4 h-4 mr-1 text-gray-400" />
                 {new Date(profile?.admissionDate || Date.now()).toLocaleDateString()}
               </span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold ${
                 profile?.status === 'active'
-                  ? 'bg-green-100 text-green-700'
+                  ? 'bg-emerald-100 text-emerald-700'
                   : profile?.status === 'pending_registration'
-                  ? 'bg-yellow-100 text-yellow-700'
+                  ? 'bg-amber-100 text-amber-700'
                   : 'bg-gray-100 text-gray-700'
               }`}
             >
@@ -98,55 +106,59 @@ const StudentDashboard: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Tests</p>
+              <p className="text-sm font-medium text-gray-500">Total Tests</p>
               <p className="text-2xl font-bold text-gray-900">
                 {stats?.totalMockTests || 0}
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <FileText className="w-5 h-5 text-blue-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+              <FileText className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Completed</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-sm font-medium text-gray-500">Completed</p>
+              <p className="text-2xl font-bold text-emerald-600">
                 {stats?.completedTests || 0}
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <CheckCircle className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Pending</p>
+              <p className="text-sm font-medium text-gray-500">Pending</p>
               <p className="text-2xl font-bold text-orange-600">
                 {stats?.pendingTests || 0}
               </p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Clock className="w-5 h-5 text-orange-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <Clock className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Avg Score</p>
+              <p className="text-sm font-medium text-gray-500">Avg Score</p>
               <p className="text-2xl font-bold text-purple-600">
                 {stats?.averagePercentage || 0}%
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
@@ -154,58 +166,66 @@ const StudentDashboard: React.FC = () => {
 
       {/* Current Program */}
       {program && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">My Program</h3>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-primary-500" />
+              My Program
+            </h3>
+            <Link
+              to="/student/program"
+              className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              View Details
+            </Link>
           </div>
           <div className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                {/* ✅ FIXED: Safe rendering */}
-                <h4 className="text-xl font-bold text-gray-900">
+                <h4 className="text-xl font-bold text-gray-900 font-display">
                   {getProgramName(program)}
                 </h4>
                 <p className="text-sm text-gray-500 mt-1">
                   {program.name} • {program.duration} months
                 </p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 mt-2 max-w-md">
                   {program.description?.en}
                 </p>
                 <p className="text-sm font-medium text-gray-700 mt-3">
                   Fee: ৳{program.fee?.toLocaleString()}
                 </p>
               </div>
-              <Link
-                to="/student/program"
-                className="px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-              >
-                View Details
-              </Link>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
+                <Award className="w-6 h-6 text-white" />
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Mock Tests */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Mock Tests</h3>
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-primary-500" />
+            Mock Tests
+          </h3>
           <Link
             to="/student/mock-tests"
-            className="text-sm text-primary-600 hover:text-primary-700"
+            className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
           >
             View All
           </Link>
         </div>
         {mockTests.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No mock tests available yet</p>
+            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">No mock tests available yet</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-100/50">
             {mockTests.slice(0, 3).map((test: any) => (
-              <div key={test._id} className="px-6 py-4 hover:bg-gray-50">
+              <div key={test._id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-gray-900">
@@ -217,17 +237,17 @@ const StudentDashboard: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     {test.hasResult ? (
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
                         {test.result?.percentage || 0}%
                       </span>
                     ) : (
-                      <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                      <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
                         Pending
                       </span>
                     )}
                     <Link
                       to={`/student/mock-tests/${test._id}`}
-                      className="text-sm text-primary-600 hover:text-primary-700"
+                      className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
                     >
                       View
                     </Link>

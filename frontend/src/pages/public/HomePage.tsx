@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Award, 
@@ -12,14 +12,16 @@ import {
   Users as UsersIcon,
   Building,
   Star,
-  Check
+  Check,
+  Globe,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Shield
 } from 'lucide-react';
 import PublicLayout from '@components/layout/PublicLayout';
-import Testimonials from '@components/Testimonials';
 import ScrollProgress from '@components/ScrollProgress';
-// FIX: file is actually named bts-logo-t.png — the old path (/bts-logo.png)
-// was a silent 404, and since both usages below have alt="", the browser
-// never showed a broken-image icon, so the logo just appeared to be missing.
 import btsLogo from '/bts-logo-t.png';
 import cambridgeLogo from '/cambridge-logo.png';
 
@@ -46,7 +48,7 @@ const useScrollReveal = () => {
 };
 
 // ============================================
-// STAIRCASE OBSERVER - FIXED
+// STAIRCASE OBSERVER
 // ============================================
 const useStaircaseObserver = () => {
   useEffect(() => {
@@ -57,7 +59,6 @@ const useStaircaseObserver = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Add the 'rise' class to trigger animation
             stairs.classList.add('rise');
             observer.unobserve(entry.target);
           }
@@ -73,48 +74,139 @@ const useStaircaseObserver = () => {
 };
 
 // ============================================
-// ANIMATED SECTION COMPONENT
+// TESTIMONIALS CAROUSEL - MATCHES TEMPLATE
 // ============================================
-const AnimatedSection: React.FC<{ 
-  children: React.ReactNode; 
-  delay?: number;
-  direction?: 'up' | 'left' | 'right' | 'scale';
-}> = ({ children, delay = 0, direction = 'up' }) => {
-  const ref = useRef<HTMLDivElement>(null);
+const TestimonialsCarousel: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = React.useState(true);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
-    );
+  const testimonials = [
+    {
+      id: 1,
+      name: 'Afnan Osman',
+      score: 'Overall Band 8.5',
+      university: 'University of Cambridge, UK',
+      testimonial: 'Beyond the Syllabus helped me achieve my dream of studying at Cambridge. The teachers are exceptional and the teaching methodology is world-class!',
+      color: '#f1592a',
+      initials: 'AO'
+    },
+    {
+      id: 2,
+      name: 'Rifat Hossain',
+      score: 'Overall Band 8.5',
+      university: 'University of Melbourne, Australia',
+      testimonial: 'The preparation I received was outstanding. I felt confident and prepared for the exam. Beyond the Syllabus truly goes beyond!',
+      color: '#283890',
+      initials: 'RH'
+    },
+    {
+      id: 3,
+      name: 'Asif Limon',
+      score: 'Overall Band 8.0',
+      university: 'University of Toronto, Canada',
+      testimonial: 'I never thought I could achieve such a high score. The personalized attention and rigorous practice sessions made all the difference.',
+      color: '#3648ad',
+      initials: 'AL'
+    },
+    {
+      id: 4,
+      name: 'Ihram Mashhood',
+      score: 'Overall Band 8.0',
+      university: 'University of Sydney, Australia',
+      testimonial: 'The mock tests and daily practice sessions were incredibly helpful. I felt fully prepared for the actual exam day.',
+      color: '#f4a06a',
+      initials: 'IM'
+    },
+    {
+      id: 5,
+      name: 'Muntaqa Nudar',
+      score: 'Overall Band 8.5',
+      university: 'National University of Singapore',
+      testimonial: 'Beyond the Syllabus gave me the confidence I needed. The teachers really care about their students\' success.',
+      color: '#7c85c8',
+      initials: 'MN'
+    },
+  ];
 
-    if (ref.current) observer.observe(ref.current);
-
-    return () => observer.disconnect();
-  }, []);
-
-  const getDirectionClass = () => {
-    switch (direction) {
-      case 'left': return 'reveal-left';
-      case 'right': return 'reveal-right';
-      case 'scale': return 'reveal-scale';
-      default: return 'reveal-up';
-    }
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   };
 
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
+  React.useEffect(() => {
+    if (!isAutoPlaying) return;
+    const timer = setInterval(nextSlide, 5200);
+    return () => clearInterval(timer);
+  }, [isAutoPlaying]);
+
   return (
-    <div
-      ref={ref}
-      className={`reveal ${getDirectionClass()}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
+    <div className="relative max-w-4xl mx-auto">
+      <div className="overflow-hidden rounded-3xl">
+        <div 
+          className="flex transition-transform duration-700 ease-out"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {testimonials.map((testimonial) => (
+            <div 
+              key={testimonial.id}
+              className="flex-none w-full px-6 py-12 md:py-16 text-center bg-white/5 border border-white/20 rounded-3xl"
+            >
+              <div className="flex justify-center gap-1 mb-4 text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <blockquote className="font-display text-xl md:text-2xl text-white leading-relaxed max-w-3xl mx-auto">
+                {testimonial.testimonial}
+              </blockquote>
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <div 
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-display font-extrabold text-lg shadow-lg flex-shrink-0"
+                  style={{ backgroundColor: testimonial.color }}
+                >
+                  {testimonial.initials}
+                </div>
+                <div className="text-left">
+                  <p className="font-bold text-white font-display text-lg">{testimonial.name}</p>
+                  <p className="text-orange-200 text-sm font-semibold">{testimonial.score}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={() => { setIsAutoPlaying(false); prevSlide(); setTimeout(() => setIsAutoPlaying(true), 5000); }}
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white hover:bg-orange-500 hover:border-transparent transition-all duration-300 flex items-center justify-center"
+        aria-label="Previous"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <button
+        onClick={() => { setIsAutoPlaying(false); nextSlide(); setTimeout(() => setIsAutoPlaying(true), 5000); }}
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white hover:bg-orange-500 hover:border-transparent transition-all duration-300 flex items-center justify-center"
+        aria-label="Next"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
+      <div className="flex justify-center gap-2 mt-6">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => { setIsAutoPlaying(false); setCurrentIndex(index); setTimeout(() => setIsAutoPlaying(true), 5000); }}
+            className={`transition-all duration-300 rounded-full ${
+              index === currentIndex
+                ? 'w-8 h-2 bg-orange-500'
+                : 'w-2 h-2 bg-white/30 hover:bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -123,80 +215,7 @@ const HomePage: React.FC = () => {
   useScrollReveal();
   useStaircaseObserver();
 
-  // Services data
-  const services = [
-    {
-      id: 1,
-      title: 'Cambridge Assessment Standard Level Teaching',
-      description: 'We follow the official Cambridge Assessment English curriculum with standardized teaching methods that ensure consistent, high-quality learning outcomes for every student.',
-      icon: Award,
-      bgColor: 'bg-white',
-      accentColor: 'from-blue-500 to-cyan-500',
-      iconBg: 'bg-blue-100 text-blue-600',
-      illustration: '📚',
-    },
-    {
-      id: 2,
-      title: 'Interactive Speaking & Presentation Sessions',
-      description: 'Build confidence through regular speaking practice and presentation opportunities. Our interactive sessions help you develop fluency, pronunciation, and presentation skills for real-world communication.',
-      icon: Mic,
-      bgColor: 'bg-gray-50/80',
-      accentColor: 'from-purple-500 to-violet-500',
-      iconBg: 'bg-purple-100 text-purple-600',
-      illustration: '🎤',
-    },
-    {
-      id: 3,
-      title: 'Academic & Creative Writing Development',
-      description: 'Master the art of writing with our comprehensive program covering academic essays, creative writing, and exam-focused composition. Develop your unique voice while meeting Cambridge standards.',
-      icon: PenTool,
-      bgColor: 'bg-white',
-      accentColor: 'from-emerald-500 to-teal-500',
-      iconBg: 'bg-green-100 text-green-600',
-      illustration: '✍️',
-    },
-    {
-      id: 4,
-      title: 'Regular Mock Tests and Progress Reports',
-      description: 'Track your improvement with regular mock tests that simulate the actual Cambridge exam experience. Receive detailed progress reports with personalized feedback and improvement strategies.',
-      icon: ClipboardList,
-      bgColor: 'bg-gray-50/80',
-      accentColor: 'from-orange-500 to-amber-500',
-      iconBg: 'bg-orange-100 text-orange-600',
-      illustration: '📊',
-    },
-    {
-      id: 5,
-      title: 'Experienced Cambridge English Trainers',
-      description: 'Learn from certified Cambridge English trainers with years of experience. Our expert instructors bring real exam knowledge and proven teaching methodologies to every session.',
-      icon: Users,
-      bgColor: 'bg-white',
-      accentColor: 'from-cyan-500 to-sky-500',
-      iconBg: 'bg-cyan-100 text-cyan-600',
-      illustration: '👨‍🏫',
-    },
-    {
-      id: 6,
-      title: 'Small Batch for Individual Attention',
-      description: 'Enjoy the benefits of small class sizes with a maximum of 8-10 students per batch. This ensures personalized attention, active participation, and focused learning for every student.',
-      icon: UsersIcon,
-      bgColor: 'bg-gray-50/80',
-      accentColor: 'from-pink-500 to-rose-500',
-      iconBg: 'bg-pink-100 text-pink-600',
-      illustration: '👥',
-    },
-    {
-      id: 7,
-      title: 'International University Admission & Foundation Support',
-      description: 'Get expert guidance for international university applications. From university selection to application preparation and visa assistance, we support your journey to global education.',
-      icon: Building,
-      bgColor: 'bg-white',
-      accentColor: 'from-indigo-500 to-purple-500',
-      iconBg: 'bg-indigo-100 text-indigo-600',
-      illustration: '🌍',
-    },
-  ];
-
+  // Quick Services - 8 items
   const quickServices = [
     { icon: Award, label: 'Cambridge Assessment', color: 'bg-blue-100 text-blue-600' },
     { icon: Mic, label: 'Speaking Sessions', color: 'bg-purple-100 text-purple-600' },
@@ -205,18 +224,15 @@ const HomePage: React.FC = () => {
     { icon: Users, label: 'Expert Trainers', color: 'bg-cyan-100 text-cyan-600' },
     { icon: UsersIcon, label: 'Small Batches', color: 'bg-pink-100 text-pink-600' },
     { icon: Building, label: 'University Support', color: 'bg-indigo-100 text-indigo-600' },
+    { icon: BookOpen, label: 'Study Materials', color: 'bg-emerald-100 text-emerald-600' },
   ];
 
   const programs = [
     { 
       id: 1, 
       name: 'Movers', 
-      level: 'Elementary', 
-      duration: '7 months', 
-      fee: '12,000 BDT', 
-      icon: '🌟', 
-      color: 'from-green-400 to-emerald-500',
-      description: 'Cambridge Movers is the second level of the Cambridge Young Learners English Tests, designed for children with basic English skills.',
+      level: 'Class 4–6',
+      duration: '7–9 months',
       cefr: 'A1',
       levelLabel: 'Movers',
       stairColor: '#283890',
@@ -226,12 +242,8 @@ const HomePage: React.FC = () => {
     { 
       id: 2, 
       name: 'KET', 
-      level: 'Elementary', 
-      duration: '7 months', 
-      fee: '15,000 BDT', 
-      icon: '📘', 
-      color: 'from-blue-400 to-cyan-500',
-      description: 'The Cambridge Key English Test (KET) is an elementary level qualification that demonstrates the ability to communicate in basic English.',
+      level: 'Class 6–8',
+      duration: '7–9 months',
       cefr: 'A2',
       levelLabel: 'KET',
       stairColor: '#3a49a8',
@@ -241,12 +253,8 @@ const HomePage: React.FC = () => {
     { 
       id: 3, 
       name: 'PET', 
-      level: 'Intermediate', 
-      duration: '8 months', 
-      fee: '18,000 BDT', 
-      icon: '📗', 
-      color: 'from-purple-400 to-violet-500',
-      description: 'The Cambridge Preliminary English Test (PET) is an intermediate level qualification for everyday English communication.',
+      level: 'Class 7–10',
+      duration: '7–9 months',
       cefr: 'B1',
       levelLabel: 'PET',
       stairColor: '#8a7fb0',
@@ -256,12 +264,8 @@ const HomePage: React.FC = () => {
     { 
       id: 4, 
       name: 'FCE', 
-      level: 'Upper-Intermediate', 
-      duration: '9 months', 
-      fee: '22,000 BDT', 
-      icon: '📕', 
-      color: 'from-orange-400 to-red-500',
-      description: 'The Cambridge First Certificate in English (FCE) is an upper-intermediate qualification for living and working independently.',
+      level: 'Class 8–12',
+      duration: '7–9 months',
       cefr: 'B2',
       levelLabel: 'FCE',
       stairColor: '#ef6a35',
@@ -271,18 +275,32 @@ const HomePage: React.FC = () => {
     { 
       id: 5, 
       name: 'CAE', 
-      level: 'Advanced', 
-      duration: '9 months', 
-      fee: '25,000 BDT', 
-      icon: '🎯', 
-      color: 'from-pink-400 to-rose-500',
-      description: 'Cambridge Advanced English (CAE) is a high-level qualification showing language skills that employers and universities are looking for.',
+      level: 'College level',
+      duration: '7–9 months',
       cefr: 'C1',
       levelLabel: 'CAE',
       stairColor: '#f1592a',
       stairHeight: '230px',
       delay: '1.3s'
     },
+  ];
+
+  const ethosData = [
+    {
+      tag: 'Our mission',
+      title: 'Empower every learner',
+      description: 'To help students of every level achieve their English goals through world-class Cambridge preparation and genuine mentorship.'
+    },
+    {
+      tag: 'Our vision',
+      title: 'Fluency beyond exams',
+      description: 'To be Bangladesh\'s most trusted Cambridge English center — known for taking learners beyond the syllabus to lasting fluency.'
+    },
+    {
+      tag: 'Our values',
+      title: 'Rigour & care',
+      description: 'Academic excellence, integrity and individual attention — every student supported as a person, not a number.'
+    }
   ];
 
   const facilities = [
@@ -292,44 +310,38 @@ const HomePage: React.FC = () => {
     { icon: Clock, title: 'Flexible Schedule', description: 'Morning, afternoon & evening batches' },
   ];
 
-  const renderService = (service: typeof services[0]) => {
-    const Icon = service.icon;
+  const familyReasons = [
+    { 
+      icon: Shield, 
+      title: 'Official Cambridge partner', 
+      description: 'An accredited preparation center following the Cambridge curriculum end to end.' 
+    },
+    { 
+      icon: Users, 
+      title: 'Cambridge-certified faculty', 
+      description: 'Experienced teachers who go beyond exam tricks toward genuine fluency.' 
+    },
+    { 
+      icon: Clock, 
+      title: 'Flexible schedules', 
+      description: 'Morning, afternoon and evening batches, timed to fit school, work and family.' 
+    },
+    { 
+      icon: Heart, 
+      title: 'Scholarships & installments', 
+      description: 'Merit scholarships and flexible plans keep quality preparation accessible.' 
+    },
+  ];
 
-    return (
-      <AnimatedSection key={service.id} delay={100}>
-        <div className={`py-20 lg:py-28 ${service.bgColor}`}>
-          <div className="container-fluid">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              <div className="flex justify-center">
-                <div className="w-full max-w-sm">
-                  <div className={`bg-gradient-to-br ${service.accentColor} bg-opacity-10 rounded-3xl p-8 border-2 shadow-xl`}>
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="text-6xl lg:text-7xl mb-4">
-                        {service.illustration}
-                      </div>
-                      <div className={`w-16 h-16 rounded-full ${service.iconBg} flex items-center justify-center shadow-lg`}>
-                        <Icon className="w-8 h-8" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className={`inline-block bg-gradient-to-r ${service.accentColor} px-6 py-3 rounded-2xl shadow-lg`}>
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight font-display">
-                    {service.title}
-                  </h3>
-                </div>
-                <p className="text-ink-soft text-base lg:text-lg leading-relaxed max-w-lg">
-                  {service.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </AnimatedSection>
-    );
+  // Helper for riser style
+  const getRiserStyle = (color: string, height: string) => {
+    return {
+      '--riser-height': height,
+      background: `linear-gradient(180deg, ${color}, ${color}33)`,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)',
+      height: '0px',
+      transition: `height 1.5s cubic-bezier(0.16, 1, 0.3, 1)`,
+    } as React.CSSProperties;
   };
 
   return (
@@ -338,16 +350,10 @@ const HomePage: React.FC = () => {
 
       {/* ==========================================
           HERO SECTION
-          FIX: btsLogo import corrected to bts-logo-t.png (below, outside
-          this section) so the watermark + bottom panel logo actually render.
-          Buttons and the Cambridge logo pill resized to match the reference
-          template's exact CSS values (.btn padding .95rem/1.6rem, text 1rem;
-          .campill img height 34px, pill padding .5rem/.85rem).
           ========================================== */}
       <section className="relative overflow-hidden text-white" style={{ 
         background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
       }}>
-        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1568792923760-d70635a89fdc?auto=format&fit=crop&w=1900&q=80" 
@@ -357,18 +363,15 @@ const HomePage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-[#0e1235]/95 via-[#141a4a]/90 to-[#1c2564]/80" />
         </div>
 
-        {/* Grid Lines */}
         <div className="absolute inset-0 z-0 opacity-50 pointer-events-none" style={{
           backgroundImage: 'linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px)',
           backgroundSize: '54px 54px',
           maskImage: 'radial-gradient(75% 75% at 60% 25%, #000, transparent 82%)'
         }} />
 
-        {/* Floating Orbs */}
-        <div className="absolute -top-14 -right-8 w-[44vw] max-w-[580px] h-[44vw] max-h-[580px] rounded-full z-0 opacity-40 blur-xl bg-orange-500/25" />
-        <div className="absolute -bottom-26 -left-12 w-[42vw] max-w-[540px] h-[42vw] max-h-[540px] rounded-full z-0 opacity-40 blur-xl bg-blue-600/35" />
+        <div className="absolute -top-14 -right-8 w-[44vw] max-w-[580px] h-[44vw] max-h-[580px] rounded-full z-0 opacity-20 blur-xl bg-orange-500/15" />
+        <div className="absolute -bottom-26 -left-12 w-[42vw] max-w-[540px] h-[42vw] max-h-[540px] rounded-full z-0 opacity-20 blur-xl bg-blue-600/15" />
 
-        {/* Floating Shapes */}
         <div className="absolute top-[12%] left-[34%] z-0 text-white/10 float-a hidden lg:block">
           <svg width="66" height="66" viewBox="0 0 122 122" fill="none" stroke="currentColor" strokeWidth="1.6">
             <circle cx="61" cy="61" r="53"/>
@@ -386,14 +389,12 @@ const HomePage: React.FC = () => {
           </svg>
         </div>
 
-        {/* Watermark Logo */}
         <div className="absolute right-[-3%] top-[12%] w-[42vw] max-w-[520px] z-0 opacity-10 pointer-events-none hidden lg:block">
           <img src={btsLogo} alt="" className="w-full brightness-0 invert" />
         </div>
 
         <div className="relative z-10 container-fluid py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Content */}
             <div>
               <div className="inline-flex items-center gap-3 text-orange-200 font-bold text-sm reveal">
                 <span className="w-7 h-7 rounded-lg bg-orange-500/30 text-orange-200 flex items-center justify-center">
@@ -415,9 +416,6 @@ const HomePage: React.FC = () => {
                 Cambridge-certified teachers, a proven level-by-level path, and real classroom energy — guiding learners from their first words to confident, exam-ready fluency and the world beyond.
               </p>
 
-              {/* FIX: buttons now match the reference .btn class exactly —
-                  padding .95rem/1.6rem, text 1rem (was px-6 py-3 text-sm),
-                  icon 18px (was 16px) */}
               <div className="flex flex-wrap gap-4 mt-8 reveal" style={{ transitionDelay: '220ms' }}>
                 <Link
                   to="/programs"
@@ -434,9 +432,6 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
 
-              {/* FIX: Cambridge logo pill now matches the reference .campill
-                  class exactly — img height 34px (was 32px), pill padding
-                  .5rem/.85rem, radius 14px (was smaller px-4 py-2 rounded-xl) */}
               <div className="flex items-center gap-[0.9rem] mt-[2.6rem] pt-[1.7rem] border-t border-white/20 reveal" style={{ transitionDelay: '300ms' }}>
                 <div className="flex items-center gap-[0.6rem] bg-white rounded-[14px] px-[0.85rem] py-[0.5rem] shadow-sh-2 flex-none">
                   <img src={cambridgeLogo} alt="Cambridge English" className="h-[34px] w-auto object-contain" />
@@ -447,7 +442,6 @@ const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column - Photo */}
             <div className="relative reveal" style={{ transitionDelay: '140ms' }}>
               <div className="relative rounded-3xl overflow-hidden shadow-sh-3 aspect-[4/4.7] bg-surface border-4 border-white/90 transform transition-transform duration-300 hover:scale-[1.02]">
                 <img
@@ -458,14 +452,11 @@ const HomePage: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
               </div>
 
-              {/* Floating Badge */}
-              <div className="absolute -top-4 -right-4 bg-orange-500 text-white rounded-2xl px-4 py-2 shadow-sh-2 font-bold text-sm flex items-center gap-2 animate-float-a">
+              <div className="absolute -top-4 -right-4 bg-orange-500 text-white rounded-2xl px-4 py-2 shadow-sh-2 font-bold text-sm flex items-center gap-2">
                 <Star className="w-4 h-4 fill-white" />
                 A1 → C1
               </div>
 
-              {/* Bottom Panel — this is where the BTS logo renders; the
-                  broken import path was the reason it appeared missing */}
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-sh-2 max-w-[240px] flex items-center gap-3">
                 <img src={btsLogo} alt="" className="w-12 h-12 rounded-xl bg-surface p-1.5 object-contain" />
                 <div>
@@ -481,7 +472,7 @@ const HomePage: React.FC = () => {
       {/* ==========================================
           MARQUEE
           ========================================== */}
-      <div className="bg-blue-800 py-4 overflow-hidden border-b border-white/10">
+      <div className="bg-blue-900 py-4 overflow-hidden border-b border-white/10">
         <div className="relative overflow-hidden">
           <div className="flex gap-0 w-max animate-marquee hover:animation-pause whitespace-nowrap">
             <div className="flex items-center gap-8 px-6">
@@ -505,7 +496,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* ==========================================
-          PROGRAMS SECTION - Staircase with Animation
+          CAMBRIDGE QUALIFICATIONS - STAIRCASE
           ========================================== */}
       <section className="py-16 lg:py-20 bg-white" id="programs">
         <div className="container-fluid">
@@ -518,59 +509,48 @@ const HomePage: React.FC = () => {
               </span>
               Cambridge Qualifications
             </span>
-            <h2>Climb the staircase, step by step.</h2>
-            <p>Every learner is placed at the right level, then rises one confident Cambridge step at a time — each stage mapped to the Common European Framework (CEFR).</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Climb the staircase, step by step.</h2>
+            <p className="text-gray-500 text-lg">Every learner is placed at the right level, then rises one confident Cambridge step at a time — each stage mapped to the Common European Framework (CEFR).</p>
           </div>
 
           <div className="staircase-container" id="staircase">
             <div className="flex flex-col md:flex-row md:items-end gap-3 relative pt-14 md:min-h-[420px]">
-              {programs.map((program) => {
-                const riserStyle: React.CSSProperties & { '--riser-height'?: string } = {
-                  '--riser-height': program.stairHeight,
-                  background: `linear-gradient(180deg, ${program.stairColor}, ${program.stairColor}33)`,
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)',
-                };
-
-                return (
-                  <div key={program.id} className="stair-item flex flex-col md:justify-end items-stretch relative md:flex-1">
-                    {/* Step Card */}
-                    <div className="bg-white border border-line rounded-r-lg p-4 shadow-sh-1 hover:shadow-sh-2 hover:-translate-y-2 transition-all duration-300 relative z-10">
-                      <div 
-                        className="w-11 h-11 rounded-xl text-white font-display font-extrabold text-lg flex items-center justify-center shadow-md"
-                        style={{ backgroundColor: program.stairColor }}
-                      >
-                        {program.cefr}
-                      </div>
-                      <h3 className="font-display font-extrabold text-blue-900 text-lg mt-3 tracking-tight">
-                        {program.levelLabel}
-                      </h3>
-                      <p className="text-xs font-bold text-muted uppercase tracking-wide mt-0.5">
-                        {program.level}
-                      </p>
-                      <div className="flex items-center gap-2 mt-3">
-                        <Clock className="w-3.5 h-3.5" style={{ color: program.stairColor }} />
-                        <span className="text-sm font-bold" style={{ color: program.stairColor }}>
-                          {program.duration}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Riser - Grows upward when staircase is triggered */}
+              {programs.map((program) => (
+                <div key={program.id} className="stair-item flex flex-col md:justify-end items-stretch relative md:flex-1">
+                  <div className="bg-white border border-line rounded-r-lg p-4 shadow-sh-1 hover:shadow-sh-2 hover:-translate-y-2 transition-all duration-300 relative z-10">
                     <div 
-                      className="stair-riser relative z-0 -mt-1 rounded-t-lg shadow-inner"
-                      style={riserStyle}
-                    />
-                    
-                    {/* CAE Cap Badge */}
-                    {program.cefr === 'C1' && (
-                      <div className="absolute -top-2 -right-2 z-20 bg-blue-900 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sh-1 flex items-center gap-1 whitespace-nowrap">
-                        <Star className="w-3 h-3 fill-orange-200 text-orange-200" />
-                        Study abroad ready
-                      </div>
-                    )}
+                      className="w-11 h-11 rounded-xl text-white font-display font-extrabold text-lg flex items-center justify-center shadow-md"
+                      style={{ backgroundColor: program.stairColor }}
+                    >
+                      {program.cefr}
+                    </div>
+                    <h3 className="font-display font-extrabold text-blue-900 text-lg mt-3 tracking-tight">
+                      {program.levelLabel}
+                    </h3>
+                    <p className="text-xs font-bold text-muted uppercase tracking-wide mt-0.5">
+                      {program.level}
+                    </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Clock className="w-3.5 h-3.5" style={{ color: program.stairColor }} />
+                      <span className="text-sm font-bold" style={{ color: program.stairColor }}>
+                        {program.duration}
+                      </span>
+                    </div>
                   </div>
-                );
-              })}
+                  
+                  <div 
+                    className="stair-riser relative z-0 -mt-1 rounded-t-lg shadow-inner"
+                    style={getRiserStyle(program.stairColor, program.stairHeight)}
+                  />
+                  
+                  {program.cefr === 'C1' && (
+                    <div className="absolute -top-2 -right-2 z-20 bg-blue-900 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sh-1 flex items-center gap-1 whitespace-nowrap">
+                      <Star className="w-3 h-3 fill-orange-200 text-orange-200" />
+                      Study abroad ready
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -583,7 +563,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          SERVICES GRID
+          HOW WE TEACH - WITH 8 CARDS
           ========================================== */}
       <section className="py-16 lg:py-20 bg-surface border-y border-line">
         <div className="container-fluid">
@@ -596,8 +576,8 @@ const HomePage: React.FC = () => {
               </span>
               How we teach
             </span>
-            <h2>A whole system — not just a classroom.</h2>
-            <p>Everything a learner needs to prepare, practise and pass, under one roof in Dhaka.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A whole system — not just a classroom.</h2>
+            <p className="text-gray-500 text-lg">Everything a learner needs to prepare, practise and pass, under one roof in Dhaka.</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 reveal">
@@ -618,19 +598,282 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          SERVICES LIST
+          STUDY ABROAD & SCHOLARSHIPS
           ========================================== */}
-      {services.map((service) => renderService(service))}
+      <section className="py-16 lg:py-20 bg-white border-y border-line overflow-hidden">
+        <div className="container-fluid">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="section-head reveal" style={{ marginBottom: '28px' }}>
+                <span className="kicker">
+                  <span className="tick">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/>
+                    </svg>
+                  </span>
+                  Study Abroad &amp; Scholarships
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Your English, a passport to the world.</h2>
+                <p className="text-gray-500 text-lg">A Cambridge qualification is recognised by universities and employers across the globe — the first step from a classroom in Dhaka to a campus abroad.</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex gap-4 items-start reveal">
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-blue-900 text-lg">Globally recognised certificates</h4>
+                    <p className="text-ink-soft text-sm">Cambridge English qualifications trusted by thousands of institutions worldwide.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start reveal" style={{ transitionDelay: '80ms' }}>
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Star className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-blue-900 text-lg">Merit scholarships</h4>
+                    <p className="text-ink-soft text-sm">Outstanding students earn merit-based scholarships, with installment plans for everyone.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start reveal" style={{ transitionDelay: '160ms' }}>
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0 mt-1">
+                    <GraduationCap className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-blue-900 text-lg">Guidance every step</h4>
+                    <p className="text-ink-soft text-sm">Personal consultation to map levels, exams and your route to studying abroad.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 relative reveal" style={{ transitionDelay: '140ms' }}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 rounded-2xl overflow-hidden shadow-sh-2 aspect-[16/9]">
+                  <img 
+                    src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80" 
+                    alt="University campus" 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="rounded-2xl overflow-hidden shadow-sh-1 aspect-square">
+                  <img 
+                    src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=700&q=80" 
+                    alt="Graduation" 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="rounded-2xl overflow-hidden shadow-sh-1 aspect-square">
+                  <img 
+                    src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=700&q=80" 
+                    alt="International students" 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-5 py-3 shadow-sh-2 font-display font-bold text-blue-900 text-sm flex items-center gap-2 whitespace-nowrap">
+                <Globe className="w-5 h-5 text-orange-500" />
+                Worldwide recognition
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ==========================================
-          TESTIMONIALS
+          WHY FAMILIES CHOOSE US
           ========================================== */}
-      <Testimonials />
+      <section className="py-16 lg:py-20 bg-surface">
+        <div className="container-fluid">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="section-head reveal" style={{ marginBottom: '34px' }}>
+                <span className="kicker">
+                  <span className="tick">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                      <path d="M12 2l2.4 5 5.6.6-4.2 3.8 1.2 5.6L12 20l-5 2.6 1.2-5.6L4 13.2l5.6-.6z"/>
+                    </svg>
+                  </span>
+                  Why families choose us
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Built to get real results.</h2>
+                <p className="text-gray-500 text-lg">Cambridge rigour with genuine care — the reason students trust us with their goals.</p>
+              </div>
+
+              <div className="space-y-6">
+                {familyReasons.map((item, index) => (
+                  <div key={index} className="flex gap-4 items-start reveal" style={{ transitionDelay: `${index * 80}ms` }}>
+                    <div className="w-12 h-12 rounded-xl bg-white border border-line flex items-center justify-center text-orange-500 shadow-sh-1 flex-shrink-0">
+                      <item.icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-display font-bold text-blue-900 text-lg">{item.title}</h4>
+                      <p className="text-ink-soft text-sm">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 relative reveal" style={{ transitionDelay: '140ms' }}>
+              <div className="rounded-3xl overflow-hidden shadow-sh-2 aspect-[5/5.4]">
+                <img 
+                  src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1000&q=80" 
+                  alt="Teacher with students" 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl px-5 py-3 shadow-sh-2 text-center">
+                <p className="font-display font-extrabold text-3xl text-orange-500">A1–C1</p>
+                <p className="text-xs font-semibold text-ink-soft">Full Cambridge range</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ==========================================
-          WHY CHOOSE US
+          LIFE AT BEYOND THE SYLLABUS - GALLERY
           ========================================== */}
-      <section className="py-16 lg:py-20 bg-gray-50/50">
+      <section className="py-16 lg:py-20 bg-white">
+        <div className="container-fluid">
+          <div className="section-head centered reveal">
+            <span className="kicker">
+              <span className="tick">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+              </span>
+              Life at Beyond the Syllabus
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A community that learns together.</h2>
+            <p className="text-gray-500 text-lg">Bright classrooms, real conversation and the friendships that make English stick.</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { 
+                src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80', 
+                label: 'Group study sessions',
+                tall: true,
+              },
+              { 
+                src: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=700&q=80', 
+                label: 'Speaking practice',
+                tall: false,
+              },
+              { 
+                src: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=700&q=80', 
+                label: 'Young learners',
+                tall: false,
+              },
+              { 
+                src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80', 
+                label: 'Library & resources',
+                tall: false,
+              },
+              { 
+                src: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=700&q=80', 
+                label: 'Our community',
+                tall: false,
+              },
+            ].map((item, index) => (
+              <div 
+                key={index}
+                className={`relative rounded-2xl overflow-hidden shadow-sh-1 hover:shadow-sh-2 transition-all duration-300 group ${
+                  item.tall ? 'col-span-2 row-span-2' : ''
+                } reveal`}
+                style={{ transitionDelay: `${index * 60}ms` }}
+              >
+                <img 
+                  src={item.src} 
+                  alt={item.label} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                  <span className="text-white font-semibold text-sm p-4">{item.label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================
+          SUCCESS STORIES
+          ========================================== */}
+      <section className="py-16 lg:py-20 text-white relative overflow-hidden" style={{ 
+        background: 'linear-gradient(115deg, #0e1235 0%, #141a4a 44%, #1c2564 100%)'
+      }}>
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-1/2 h-full bg-orange-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-1/2 h-full bg-blue-600/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 container-fluid">
+          <div className="section-head centered reveal" style={{ marginBottom: '40px' }}>
+            <span className="kicker" style={{ color: '#ffd6c4' }}>
+              <span className="tick" style={{ background: 'rgba(241,89,42,0.22)', color: '#ffd6c4' }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 2l2.9 6.3 6.8.8-5 4.6 1.4 6.7L12 17.8 5.9 21.2 7.3 14.5l-5-4.6 6.8-.8z"/>
+                </svg>
+              </span>
+              Success stories
+            </span>
+            <h2 style={{ color: '#fff' }}>What Our Students Say</h2>
+            <p style={{ color: '#b7bde0' }}>Hear from learners who climbed the Cambridge staircase with us.</p>
+          </div>
+
+          <TestimonialsCarousel />
+        </div>
+      </section>
+
+      {/* ==========================================
+          WHAT DRIVES US - ETHOS
+          ========================================== */}
+      <section className="py-16 lg:py-20 bg-surface border-y border-line">
+        <div className="container-fluid">
+          <div className="section-head centered reveal">
+            <span className="kicker">
+              <span className="tick">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7z"/>
+                </svg>
+              </span>
+              What drives us
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Beyond the syllabus, on purpose.</h2>
+            <p className="text-gray-500 text-lg">We believe language learning should reach past textbooks — into confidence, character and real communication.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ethosData.map((item, index) => (
+              <div 
+                key={index} 
+                className="bg-white rounded-2xl p-8 border border-line hover:shadow-sh-2 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden reveal"
+                style={{ transitionDelay: `${index * 80}ms` }}
+              >
+                <span className="font-display font-bold text-sm text-orange-600 relative z-10">{item.tag}</span>
+                <h3 className="font-display font-bold text-2xl text-blue-900 mt-3 mb-2 relative z-10">{item.title}</h3>
+                <p className="text-ink-soft text-sm relative z-10">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================
+          WHY CHOOSE US - OLDER UI, NO IMAGE
+          ========================================== */}
+      <section className="py-16 lg:py-20 bg-white">
         <div className="container-fluid">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 rounded-full text-primary-700 text-sm font-medium mb-4">
@@ -659,24 +902,29 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          CTA SECTION
+          READY TO START YOUR JOURNEY? - CTA
           ========================================== */}
-      <section className="py-16 lg:py-20 bg-primary-600 text-white">
-        <div className="container-fluid max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-display">Ready to Start Your Journey?</h2>
-          <p className="text-primary-100 mb-8 max-w-2xl mx-auto">
+      <section className="py-16 lg:py-20 relative overflow-hidden" style={{ background: 'linear-gradient(120deg, #f1592a, #df481c)' }}>
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute -top-20 -right-20 w-[420px] h-[420px] rounded-full bg-white/20 blur-3xl" />
+        </div>
+        <div className="relative z-10 container-fluid max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-extrabold text-white mb-4">
+            Ready to Start Your Journey?
+          </h2>
+          <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
             Join Beyond the Syllabus today and discover the path to achieving your Cambridge English qualification.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               to="/programs"
-              className="px-8 py-3 bg-white text-primary-700 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:shadow-lg hover:-translate-y-0.5"
+              className="px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300"
             >
               Explore Programs
             </Link>
             <Link
               to="/contact"
-              className="px-8 py-3 border-2 border-white/50 text-white font-semibold rounded-xl hover:bg-white/10 transition-all backdrop-blur-sm hover:-translate-y-0.5"
+              className="px-8 py-4 border-2 border-white/60 text-white font-bold rounded-full hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300"
             >
               Contact Us
             </Link>

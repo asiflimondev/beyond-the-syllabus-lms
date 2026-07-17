@@ -4,12 +4,14 @@ import {
   User, 
   Settings, 
   LogOut, 
-  ChevronDown
+  ChevronDown,
+  Bell,
+  Search,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import btsLogo from '/bts-logo.png';
-import cambridgeLogo from '/cambridge-logo.png';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -26,17 +28,31 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     navigate('/login');
   };
 
-  // Get the correct settings path based on user role
   const getSettingsPath = () => {
     const role = user?.role;
     if (role === 'admin') return '/admin/settings';
     if (role === 'teacher') return '/teacher/settings';
     if (role === 'student') return '/student/settings';
     if (role === 'office') return '/office/settings';
-    return '/settings'; // fallback
+    return '/settings';
   };
 
-  // Close dropdown when clicking outside
+  const getDisplayName = () => {
+    if (!user?.email) return 'User';
+    return user.email.split('@')[0];
+  };
+
+  const getUserInitials = () => {
+    if (!user?.email) return 'U';
+    return user.email.charAt(0).toUpperCase();
+  };
+
+  const getRoleDisplay = () => {
+    const role = user?.role;
+    if (!role) return 'User';
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -48,96 +64,113 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
-      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {/* Left section - Logo and Brand */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onMenuClick}
-            className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all duration-200 lg:hidden"
-          >
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          
-          {/* BTS Logo */}
-          <img 
-            src={btsLogo} 
-            alt="BTS Logo" 
-            className="h-8 w-auto object-contain"
-          />
-          
-          <span className="text-lg font-bold text-gray-900 tracking-tight">
-            Beyond the Syllabus
-          </span>
-        </div>
-
-        {/* Right section - Cambridge Logo + User Dropdown */}
-        <div className="flex items-center gap-4">
-          {/* Cambridge Logo */}
-          <img 
-            src={cambridgeLogo} 
-            alt="Cambridge English" 
-            className="h-10 w-auto object-contain"
-          />
-
-          {/* User dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2.5 px-2.5 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
-                {user?.email?.charAt(0).toUpperCase() || 'U'}
+    <header className="sticky top-4 z-30 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-lg shadow-primary-500/5 rounded-2xl px-4 py-3 sm:px-6 sm:py-4 transition-all duration-300">
+          <div className="flex items-center justify-between">
+            {/* Left section */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onMenuClick}
+                className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all duration-200 lg:hidden"
+              >
+                <MenuIcon className="w-5 h-5" />
+              </button>
+              
+              <img 
+                src={btsLogo} 
+                alt="BTS Logo" 
+                className="h-8 w-auto object-contain"
+              />
+              
+              <div className="hidden sm:block">
+                <span className="text-sm font-bold text-gray-900 tracking-tight">
+                  Beyond the Syllabus
+                </span>
+                <span className="ml-2 text-xs font-medium text-gray-400">
+                  {getRoleDisplay()} Panel
+                </span>
               </div>
-              <span className="hidden sm:inline-block font-medium">
-                {user?.email?.split('@')[0]}
-              </span>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
+            </div>
 
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg ring-1 ring-black/5 divide-y divide-gray-100 animate-scale-in">
-                <div className="px-4 py-3">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.email}
-                  </p>
-                  <p className="text-xs text-gray-500 capitalize mt-0.5">
-                    {user?.role}
-                  </p>
-                </div>
-                <div className="py-1">
-                  <button
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      navigate('/profile');
-                    }}
-                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <User className="w-4 h-4 mr-3 text-gray-400" />
-                    Profile
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      navigate(getSettingsPath());
-                    }}
-                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <Settings className="w-4 h-4 mr-3 text-gray-400" />
-                    Settings
-                  </button>
-                </div>
-                <div className="py-1">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                  >
-                    <LogOut className="w-4 h-4 mr-3 text-red-400" />
-                    Logout
-                  </button>
-                </div>
+            {/* Right section */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Search */}
+              <button className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-gray-500 bg-gray-100/80 rounded-xl hover:bg-gray-200/80 transition-all duration-200">
+                <Search className="w-4 h-4" />
+                <span className="hidden lg:inline">Search...</span>
+                <span className="text-xs text-gray-400 bg-white px-1.5 py-0.5 rounded-md border border-gray-200">
+                  ⌘K
+                </span>
+              </button>
+
+              {/* Notifications */}
+              <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-all duration-200">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+              </button>
+
+              {/* User dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-2.5 px-2.5 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-sm font-medium shadow-sm shadow-primary-500/20">
+                    {getUserInitials()}
+                  </div>
+                  <span className="hidden sm:inline-block font-medium">
+                    {getDisplayName()}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl ring-1 ring-black/5 divide-y divide-gray-100 animate-scale-in border border-white/50">
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {user?.email}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize mt-0.5 flex items-center gap-1.5">
+                        <Sparkles className="w-3 h-3 text-primary-400" />
+                        {getRoleDisplay()}
+                      </p>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          navigate('/profile');
+                        }}
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <User className="w-4 h-4 mr-3 text-gray-400" />
+                        Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          navigate(getSettingsPath());
+                        }}
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <Settings className="w-4 h-4 mr-3 text-gray-400" />
+                        Settings
+                      </button>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                      >
+                        <LogOut className="w-4 h-4 mr-3 text-red-400" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

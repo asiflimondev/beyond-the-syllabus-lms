@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { X } from 'lucide-react';
+import { X, Save, Loader2, BookOpen, Users, DollarSign, Clock } from 'lucide-react';
 import { Program } from '@api/programs.api';
 
 interface ProgramFormProps {
@@ -10,264 +11,258 @@ interface ProgramFormProps {
   onClose: () => void;
   onSubmit: (data: any) => void;
   program?: Program | null;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 const programSchema = yup.object({
-  name: yup
-    .string()
-    .required('Program name is required')
-    .min(2, 'Program name must be at least 2 characters')
-    .max(50, 'Program name must be at most 50 characters'),
+  name: yup.string().required('Program name is required').min(2, 'Name must be at least 2 characters'),
   displayName: yup.object({
-    en: yup
-      .string()
-      .required('English display name is required')
-      .min(2, 'English display name must be at least 2 characters')
-      .max(100, 'English display name must be at most 100 characters'),
-    bn: yup
-      .string()
-      .required('Bangla display name is required')
-      .min(2, 'Bangla display name must be at least 2 characters')
-      .max(100, 'Bangla display name must be at most 100 characters'),
+    en: yup.string().required('English display name is required'),
+    bn: yup.string().required('Bangla display name is required'),
   }),
   description: yup.object({
-    en: yup
-      .string()
-      .required('English description is required')
-      .min(10, 'English description must be at least 10 characters')
-      .max(500, 'English description must be at most 500 characters'),
-    bn: yup
-      .string()
-      .required('Bangla description is required')
-      .min(10, 'Bangla description must be at least 10 characters')
-      .max(500, 'Bangla description must be at most 500 characters'),
+    en: yup.string().required('English description is required'),
+    bn: yup.string().required('Bangla description is required'),
   }),
-  duration: yup
-    .number()
-    .required('Duration is required')
-    .min(1, 'Duration must be at least 1 month')
-    .max(24, 'Duration must be at most 24 months'),
-  fee: yup
-    .number()
-    .required('Fee is required')
-    .min(0, 'Fee cannot be negative'),
+  duration: yup.number().required('Duration is required').min(1, 'Duration must be at least 1 month'),
+  fee: yup.number().required('Fee is required').min(0, 'Fee cannot be negative'),
+  teacherIds: yup.array().of(yup.string()).optional(),
+  isActive: yup.boolean().optional(),
 });
 
 type ProgramFormData = yup.InferType<typeof programSchema>;
 
-const ProgramForm: React.FC<ProgramFormProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  program,
-  isLoading,
-}) => {
+const ProgramForm: React.FC<ProgramFormProps> = ({ isOpen, onClose, onSubmit, program, isLoading }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<ProgramFormData>({
     resolver: yupResolver(programSchema),
     defaultValues: {
-      displayName: { en: '', bn: '' },
-      description: { en: '', bn: '' },
+      isActive: true,
+      teacherIds: [],
     },
   });
 
   useEffect(() => {
     if (program) {
-      reset({
-        name: program.name,
-        displayName: program.displayName,
-        description: program.description,
-        duration: program.duration,
-        fee: program.fee,
-      });
+      setValue('name', program.name);
+      setValue('displayName', program.displayName || { en: '', bn: '' });
+      setValue('description', program.description || { en: '', bn: '' });
+      setValue('duration', program.duration);
+      setValue('fee', program.fee);
+      setValue('teacherIds', program.teacherIds || []);
+      setValue('isActive', program.isActive !== false);
     } else {
       reset({
-        name: '',
+        isActive: true,
+        teacherIds: [],
         displayName: { en: '', bn: '' },
         description: { en: '', bn: '' },
-        duration: 0,
-        fee: 0,
       });
     }
-  }, [program, reset]);
+  }, [program, setValue, reset]);
+
+  const handleFormSubmit = (data: ProgramFormData) => {
+    onSubmit(data);
+  };
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-
-      {/* Modal */}
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/50">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {program ? 'Edit Program' : 'Create New Program'}
-            </h3>
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">
+                  {program ? 'Edit Program' : 'Create New Program'}
+                </h3>
+                <p className="text-sm text-primary-100">
+                  {program ? 'Update program details' : 'Add a new program to the system'}
+                </p>
+              </div>
+            </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-            {/* Program Name */}
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-6">
+            {/* Basic Information */}
             <div>
-              <label htmlFor="name" className="label">
-                Program Code
-              </label>
-              <input
-                id="name"
-                type="text"
-                placeholder="e.g., KET, PET, FCE"
-                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
-                {...register('name')}
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-              )}
-            </div>
-
-            {/* English Display Name */}
-            <div>
-              <label htmlFor="displayName.en" className="label">
-                Display Name (English)
-              </label>
-              <input
-                id="displayName.en"
-                type="text"
-                placeholder="e.g., Key English Test"
-                className={`input-field ${errors.displayName?.en ? 'border-red-500' : ''}`}
-                {...register('displayName.en')}
-              />
-              {errors.displayName?.en && (
-                <p className="mt-1 text-sm text-red-600">{errors.displayName.en.message}</p>
-              )}
-            </div>
-
-            {/* Bangla Display Name */}
-            <div>
-              <label htmlFor="displayName.bn" className="label">
-                Display Name (Bangla)
-              </label>
-              <input
-                id="displayName.bn"
-                type="text"
-                placeholder="e.g., কী ইংলিশ টেস্ট"
-                className={`input-field ${errors.displayName?.bn ? 'border-red-500' : ''}`}
-                {...register('displayName.bn')}
-              />
-              {errors.displayName?.bn && (
-                <p className="mt-1 text-sm text-red-600">{errors.displayName.bn.message}</p>
-              )}
-            </div>
-
-            {/* English Description */}
-            <div>
-              <label htmlFor="description.en" className="label">
-                Description (English)
-              </label>
-              <textarea
-                id="description.en"
-                rows={3}
-                placeholder="Describe the program in English"
-                className={`input-field ${errors.description?.en ? 'border-red-500' : ''}`}
-                {...register('description.en')}
-              />
-              {errors.description?.en && (
-                <p className="mt-1 text-sm text-red-600">{errors.description.en.message}</p>
-              )}
-            </div>
-
-            {/* Bangla Description */}
-            <div>
-              <label htmlFor="description.bn" className="label">
-                Description (Bangla)
-              </label>
-              <textarea
-                id="description.bn"
-                rows={3}
-                placeholder="Describe the program in Bangla"
-                className={`input-field ${errors.description?.bn ? 'border-red-500' : ''}`}
-                {...register('description.bn')}
-              />
-              {errors.description?.bn && (
-                <p className="mt-1 text-sm text-red-600">{errors.description.bn.message}</p>
-              )}
-            </div>
-
-            {/* Duration and Fee */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="duration" className="label">
-                  Duration (months)
-                </label>
-                <input
-                  id="duration"
-                  type="number"
-                  placeholder="7-9"
-                  className={`input-field ${errors.duration ? 'border-red-500' : ''}`}
-                  {...register('duration')}
-                />
-                {errors.duration && (
-                  <p className="mt-1 text-sm text-red-600">{errors.duration.message}</p>
-                )}
+              <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                Basic Information
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="label">Program Code *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., KET, PET, FCE"
+                    className={`input ${errors.name ? 'input-error' : ''}`}
+                    {...register('name')}
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label">Display Name (English) *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Key English Test"
+                    className={`input ${errors.displayName?.en ? 'input-error' : ''}`}
+                    {...register('displayName.en')}
+                  />
+                  {errors.displayName?.en && (
+                    <p className="mt-1 text-sm text-red-600">{errors.displayName.en.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label">Display Name (Bangla) *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., কী ইংলিশ টেস্ট"
+                    className={`input ${errors.displayName?.bn ? 'input-error' : ''}`}
+                    {...register('displayName.bn')}
+                  />
+                  {errors.displayName?.bn && (
+                    <p className="mt-1 text-sm text-red-600">{errors.displayName.bn.message}</p>
+                  )}
+                </div>
+                <div className="md:col-span-2">
+                  <label className="label">Description (English) *</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe the program in English..."
+                    className={`input resize-none ${errors.description?.en ? 'input-error' : ''}`}
+                    {...register('description.en')}
+                  />
+                  {errors.description?.en && (
+                    <p className="mt-1 text-sm text-red-600">{errors.description.en.message}</p>
+                  )}
+                </div>
+                <div className="md:col-span-2">
+                  <label className="label">Description (Bangla) *</label>
+                  <textarea
+                    rows={3}
+                    placeholder="বাংলায় প্রোগ্রামটি বর্ণনা করুন..."
+                    className={`input resize-none ${errors.description?.bn ? 'input-error' : ''}`}
+                    {...register('description.bn')}
+                  />
+                  {errors.description?.bn && (
+                    <p className="mt-1 text-sm text-red-600">{errors.description.bn.message}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <label htmlFor="fee" className="label">
-                  Fee (BDT)
-                </label>
-                <input
-                  id="fee"
-                  type="number"
-                  placeholder="15000"
-                  className={`input-field ${errors.fee ? 'border-red-500' : ''}`}
-                  {...register('fee')}
-                />
-                {errors.fee && (
-                  <p className="mt-1 text-sm text-red-600">{errors.fee.message}</p>
-                )}
+            </div>
+
+            {/* Program Details */}
+            <div className="border-t border-gray-200/50 pt-6">
+              <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                Program Details
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="label flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    Duration (months) *
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 7"
+                    className={`input ${errors.duration ? 'input-error' : ''}`}
+                    {...register('duration')}
+                  />
+                  {errors.duration && (
+                    <p className="mt-1 text-sm text-red-600">{errors.duration.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-gray-400" />
+                    Fee (BDT) *
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 15000"
+                    className={`input ${errors.fee ? 'input-error' : ''}`}
+                    {...register('fee')}
+                  />
+                  {errors.fee && (
+                    <p className="mt-1 text-sm text-red-600">{errors.fee.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    Teacher IDs (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., teacher-id-1, teacher-id-2"
+                    className="input"
+                    {...register('teacherIds')}
+                  />
+                </div>
+                <div>
+                  <label className="label flex items-center gap-2">Status</label>
+                  <select className="input" {...register('isActive')}>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                  </select>
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200/50">
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-secondary"
+                className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="btn-primary"
                 disabled={isLoading}
+                className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {isLoading ? (
-                  <span className="flex items-center">
-                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                    {program ? 'Updating...' : 'Creating...'}
-                  </span>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
                 ) : (
-                  program ? 'Update Program' : 'Create Program'
+                  <>
+                    <Save className="w-4 h-4" />
+                    {program ? 'Update Program' : 'Create Program'}
+                  </>
                 )}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

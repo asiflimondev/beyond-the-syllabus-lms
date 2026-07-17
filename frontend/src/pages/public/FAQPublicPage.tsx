@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '@components/layout/PublicLayout';
-import AnimatedSection from '@components/AnimatedSection';
 import {
   Search,
   ChevronDown,
@@ -14,7 +13,8 @@ import {
   Award,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  ChevronRight
 } from 'lucide-react';
 
 interface FAQItem {
@@ -155,12 +155,12 @@ const FAQPublicPage: React.FC = () => {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'general': return <BookOpen className="w-4 h-4 text-primary-600" />;
-      case 'admission': return <Users className="w-4 h-4 text-primary-600" />;
-      case 'programs': return <GraduationCap className="w-4 h-4 text-primary-600" />;
-      case 'exam': return <Award className="w-4 h-4 text-primary-600" />;
-      case 'fees': return <DollarSign className="w-4 h-4 text-primary-600" />;
-      default: return <HelpCircle className="w-4 h-4 text-primary-600" />;
+      case 'general': return <BookOpen className="w-4 h-4 text-orange-500" />;
+      case 'admission': return <Users className="w-4 h-4 text-orange-500" />;
+      case 'programs': return <GraduationCap className="w-4 h-4 text-orange-500" />;
+      case 'exam': return <Award className="w-4 h-4 text-orange-500" />;
+      case 'fees': return <DollarSign className="w-4 h-4 text-orange-500" />;
+      default: return <HelpCircle className="w-4 h-4 text-orange-500" />;
     }
   };
 
@@ -193,23 +193,32 @@ const FAQPublicPage: React.FC = () => {
 
   return (
     <PublicLayout>
-      {/* Hero */}
-      <AnimatedSection>
-        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-              <p className="text-lg text-primary-100 max-w-3xl mx-auto">
-                Find answers to common questions about our programs, admission process, exams, and more.
-              </p>
-            </div>
+      {/* Hero - Matching Homepage Style */}
+      <section className="relative overflow-hidden text-white pt-32 pb-16" style={{ 
+        background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
+      }}>
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1523050854058-8df90110c7f1?auto=format&fit=crop&w=1900&q=80" 
+            alt="FAQ" 
+            className="w-full h-full object-cover opacity-20"
+          />
+        </div>
+        <div className="relative z-10 container-fluid text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4">
+            <HelpCircle className="w-4 h-4" />
+            FAQ
           </div>
-        </section>
-      </AnimatedSection>
+          <h1 className="text-4xl md:text-5xl font-bold font-display mb-4">Frequently Asked Questions</h1>
+          <p className="text-lg text-white/80 max-w-3xl mx-auto">
+            Find answers to common questions about our programs, admission process, exams, and more.
+          </p>
+        </div>
+      </section>
 
       {/* Search and Filter */}
       <section className="py-8 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-fluid">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -218,7 +227,7 @@ const FAQPublicPage: React.FC = () => {
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
             </div>
             <div className="hidden md:flex flex-wrap gap-2">
@@ -226,9 +235,9 @@ const FAQPublicPage: React.FC = () => {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                     selectedCategory === category.id
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -240,7 +249,7 @@ const FAQPublicPage: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -255,7 +264,7 @@ const FAQPublicPage: React.FC = () => {
 
       {/* FAQ List */}
       <section className="py-12 bg-gray-50 min-h-[400px]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-fluid max-w-4xl mx-auto">
           <div className="text-sm text-gray-500 mb-6">
             {filteredFAQs.length} {filteredFAQs.length === 1 ? 'question' : 'questions'} found
           </div>
@@ -270,7 +279,7 @@ const FAQPublicPage: React.FC = () => {
                   setSearchTerm('');
                   setSelectedCategory('all');
                 }}
-                className="mt-4 text-primary-600 hover:text-primary-700"
+                className="mt-4 text-orange-500 hover:text-orange-600 font-medium"
               >
                 Clear filters
               </button>
@@ -278,85 +287,90 @@ const FAQPublicPage: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {filteredFAQs.map((faq, index) => (
-                <AnimatedSection key={faq.id} delay={index * 50}>
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md">
-                    <button
-                      onClick={() => toggleExpand(faq.id)}
-                      className="w-full px-6 py-4 flex items-start justify-between text-left hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 mt-1">
-                          {getCategoryIcon(faq.category)}
-                        </div>
-                        <div>
-                          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${getCategoryBadge(faq.category)} mb-1`}>
-                            {getCategoryLabel(faq.category)}
-                          </span>
-                          <h3 className="text-base font-medium text-gray-900">
-                            {faq.question}
-                          </h3>
-                        </div>
+                <div 
+                  key={faq.id} 
+                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md"
+                  style={{ transitionDelay: `${index * 40}ms` }}
+                >
+                  <button
+                    onClick={() => toggleExpand(faq.id)}
+                    className="w-full px-6 py-4 flex items-start justify-between text-left hover:bg-gray-50/80 transition-colors"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">
+                        {getCategoryIcon(faq.category)}
                       </div>
-                      <div className="flex-shrink-0 ml-4">
-                        {expandedId === faq.id ? (
-                          <ChevronUp className="w-5 h-5 text-primary-600" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-gray-400" />
-                        )}
+                      <div>
+                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${getCategoryBadge(faq.category)} mb-1`}>
+                          {getCategoryLabel(faq.category)}
+                        </span>
+                        <h3 className="text-base font-medium text-gray-900">
+                          {faq.question}
+                        </h3>
                       </div>
-                    </button>
+                    </div>
+                    <div className="flex-shrink-0 ml-4">
+                      {expandedId === faq.id ? (
+                        <ChevronUp className="w-5 h-5 text-orange-500" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                      )}
+                    </div>
+                  </button>
 
-                    {expandedId === faq.id && (
-                      <div className="px-6 pb-4 pt-0 border-t border-gray-100">
-                        <div className="pt-3 pl-9">
-                          <p className="text-gray-600 leading-relaxed">
-                            {faq.answer}
-                          </p>
-                        </div>
+                  {expandedId === faq.id && (
+                    <div className="px-6 pb-4 pt-0 border-t border-gray-100">
+                      <div className="pt-3 pl-9">
+                        <p className="text-gray-600 leading-relaxed">
+                          {faq.answer}
+                        </p>
                       </div>
-                    )}
-                  </div>
-                </AnimatedSection>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Still Have Questions? */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedSection>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Still Have Questions?</h2>
-            <p className="text-gray-600 mb-8">
-              We're here to help! Contact us and we'll get back to you as soon as possible.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
-                <Phone className="w-8 h-8 text-primary-600 mb-2" />
-                <h4 className="font-medium text-gray-900">Call Us</h4>
-                <p className="text-sm text-gray-600">+880 1712 345 678</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
-                <Mail className="w-8 h-8 text-primary-600 mb-2" />
-                <h4 className="font-medium text-gray-900">Email Us</h4>
-                <p className="text-sm text-gray-600">info@beyondsyllabus.com</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl">
-                <MapPin className="w-8 h-8 text-primary-600 mb-2" />
-                <h4 className="font-medium text-gray-900">Visit Us</h4>
-                <p className="text-sm text-gray-600">Dhaka, Bangladesh</p>
-              </div>
+      {/* Still Have Questions? - Matching Homepage Style */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="container-fluid max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-full text-orange-600 text-sm font-medium mb-4">
+            <HelpCircle className="w-4 h-4" />
+            Still Have Questions?
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 font-display mb-4">We're Here to Help</h2>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+            Contact us and we'll get back to you as soon as possible.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="flex flex-col items-center p-6 bg-gray-50 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <Phone className="w-8 h-8 text-orange-500 mb-2" />
+              <h4 className="font-medium text-gray-900">Call Us</h4>
+              <p className="text-sm text-gray-600">+880 1712 345 678</p>
             </div>
-            <div className="mt-8">
-              <Link
-                to="/contact"
-                className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
-              >
-                Contact Us
-              </Link>
+            <div className="flex flex-col items-center p-6 bg-gray-50 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <Mail className="w-8 h-8 text-orange-500 mb-2" />
+              <h4 className="font-medium text-gray-900">Email Us</h4>
+              <p className="text-sm text-gray-600">info@beyondsyllabus.com</p>
             </div>
-          </AnimatedSection>
+            <div className="flex flex-col items-center p-6 bg-gray-50 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <MapPin className="w-8 h-8 text-orange-500 mb-2" />
+              <h4 className="font-medium text-gray-900">Visit Us</h4>
+              <p className="text-sm text-gray-600">Dhaka, Bangladesh</p>
+            </div>
+          </div>
+          <div className="mt-8">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 hover:-translate-y-0.5 shadow-lg shadow-orange-500/30 transition-all duration-300"
+            >
+              Contact Us
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </PublicLayout>

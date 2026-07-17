@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Users, Search, Clock, CheckCircle } from 'lucide-react';
+import { UserPlus, Users, Search, Clock, CheckCircle, Sparkles} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { admissionApi, Student } from '@api/admission.api';
 import AdmissionForm from '@components/admission/AdmissionForm';
@@ -61,7 +61,6 @@ const AdmissionPage: React.FC = () => {
     (s: Student) => s.status === 'pending_registration'
   ).length;
 
-  // Helper function to safely get program name
   const getProgramName = (program: any): string => {
     if (!program) return 'N/A';
     if (typeof program === 'string') return program;
@@ -80,147 +79,160 @@ const AdmissionPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Student Admission</h2>
-          <p className="text-sm text-gray-500">
+          <div className="flex items-center gap-2 mb-1">
+            <UserPlus className="w-5 h-5 text-primary-500" />
+            <span className="text-sm font-medium text-primary-600">Admissions</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display">Student Admission</h2>
+          <p className="text-sm text-gray-500 mt-0.5">
             Admit new students and manage admission records
           </p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="btn-primary flex items-center space-x-2"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="w-5 h-5" />
           <span>Admit New Student</span>
         </button>
       </div>
 
       {/* Admission Mode Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-3">
-        <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Search className="w-4 h-4 text-blue-600" />
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-50/80 to-cyan-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-4 shadow-sm">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl" />
+        <div className="relative flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Search className="w-5 h-5 text-white" />
+            </div>
           </div>
-        </div>
-        <div>
-          <h4 className="text-sm font-medium text-blue-900">Admission Mode</h4>
-          <p className="text-sm text-blue-700">
-            Current mode: <strong className="uppercase">{settingsData?.data?.mode || 'automatic'}</strong>
-            {settingsData?.data?.mode === 'automatic' && (
-              <span className="ml-2">
-                (Prefix: {settingsData.data.prefix || 'BTS'}, 
-                Next ID: {settingsData.data.currentNumber ? settingsData.data.currentNumber + 1 : 'N/A'})
-              </span>
-            )}
-          </p>
-          <p className="text-xs text-blue-600 mt-1">
-            {settingsData?.data?.mode === 'automatic' 
-              ? 'Admission IDs will be auto-generated with the configured prefix' 
-              : 'You need to manually enter Admission IDs'}
-          </p>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900">Admission Mode</h4>
+            <p className="text-sm text-gray-700">
+              Current mode: <strong className="uppercase text-primary-600">{settingsData?.data?.mode || 'automatic'}</strong>
+              {settingsData?.data?.mode === 'automatic' && (
+                <span className="ml-2 text-gray-500">
+                  (Prefix: <span className="font-mono font-semibold">{settingsData.data.prefix || 'BTS'}</span>, 
+                  Next ID: <span className="font-mono font-semibold">{settingsData.data.currentNumber ? settingsData.data.currentNumber + 1 : 'N/A'}</span>)
+                </span>
+              )}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {settingsData?.data?.mode === 'automatic' 
+                ? '✨ Admission IDs will be auto-generated with the configured prefix' 
+                : '📝 You need to manually enter Admission IDs'}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Students</p>
+              <p className="text-sm font-medium text-gray-500">Total Students</p>
               <p className="text-2xl font-bold text-gray-900">{totalStudents || 0}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Users className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Pending Registration</p>
+              <p className="text-sm font-medium text-gray-500">Pending Registration</p>
               <p className="text-2xl font-bold text-orange-600">{pendingStudents || 0}</p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Clock className="w-5 h-5 text-orange-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <Clock className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
+        <div className="group relative overflow-hidden bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Active Students</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-sm font-medium text-gray-500">Active Students</p>
+              <p className="text-2xl font-bold text-emerald-600">
                 {(totalStudents || 0) - pendingStudents}
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <CheckCircle className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Recent Admissions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Admissions</h3>
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary-500" />
+            Recent Admissions
+          </h3>
+          <span className="text-xs text-gray-400">{recentAdmissions.length} records</span>
         </div>
         
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
             <span className="ml-3 text-gray-600">Loading admissions...</span>
           </div>
         ) : recentAdmissions.length === 0 ? (
-          <div className="text-center py-12">
-            <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No admissions yet</p>
-            <p className="text-sm text-gray-400">Click "Admit New Student" to get started</p>
+          <div className="text-center py-16">
+            <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">No admissions yet</p>
+            <p className="text-sm text-gray-400 mt-1">Click "Admit New Student" to get started</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <thead>
+                <tr className="bg-gradient-to-r from-gray-50/80 to-gray-50/40">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Admission ID
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Student Name
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Program
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100/50">
                 {recentAdmissions.map((student: Student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <tr key={student.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 font-mono">
                       {student.admissionId}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-700">
                       {student.fullName}
                     </td>
-                    {/* ✅ FIXED: Program column - safe object rendering */}
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {getProgramName(student.programId)}
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           student.status === 'active'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-emerald-100 text-emerald-700'
                             : student.status === 'pending_registration'
-                            ? 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-amber-100 text-amber-700'
                             : student.status === 'completed'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
                         }`}
                       >
                         {student.status === 'pending_registration' 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '@components/layout/PublicLayout';
-import AnimatedSection from '@components/AnimatedSection';
 import {
   Camera,
   X,
@@ -13,7 +12,8 @@ import {
   Users,
   Calendar,
   BookOpen,
-  Sparkles
+  Sparkles,
+  ChevronRight as ChevronRightIcon
 } from 'lucide-react';
 
 type GalleryCategory = 'all' | 'classroom' | 'events' | 'programs' | 'facility';
@@ -179,23 +179,32 @@ const GalleryPublicPage: React.FC = () => {
 
   return (
     <PublicLayout>
-      {/* Hero */}
-      <AnimatedSection>
-        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Gallery</h1>
-              <p className="text-lg text-primary-100 max-w-3xl mx-auto">
-                Explore photos from our classrooms, events, and student activities at Beyond the Syllabus.
-              </p>
-            </div>
+      {/* Hero - Matching Homepage Style */}
+      <section className="relative overflow-hidden text-white pt-32 pb-16" style={{ 
+        background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
+      }}>
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1523050854058-8df90110c7f1?auto=format&fit=crop&w=1900&q=80" 
+            alt="Gallery" 
+            className="w-full h-full object-cover opacity-20"
+          />
+        </div>
+        <div className="relative z-10 container-fluid text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4">
+            <Camera className="w-4 h-4" />
+            Gallery
           </div>
-        </section>
-      </AnimatedSection>
+          <h1 className="text-4xl md:text-5xl font-bold font-display mb-4">Gallery</h1>
+          <p className="text-lg text-white/80 max-w-3xl mx-auto">
+            Explore photos from our classrooms, events, and student activities at Beyond the Syllabus.
+          </p>
+        </div>
+      </section>
 
       {/* Gallery Content */}
       <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-fluid">
           {/* Category Filter */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div className="flex flex-wrap gap-2">
@@ -203,15 +212,15 @@ const GalleryPublicPage: React.FC = () => {
                 <button
                   key={category.value}
                   onClick={() => setSelectedCategory(category.value)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                     selectedCategory === category.value
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   {category.icon}
                   <span>{category.label}</span>
-                  <span className={`text-xs ${selectedCategory === category.value ? 'text-primary-200' : 'text-gray-400'}`}>
+                  <span className={`text-xs ${selectedCategory === category.value ? 'text-orange-200' : 'text-gray-400'}`}>
                     ({getCategoryCount(category.value)})
                   </span>
                 </button>
@@ -222,7 +231,7 @@ const GalleryPublicPage: React.FC = () => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+                  viewMode === 'grid' ? 'bg-orange-500 text-white' : 'text-gray-500 hover:bg-gray-100'
                 }`}
                 title="Grid View"
               >
@@ -231,7 +240,7 @@ const GalleryPublicPage: React.FC = () => {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+                  viewMode === 'list' ? 'bg-orange-500 text-white' : 'text-gray-500 hover:bg-gray-100'
                 }`}
                 title="List View"
               >
@@ -248,56 +257,56 @@ const GalleryPublicPage: React.FC = () => {
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredImages.map((image, index) => (
-                <AnimatedSection key={image.id} delay={index * 50}>
-                  <div
-                    onClick={() => setSelectedImage(image)}
-                    className="group relative overflow-hidden rounded-2xl shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                  >
-                    <img
-                      src={image.imageUrl}
-                      alt={image.title}
-                      className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                        <h4 className="text-sm font-semibold">{image.title}</h4>
-                        <p className="text-xs text-gray-200">{image.date}</p>
-                      </div>
-                    </div>
-                    <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                      {image.category}
+                <div
+                  key={image.id}
+                  onClick={() => setSelectedImage(image)}
+                  className="group relative overflow-hidden rounded-2xl shadow-sm cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  style={{ transitionDelay: `${index * 40}ms` }}
+                >
+                  <img
+                    src={image.imageUrl}
+                    alt={image.title}
+                    className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <h4 className="text-sm font-semibold">{image.title}</h4>
+                      <p className="text-xs text-gray-200">{image.date}</p>
                     </div>
                   </div>
-                </AnimatedSection>
+                  <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    {image.category}
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
             <div className="space-y-4">
               {filteredImages.map((image, index) => (
-                <AnimatedSection key={image.id} delay={index * 50}>
-                  <div
-                    onClick={() => setSelectedImage(image)}
-                    className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer flex flex-col sm:flex-row gap-4"
-                  >
-                    <img
-                      src={image.imageUrl}
-                      alt={image.title}
-                      className="w-full sm:w-48 h-32 object-cover rounded-xl"
-                      loading="lazy"
-                    />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{image.title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{image.description}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-gray-500">{image.date}</span>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                          {image.category}
-                        </span>
-                      </div>
+                <div
+                  key={image.id}
+                  onClick={() => setSelectedImage(image)}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1 flex flex-col sm:flex-row gap-4"
+                  style={{ transitionDelay: `${index * 40}ms` }}
+                >
+                  <img
+                    src={image.imageUrl}
+                    alt={image.title}
+                    className="w-full sm:w-48 h-32 object-cover rounded-xl"
+                    loading="lazy"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900">{image.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{image.description}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-gray-500">{image.date}</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        {image.category}
+                      </span>
                     </div>
                   </div>
-                </AnimatedSection>
+                </div>
               ))}
             </div>
           )}
@@ -350,23 +359,25 @@ const GalleryPublicPage: React.FC = () => {
         </div>
       )}
 
-      {/* CTA */}
-      <section className="py-16 bg-primary-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedSection>
-            <h2 className="text-3xl font-bold mb-4">Visit Our Center</h2>
-            <p className="text-primary-100 mb-8 max-w-2xl mx-auto">
-              See our facilities and meet our team in person. Contact us to schedule a visit.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/contact" className="px-8 py-3 bg-white text-primary-700 rounded-xl font-medium hover:bg-gray-100 transition-colors">
-                Contact Us
-              </Link>
-              <Link to="/programs" className="px-8 py-3 border border-white text-white rounded-xl font-medium hover:bg-white/10 transition-colors">
-                Our Programs
-              </Link>
-            </div>
-          </AnimatedSection>
+      {/* CTA - Matching Homepage Style */}
+      <section className="py-16 relative overflow-hidden" style={{ background: 'linear-gradient(120deg, #f1592a, #df481c)' }}>
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute -top-20 -right-20 w-[420px] h-[420px] rounded-full bg-white/20 blur-3xl" />
+        </div>
+        <div className="relative z-10 container-fluid max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold font-display text-white mb-4">Visit Our Center</h2>
+          <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
+            See our facilities and meet our team in person. Contact us to schedule a visit.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link to="/contact" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300">
+              Contact Us
+              <ChevronRightIcon className="w-4 h-4" />
+            </Link>
+            <Link to="/programs" className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/60 text-white font-bold rounded-full hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300">
+              Our Programs
+            </Link>
+          </div>
         </div>
       </section>
     </PublicLayout>
