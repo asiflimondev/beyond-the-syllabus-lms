@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Printer, Download, ArrowLeft, CheckCircle } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { useReactToPrint } from 'react-to-print';
 import ReceiptPrint from './ReceiptPrint';
 
@@ -31,23 +30,35 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ isOpen, onClose, receip
     pageStyle: `
       @page {
         size: A4;
-        margin: 0;
+        margin: 10mm 15mm;
       }
       @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
         body {
           margin: 0;
           padding: 0;
+          background: white;
         }
         .no-print {
           display: none !important;
+        }
+        .receipt-preview-wrapper {
+          box-shadow: none !important;
+          border-radius: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          background: white !important;
         }
       }
     `,
   });
 
   const handleDownloadPDF = () => {
-    toast.success('PDF download feature coming soon!');
-    // For now, just print to PDF
+    // This opens the print dialog where users can select "Save as PDF"
     handlePrint();
   };
 
@@ -58,14 +69,14 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ isOpen, onClose, receip
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 flex items-center justify-between rounded-t-2xl flex-shrink-0">
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-[#0a0f2a] to-[#1a2360] px-6 py-4 flex items-center justify-between rounded-t-2xl flex-shrink-0">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white">Receipt Generated</h3>
-                <p className="text-sm text-primary-100">Student admitted successfully</p>
+                <p className="text-sm text-white/70">Student admitted successfully</p>
               </div>
             </div>
             <button
@@ -77,7 +88,7 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ isOpen, onClose, receip
           </div>
 
           {/* Actions Bar */}
-          <div className="flex items-center justify-between px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center justify-between px-6 py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0 no-print">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-gray-500">Receipt:</span>
               <span className="text-xs font-bold text-gray-700">{receiptData.receiptNumber}</span>
@@ -85,14 +96,14 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ isOpen, onClose, receip
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrint}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg"
+                className="px-4 py-2 bg-gradient-to-r from-[#0a0f2a] to-[#1a2360] hover:shadow-xl text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md"
               >
                 <Printer className="w-4 h-4" />
                 Print
               </button>
               <button
                 onClick={handleDownloadPDF}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-xl transition-all duration-200 flex items-center gap-2"
+                className="px-4 py-2 bg-gradient-to-r from-[#0a0f2a] to-[#1a2360] hover:shadow-xl text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md"
               >
                 <Download className="w-4 h-4" />
                 PDF
@@ -108,10 +119,15 @@ const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ isOpen, onClose, receip
           </div>
 
           {/* Receipt Content */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <div className="max-w-2xl mx-auto">
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-100 no-print">
+            <div className="max-w-4xl mx-auto receipt-preview-wrapper">
               <ReceiptPrint ref={printRef} data={receiptData} />
             </div>
+          </div>
+          
+          {/* Print-only wrapper */}
+          <div className="hidden print:block">
+            <ReceiptPrint ref={printRef} data={receiptData} />
           </div>
         </div>
       </div>

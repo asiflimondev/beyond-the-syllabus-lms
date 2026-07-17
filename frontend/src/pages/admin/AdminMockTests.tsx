@@ -4,6 +4,7 @@ import { adminMockTestApi } from '@api/admin/mockTest.api';
 import { programsApi } from '@api/programs.api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { createPortal } from 'react-dom';
 import {
   FileText,
   Plus,
@@ -16,7 +17,7 @@ import {
   CheckSquare,
   Square,
   Edit,
-  Trash2,
+  Trash2
 } from 'lucide-react';
 
 interface SectionConfig {
@@ -317,27 +318,351 @@ const AdminMockTests: React.FC = () => {
     );
   }
 
+  // Modal content
+  const renderModal = () => {
+    if (!isFormOpen) return null;
+
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm" onClick={() => { setIsFormOpen(false); resetForm(); }} />
+        <div className="relative z-[10000] min-h-screen flex items-center justify-center p-4">
+          <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-white/50 animate-scale-in">
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {editingTest ? 'Edit Mock Test' : 'Create Mock Test'}
+                  </h3>
+                  <p className="text-sm text-primary-100">
+                    {editingTest ? 'Update mock test details' : 'Add a new mock test'}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => { setIsFormOpen(false); resetForm(); }} 
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Select Program */}
+              <div>
+                <label className="label font-medium text-gray-700">Select Program *</label>
+                <select 
+                  value={selectedProgramId} 
+                  onChange={(e) => setSelectedProgramId(e.target.value)} 
+                  className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                >
+                  <option value="">Select a program</option>
+                  {programs.map((program: any) => (
+                    <option key={program.id} value={program.id}>
+                      {program.displayName?.en || program.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Basic Information */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  Basic Information
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="label font-medium text-gray-700">Test Title *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Mock Test 1"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Description</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Test description..."
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Test Date *</label>
+                    <input
+                      type="date"
+                      value={formData.testDate}
+                      onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sections */}
+              <div className="border-t border-gray-200/50 pt-6">
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  Select Sections to Include
+                </h4>
+                <p className="text-xs text-gray-500 mb-4">Toggle sections on/off. Only enabled sections will be included.</p>
+
+                <div className="space-y-3">
+                  {/* Reading */}
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => toggleSection('reading')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                          {formData.reading.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                        </button>
+                        <label className="font-medium text-gray-900">Reading</label>
+                      </div>
+                      {formData.reading.enabled && (
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.reading.totalMarks}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            reading: { ...formData.reading, totalMarks: parseInt(e.target.value) || 0 }
+                          })}
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          placeholder="Marks"
+                        />
+                      )}
+                    </div>
+                    {formData.reading.enabled && (
+                      <div className="mt-2 ml-10">
+                        <input
+                          type="text"
+                          placeholder="Description"
+                          value={formData.reading.description}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            reading: { ...formData.reading, description: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Writing */}
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => toggleSection('writing')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                          {formData.writing.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                        </button>
+                        <label className="font-medium text-gray-900">Writing</label>
+                      </div>
+                      {formData.writing.enabled && (
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.writing.totalMarks}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            writing: { ...formData.writing, totalMarks: parseInt(e.target.value) || 0 }
+                          })}
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          placeholder="Marks"
+                        />
+                      )}
+                    </div>
+                    {formData.writing.enabled && (
+                      <div className="mt-2 ml-10">
+                        <input
+                          type="text"
+                          placeholder="Description"
+                          value={formData.writing.description}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            writing: { ...formData.writing, description: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Listening */}
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => toggleSection('listening')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                          {formData.listening.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                        </button>
+                        <label className="font-medium text-gray-900">Listening</label>
+                      </div>
+                      {formData.listening.enabled && (
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.listening.totalMarks}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            listening: { ...formData.listening, totalMarks: parseInt(e.target.value) || 0 }
+                          })}
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          placeholder="Marks"
+                        />
+                      )}
+                    </div>
+                    {formData.listening.enabled && (
+                      <div className="mt-2 ml-10">
+                        <input
+                          type="text"
+                          placeholder="Description"
+                          value={formData.listening.description}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            listening: { ...formData.listening, description: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Speaking */}
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => toggleSection('speaking')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                          {formData.speaking.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                        </button>
+                        <label className="font-medium text-gray-900">Speaking</label>
+                      </div>
+                    </div>
+                    {formData.speaking.enabled && (
+                      <div className="mt-2 ml-10">
+                        <input
+                          type="text"
+                          placeholder="Description"
+                          value={formData.speaking.description}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            speaking: { ...formData.speaking, description: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Presentation */}
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => toggleSection('presentation')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                          {formData.presentation.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                        </button>
+                        <label className="font-medium text-gray-900">Presentation</label>
+                      </div>
+                      {formData.presentation.enabled && (
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.presentation.totalMarks}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            presentation: { ...formData.presentation, totalMarks: parseInt(e.target.value) || 0 }
+                          })}
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          placeholder="Marks"
+                        />
+                      )}
+                    </div>
+                    {formData.presentation.enabled && (
+                      <div className="mt-2 ml-10">
+                        <input
+                          type="text"
+                          placeholder="Description"
+                          value={formData.presentation.description}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            presentation: { ...formData.presentation, description: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200/50">
+                <button 
+                  onClick={() => { setIsFormOpen(false); resetForm(); }} 
+                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSubmit} 
+                  disabled={isSubmitting} 
+                  className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{editingTest ? 'Updating...' : 'Creating...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>{editingTest ? 'Update Mock Test' : 'Create Mock Test'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Mock Tests</h2>
-          <p className="text-sm text-gray-500">Create, manage, and enter marks for mock tests</p>
+          <div className="flex items-center gap-2 mb-1">
+            <FileText className="w-5 h-5 text-primary-500" />
+            <span className="text-sm font-medium text-primary-600">Mock Tests</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 font-display">Mock Tests</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Create, manage, and enter marks for mock tests</p>
         </div>
-        <button onClick={handleOpenCreate} className="btn-primary flex items-center space-x-2">
-          <Plus className="w-4 h-4" />
+        <button 
+          onClick={handleOpenCreate} 
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        >
+          <Plus className="w-5 h-5" />
           <span>Create Mock Test</span>
         </button>
       </div>
 
+      {/* Mock Tests Grid */}
       {mockTests.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-16 text-center">
           <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No mock tests created yet</p>
-          <p className="text-sm text-gray-400">Create your first mock test for any program</p>
+          <p className="text-gray-500 font-medium">No mock tests created yet</p>
+          <p className="text-sm text-gray-400 mt-1">Create your first mock test for any program</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mockTests.map((test: any) => {
             const sections = [];
             if (test.reading) sections.push('Reading');
@@ -349,11 +674,11 @@ const AdminMockTests: React.FC = () => {
             return (
               <div
                 key={test._id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-gray-900 text-lg font-display">
                       {test.title || `Mock Test ${test.testNumber}`}
                     </h3>
                     <p className="text-sm text-gray-500">Test #{test.testNumber}</p>
@@ -362,21 +687,21 @@ const AdminMockTests: React.FC = () => {
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                       title="Enter Marks"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleOpenEdit(test)}
-                      className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(test._id)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -386,21 +711,21 @@ const AdminMockTests: React.FC = () => {
 
                 <div className="mt-3 space-y-1 text-sm text-gray-600">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-primary-600" />
+                    <Calendar className="w-4 h-4 mr-2 text-primary-500" />
                     <span>{new Date(test.testDate).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center flex-wrap gap-1">
-                    <Clock className="w-4 h-4 mr-2 text-primary-600" />
+                    <Clock className="w-4 h-4 mr-2 text-primary-500" />
                     <span className="text-xs">{sections.join(' • ')}</span>
                   </div>
                 </div>
 
                 <button
-                  className="mt-4 w-full px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors text-sm flex items-center justify-center space-x-2"
+                  className="mt-4 w-full px-4 py-3 bg-gradient-to-r from-primary-500/10 to-primary-600/10 text-primary-700 font-medium rounded-xl border border-primary-200/50 hover:from-primary-500 hover:to-primary-600 hover:text-white transition-all duration-300"
                   onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
                 >
-                  <Eye className="w-4 h-4" />
-                  <span>Enter Marks</span>
+                  <Eye className="w-4 h-4 inline-block mr-2" />
+                  Enter Marks
                 </button>
               </div>
             );
@@ -408,291 +733,8 @@ const AdminMockTests: React.FC = () => {
         </div>
       )}
 
-      {/* Create/Edit Form Modal */}
-      {isFormOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/50" onClick={() => { setIsFormOpen(false); resetForm(); }} />
-          <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {editingTest ? 'Edit Mock Test' : 'Create Mock Test'}
-                </h3>
-                <button onClick={() => { setIsFormOpen(false); resetForm(); }} className="p-1 rounded-lg hover:bg-gray-100">
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-6">
-                <div>
-                  <label className="label">Select Program *</label>
-                  <select 
-                    value={selectedProgramId} 
-                    onChange={(e) => setSelectedProgramId(e.target.value)} 
-                    className="input-field"
-                  >
-                    <option value="">Select a program</option>
-                    {programs.map((program: any) => (
-                      <option key={program.id} value={program.id}>
-                        {program.displayName?.en || program.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Basic Information</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="label">Test Title *</label>
-                      <input
-                        type="text"
-                        placeholder="e.g., Mock Test 1"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="label">Description</label>
-                      <textarea
-                        rows={2}
-                        placeholder="Test description..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="input-field"
-                      />
-                    </div>
-                    <div>
-                      <label className="label">Test Date *</label>
-                      <input
-                        type="date"
-                        value={formData.testDate}
-                        onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
-                        className="input-field"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sections */}
-                <div className="border-t border-gray-200 pt-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4">Select Sections to Include</h4>
-                  <p className="text-xs text-gray-500 mb-4">Toggle sections on/off. Only enabled sections will be included.</p>
-
-                  <div className="space-y-4">
-                    {/* Reading */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => toggleSection('reading')} className="text-primary-600">
-                            {formData.reading.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                          </button>
-                          <label className="font-medium text-gray-900">Reading</label>
-                        </div>
-                        {formData.reading.enabled && (
-                          <input
-                            type="number"
-                            min="1"
-                            value={formData.reading.totalMarks}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              reading: { ...formData.reading, totalMarks: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                            placeholder="Marks"
-                          />
-                        )}
-                      </div>
-                      {formData.reading.enabled && (
-                        <div className="mt-2 ml-10">
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.reading.description}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              reading: { ...formData.reading, description: e.target.value }
-                            })}
-                            className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Writing */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => toggleSection('writing')} className="text-primary-600">
-                            {formData.writing.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                          </button>
-                          <label className="font-medium text-gray-900">Writing</label>
-                        </div>
-                        {formData.writing.enabled && (
-                          <input
-                            type="number"
-                            min="1"
-                            value={formData.writing.totalMarks}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              writing: { ...formData.writing, totalMarks: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                            placeholder="Marks"
-                          />
-                        )}
-                      </div>
-                      {formData.writing.enabled && (
-                        <div className="mt-2 ml-10">
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.writing.description}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              writing: { ...formData.writing, description: e.target.value }
-                            })}
-                            className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Listening */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => toggleSection('listening')} className="text-primary-600">
-                            {formData.listening.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                          </button>
-                          <label className="font-medium text-gray-900">Listening</label>
-                        </div>
-                        {formData.listening.enabled && (
-                          <input
-                            type="number"
-                            min="1"
-                            value={formData.listening.totalMarks}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              listening: { ...formData.listening, totalMarks: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                            placeholder="Marks"
-                          />
-                        )}
-                      </div>
-                      {formData.listening.enabled && (
-                        <div className="mt-2 ml-10">
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.listening.description}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              listening: { ...formData.listening, description: e.target.value }
-                            })}
-                            className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Speaking */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => toggleSection('speaking')} className="text-primary-600">
-                            {formData.speaking.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                          </button>
-                          <label className="font-medium text-gray-900">Speaking</label>
-                        </div>
-                      </div>
-                      {formData.speaking.enabled && (
-                        <div className="mt-2 ml-10">
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.speaking.description}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              speaking: { ...formData.speaking, description: e.target.value }
-                            })}
-                            className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Presentation */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => toggleSection('presentation')} className="text-primary-600">
-                            {formData.presentation.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                          </button>
-                          <label className="font-medium text-gray-900">Presentation</label>
-                        </div>
-                        {formData.presentation.enabled && (
-                          <input
-                            type="number"
-                            min="1"
-                            value={formData.presentation.totalMarks}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              presentation: { ...formData.presentation, totalMarks: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                            placeholder="Marks"
-                          />
-                        )}
-                      </div>
-                      {formData.presentation.enabled && (
-                        <div className="mt-2 ml-10">
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.presentation.description}
-                            onChange={(e) => setFormData({
-                              ...formData,
-                              presentation: { ...formData.presentation, description: e.target.value }
-                            })}
-                            className="w-full px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
-                  <button onClick={() => { setIsFormOpen(false); resetForm(); }} className="btn-secondary">
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleSubmit} 
-                    disabled={isSubmitting} 
-                    className="btn-primary flex items-center space-x-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>{editingTest ? 'Updating...' : 'Creating...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        <span>{editingTest ? 'Update' : 'Create'}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal - Rendered via createPortal */}
+      {renderModal()}
     </div>
   );
 };

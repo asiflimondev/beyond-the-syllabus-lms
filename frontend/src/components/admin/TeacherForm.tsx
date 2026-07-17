@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { X } from 'lucide-react';
+import { X, Save, Loader2, User, Mail, Phone, UserPlus, Calendar, MapPin, Lock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { createPortal } from 'react-dom';
 import { programsApi, Program } from '@api/programs.api';
 import { Teacher } from '@api/admin/teacher.api';
 
@@ -116,185 +117,258 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
     }
   }, [teacher, reset]);
 
-  if (!isOpen) return null;
+  // Modal content
+  const renderModal = () => {
+    if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {teacher ? 'Edit Teacher' : 'Add New Teacher'}
-            </h3>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-            {/* Account Information */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-4">Account Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Email Address *</label>
-                  <input
-                    type="email"
-                    className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-                    placeholder="teacher@example.com"
-                    {...register('email')}
-                    disabled={isEdit}
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                  )}
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative z-[10000] min-h-screen flex items-center justify-center p-4">
+          <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/50 animate-scale-in">
+            {/* Header - Glass Gradient */}
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <UserPlus className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <label className="label">Password {!isEdit && '*'}</label>
-                  <input
-                    type="password"
-                    className={`input-field ${errors.password ? 'border-red-500' : ''}`}
-                    placeholder={isEdit ? 'Leave blank to keep current' : 'Enter password'}
-                    {...register('password')}
-                  />
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                  )}
+                  <h3 className="text-lg font-semibold text-white">
+                    {teacher ? 'Edit Teacher' : 'Add New Teacher'}
+                  </h3>
+                  <p className="text-sm text-primary-100">
+                    {teacher ? 'Update teacher information' : 'Add a new teacher to the system'}
+                  </p>
                 </div>
               </div>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Personal Information */}
-            <div className="border-t border-gray-200 pt-6">
-              <h4 className="text-sm font-semibold text-gray-700 mb-4">Personal Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="label">Full Name *</label>
-                  <input
-                    type="text"
-                    className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
-                    placeholder="John Teacher"
-                    {...register('fullName')}
-                  />
-                  {errors.fullName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="label">Phone Number *</label>
-                  <input
-                    type="text"
-                    className={`input-field ${errors.phone ? 'border-red-500' : ''}`}
-                    placeholder="017XXXXXXXX"
-                    {...register('phone')}
-                  />
-                  {errors.phone && (
-                    <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="label">Date of Birth</label>
-                  <input
-                    type="date"
-                    className="input-field"
-                    {...register('dateOfBirth')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Gender</label>
-                  <select className="input-field" {...register('gender')}>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Blood Group</label>
-                  <select 
-                    className="input-field" 
-                    {...register('bloodGroup')}
-                    value={watch('bloodGroup') || ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setValue('bloodGroup', value === '' ? null : value as BloodGroup);
-                    }}
-                  >
-                    <option value="">Select Blood Group</option>
-                    {bloodGroups.map((bg) => (
-                      <option key={bg} value={bg}>
-                        {bg}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.bloodGroup && (
-                    <p className="mt-1 text-sm text-red-600">{errors.bloodGroup.message}</p>
-                  )}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="label">Address</label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="Enter address"
-                    {...register('address')}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Program Assignment */}
-            <div className="border-t border-gray-200 pt-6">
-              <h4 className="text-sm font-semibold text-gray-700 mb-4">Assigned Programs</h4>
-              <div className="space-y-2">
-                {programs.length === 0 ? (
-                  <p className="text-sm text-gray-500">No active programs available</p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    {programs.map((program: Program) => (
-                      <label key={program.id} className="flex items-center space-x-2 text-sm">
-                        <input
-                          type="checkbox"
-                          value={program.id}
-                          defaultChecked={teacher?.programIds?.some(
-                            (p: any) => p._id === program.id || p === program.id
-                          )}
-                          {...register('programIds')}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                        />
-                        <span>{program.displayName?.en || program.name}</span>
-                      </label>
-                    ))}
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+              {/* Account Information */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  Account Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label font-medium text-gray-700">Email Address *</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="email"
+                        className={`w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all ${errors.email ? 'border-red-500' : ''}`}
+                        placeholder="teacher@example.com"
+                        {...register('email')}
+                        disabled={isEdit}
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                    )}
                   </div>
-                )}
+                  <div>
+                    <label className="label font-medium text-gray-700">Password {!isEdit && '*'}</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="password"
+                        className={`w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all ${errors.password ? 'border-red-500' : ''}`}
+                        placeholder={isEdit ? 'Leave blank to keep current' : 'Enter password'}
+                        {...register('password')}
+                      />
+                    </div>
+                    {errors.password && (
+                      <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
-              <button type="button" onClick={onClose} className="btn-secondary">
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary" disabled={isLoading}>
-                {isLoading ? (
-                  <span className="flex items-center">
-                    <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                    {teacher ? 'Updating...' : 'Creating...'}
-                  </span>
-                ) : (
-                  teacher ? 'Update Teacher' : 'Create Teacher'
-                )}
-              </button>
-            </div>
-          </form>
+              {/* Personal Information */}
+              <div className="border-t border-gray-200/50 pt-6">
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  Personal Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="label font-medium text-gray-700">Full Name *</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        className={`w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all ${errors.fullName ? 'border-red-500' : ''}`}
+                        placeholder="John Teacher"
+                        {...register('fullName')}
+                      />
+                    </div>
+                    {errors.fullName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Phone Number *</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        className={`w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all ${errors.phone ? 'border-red-500' : ''}`}
+                        placeholder="017XXXXXXXX"
+                        {...register('phone')}
+                      />
+                    </div>
+                    {errors.phone && (
+                      <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Date of Birth</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="date"
+                        className="w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                        {...register('dateOfBirth')}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Gender</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                      {...register('gender')}
+                    >
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label font-medium text-gray-700">Blood Group</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                      {...register('bloodGroup')}
+                      value={watch('bloodGroup') || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setValue('bloodGroup', value === '' ? null : value as BloodGroup);
+                      }}
+                    >
+                      <option value="">Select Blood Group</option>
+                      {bloodGroups.map((bg) => (
+                        <option key={bg} value={bg}>
+                          {bg}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.bloodGroup && (
+                      <p className="mt-1 text-sm text-red-600">{errors.bloodGroup.message}</p>
+                    )}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="label font-medium text-gray-700">Address</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        className="w-full pl-10 pr-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                        placeholder="Enter address"
+                        {...register('address')}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Program Assignment */}
+              <div className="border-t border-gray-200/50 pt-6">
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  Assigned Programs
+                </h4>
+                <div className="space-y-2">
+                  {programs.length === 0 ? (
+                    <p className="text-sm text-gray-500 bg-gray-50/80 rounded-xl p-4 text-center">No active programs available</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      {programs.map((program: Program) => (
+                        <label 
+                          key={program.id} 
+                          className="flex items-center space-x-3 text-sm p-3 bg-gray-50/80 rounded-xl hover:bg-gray-100/80 transition-all cursor-pointer border border-transparent hover:border-primary-200/50"
+                        >
+                          <input
+                            type="checkbox"
+                            value={program.id}
+                            defaultChecked={teacher?.programIds?.some(
+                              (p: any) => p._id === program.id || p === program.id
+                            )}
+                            {...register('programIds')}
+                            className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                          />
+                          <span className="text-gray-700">{program.displayName?.en || program.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200/50">
+                <button 
+                  type="button" 
+                  onClick={onClose} 
+                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {teacher ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      {teacher ? 'Update Teacher' : 'Create Teacher'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+      </div>,
+      document.body
+    );
+  };
+
+  return renderModal();
 };
 
 export default TeacherForm;

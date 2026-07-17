@@ -109,8 +109,8 @@ const AdmissionPage: React.FC = () => {
           <div>
             <h4 className="text-sm font-semibold text-gray-900">Admission Mode</h4>
             <p className="text-sm text-gray-700">
-              Current mode: <strong className="uppercase text-primary-600">{settingsData?.data?.mode || 'automatic'}</strong>
-              {settingsData?.data?.mode === 'automatic' && (
+              Current mode: <strong className="uppercase text-primary-600">{settingsData?.data?.mode || 'Manual'}</strong>
+              {settingsData?.data?.mode === 'manual' && (
                 <span className="ml-2 text-gray-500">
                   (Prefix: <span className="font-mono font-semibold">{settingsData.data.prefix || 'BTS'}</span>, 
                   Next ID: <span className="font-mono font-semibold">{settingsData.data.currentNumber ? settingsData.data.currentNumber + 1 : 'N/A'}</span>)
@@ -118,7 +118,7 @@ const AdmissionPage: React.FC = () => {
               )}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {settingsData?.data?.mode === 'automatic' 
+              {settingsData?.data?.mode === 'auto' 
                 ? '✨ Admission IDs will be auto-generated with the configured prefix' 
                 : '📝 You need to manually enter Admission IDs'}
             </p>
