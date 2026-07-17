@@ -99,9 +99,9 @@ const DashboardPage: React.FC = () => {
   ];
 
   const recentActivities = [
-    { user: 'Sarah Ahmed', action: 'Completed FCE Mock Test', time: '2 hours ago', type: 'test' },
-    { user: 'Rafi Hasan', action: 'Admitted to KET Program', time: '4 hours ago', type: 'admission' },
-    { user: 'Nadia Khan', action: 'Submitted PET Writing', time: '6 hours ago', type: 'submission' },
+    { user: 'Asif Limon', action: 'Completed FCE Mock Test', time: '2 hours ago', type: 'test' },
+    { user: 'Rifat Hossain', action: 'Admitted to KET Program', time: '4 hours ago', type: 'admission' },
+    { user: 'Mahmoud', action: 'Submitted PET Writing', time: '6 hours ago', type: 'submission' },
   ];
 
   const quickActions = [
