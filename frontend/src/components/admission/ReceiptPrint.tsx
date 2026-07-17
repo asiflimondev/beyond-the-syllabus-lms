@@ -175,7 +175,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(({ data }, re
                     className="h-12 w-auto object-contain opacity-80 print:h-10"
                   />
                 </div>
-                <p className="text-sm font-semibold text-gray-700 print:text-xs">Admin/Teacher Signature</p>
+                <p className="text-sm font-semibold text-gray-700 print:text-xs">Head Instructor</p>
               </div>
 
               {/* Guardian/Student Signature - Right */}
