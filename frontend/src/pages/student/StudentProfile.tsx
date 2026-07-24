@@ -20,10 +20,8 @@ import {
   UserCheck,
   GraduationCap,
   Clock,
-  UserCog,
   UserCircle,
   Droplet,
-  ChevronRight,
   Shield,
   Star,
   Briefcase
