@@ -53,7 +53,7 @@ const formSchema = yup.object({
   motherName: yup.string().optional(),
   dateOfBirth: yup.string().optional(),
   gender: yup.string().oneOf(['male', 'female', 'other'] as const).optional(),
-  bloodGroup: yup.string().oneOf(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as const).optional(),
+  bloodGroup: yup.string().optional().nullable(),
   address: yup.string().optional(),
   schoolCollege: yup.string().optional(),
 });
@@ -341,7 +341,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
         motherName: data.motherName || '',
         dateOfBirth: data.dateOfBirth || '',
         gender: data.gender || 'male',
-        bloodGroup: data.bloodGroup || '',
+        bloodGroup: data.bloodGroup || undefined,
         address: data.address || '',
         schoolCollege: data.schoolCollege || '',
       };
@@ -754,7 +754,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
 
                       <div>
                         <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 mb-1.5">
-                          Blood Group
+                          Blood Group<span className="text-gray-400 text-xs font-normal">(Optional)</span>
                         </label>
                         <select
                           id="bloodGroup"

@@ -155,7 +155,7 @@ export const admitStudent = async (data: {
       email: data.email,
       dateOfBirth: data.dateOfBirth,
       gender: data.gender,
-      bloodGroup: data.bloodGroup,
+      bloodGroup: data.bloodGroup || undefined,
       address: data.address || '',
       schoolCollege: data.schoolCollege || '',
       programId: data.programId,
