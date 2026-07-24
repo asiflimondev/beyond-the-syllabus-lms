@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Menu as MenuIcon, 
-  User, 
-  Settings, 
   LogOut, 
   ChevronDown,
   Sparkles
@@ -24,15 +22,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const handleLogout = () => {
     logout();
     navigate('/login');
-  };
-
-  const getSettingsPath = () => {
-    const role = user?.role;
-    if (role === 'admin') return '/admin/settings';
-    if (role === 'teacher') return '/teacher/settings';
-    if (role === 'student') return '/student/settings';
-    if (role === 'office') return '/office/settings';
-    return '/settings';
   };
 
   const getDisplayName = () => {
@@ -75,7 +64,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 <MenuIcon className="w-5 h-5" />
               </button>
               
-              {/* Cambridge Logo instead of BTS Logo */}
               <img 
                 src={cambridgeLogo} 
                 alt="Cambridge English" 
@@ -92,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </div>
             </div>
 
-            {/* Right section - Removed Search and Notifications */}
+            {/* Right section */}
             <div className="flex items-center gap-2 sm:gap-3">
               {/* User dropdown */}
               <div className="relative" ref={dropdownRef}>
@@ -119,28 +107,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         <Sparkles className="w-3 h-3 text-primary-400" />
                         {getRoleDisplay()}
                       </p>
-                    </div>
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate('/profile');
-                        }}
-                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                      >
-                        <User className="w-4 h-4 mr-3 text-gray-400" />
-                        Profile
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate(getSettingsPath());
-                        }}
-                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                      >
-                        <Settings className="w-4 h-4 mr-3 text-gray-400" />
-                        Settings
-                      </button>
                     </div>
                     <div className="py-1">
                       <button

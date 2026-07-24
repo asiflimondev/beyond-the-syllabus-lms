@@ -6,8 +6,16 @@ export interface Student {
   admissionId: string;
   email: string;
   phone: string;
-  status: 'pending_registration' | 'active' | 'completed' | 'inactive';
-  program: {
+  fatherName?: string;
+  motherName?: string;
+  parentPhone?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+  schoolCollege?: string;
+  status: string;
+  program?: {
     id: string;
     name: string;
     displayName: {
@@ -15,11 +23,12 @@ export interface Student {
       bn: string;
     };
   };
-  user: {
-    id: string;
+  user?: {
     email: string;
     isActive: boolean;
-    lastLogin?: string;
+  };
+  admittedBy?: {
+    email: string;
   };
   admissionDate: string;
   createdAt: string;
@@ -28,11 +37,11 @@ export interface Student {
 }
 
 export const studentManagementApi = {
-  getAll: (params?: { 
-    page?: number; 
-    limit?: number; 
-    search?: string; 
-    status?: string; 
+  getAll: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
     programId?: string;
     isDeleted?: string;
   }) =>
@@ -41,17 +50,20 @@ export const studentManagementApi = {
   getById: (id: string) =>
     apiClient.get(`/admin/students/${id}`),
 
+  create: (data: any) =>
+    apiClient.post('/admin/students', data),
+
   update: (id: string, data: any) =>
     apiClient.put(`/admin/students/${id}`, data),
 
   delete: (id: string) =>
     apiClient.delete(`/admin/students/${id}`),
 
-  permanentDelete: (id: string) => // NEW
-    apiClient.delete(`/admin/students/${id}/permanent`),
-
   restore: (id: string) =>
-    apiClient.patch(`/admin/students/${id}/restore`),
+    apiClient.post(`/admin/students/${id}/restore`),
+
+  permanentDelete: (id: string) =>
+    apiClient.delete(`/admin/students/${id}/permanent`),
 
   resetPassword: (id: string, data: { newPassword: string }) =>
     apiClient.post(`/admin/students/${id}/reset-password`, data),

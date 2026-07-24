@@ -61,6 +61,7 @@ const StudentSchema = new Schema<IStudentDocument>(
     bloodGroup: {
       type: String,
       enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      default: '', // <--- ADDED THIS LINE - makes blood group optional
     },
     address: {
       type: String,

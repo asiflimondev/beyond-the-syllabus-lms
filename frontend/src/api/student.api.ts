@@ -39,6 +39,26 @@ export interface StudentProfile {
   updatedAt: string;
 }
 
+// Extended interface for admin view with all fields
+export interface StudentAdminView extends StudentProfile {
+  fatherName?: string;
+  motherName?: string;
+  parentPhone?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
+  bloodGroup?: string;
+  address?: string;
+  schoolCollege?: string;
+  admittedBy?: {
+    email: string;
+  };
+  user?: {
+    email: string;
+    isActive: boolean;
+  };
+  isDeleted: boolean;
+}
+
 export interface StudentStats {
   totalMockTests: number;
   completedTests: number;

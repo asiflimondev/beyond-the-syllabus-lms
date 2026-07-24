@@ -39,10 +39,10 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ==========================================
-          HEADER WRAPPER - Contains both the glass navbar AND login button
+          HEADER WRAPPER
           ========================================== */}
       <header className="fixed top-0 left-0 right-0 z-50">
-        {/* Glassmorphism Navbar - STRETCHED FULL WIDTH */}
+        {/* Glassmorphism Navbar */}
         <div className="container-fluid pt-4 md:pt-6">
           <div 
             className={`
@@ -55,7 +55,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             `}
           >
             <div className="flex items-center justify-between">
-              {/* Brand - Always visible */}
+              {/* Brand */}
               <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
                 <img
                   src={btsLogo}
@@ -76,7 +76,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 </div>
               </Link>
 
-              {/* Desktop Navigation - Inside glass bar */}
+              {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-0.5 lg:gap-1">
                 {navItems.map((item) => (
                   <Link
@@ -84,7 +84,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                     to={item.path}
                     className={`
                       relative px-3 lg:px-4 py-2 text-sm lg:text-base font-semibold rounded-xl
-                      transition-all duration-300
+                      transition-all duration-300 whitespace-nowrap
                       ${isActive(item.path)
                         ? isScrolled
                           ? 'text-blue-600 bg-blue-50/80'
@@ -103,7 +103,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 ))}
               </nav>
 
-              {/* Right side - Cambridge Logo + Mobile Menu (inside glass bar) */}
+              {/* Right side */}
               <div className="flex items-center gap-3 flex-shrink-0">
                 {/* Cambridge Logo */}
                 <div className="hidden sm:flex items-center">
@@ -113,6 +113,20 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                     className="h-8 md:h-9 w-auto object-contain"
                   />
                 </div>
+
+                {/* Login Button */}
+                <Link
+                  to="/login"
+                  className={`
+                    hidden md:inline-flex px-6 py-2.5 text-sm font-bold rounded-full
+                    transition-all duration-300 whitespace-nowrap
+                    bg-orange-500 text-white 
+                    hover:bg-orange-600 hover:-translate-y-0.5
+                    shadow-sh-orange hover:shadow-sh-orange-lg
+                  `}
+                >
+                  Login
+                </Link>
 
                 {/* Mobile Menu Button */}
                 <button
@@ -132,26 +146,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* ==========================================
-            LOGIN BUTTON - Far right, BIGGER, aligned with top of glass bar
-            ========================================== */}
-        <Link
-          to="/login"
-          className={`
-            hidden md:inline-flex fixed top-4 md:top-6 right-4 lg:right-8 
-            px-8 py-4 text-base font-bold rounded-full
-            transition-all duration-300 z-50
-            bg-orange-500 text-white 
-            hover:bg-orange-600 hover:-translate-y-0.5
-            shadow-sh-orange hover:shadow-sh-orange-lg
-          `}
-        >
-          Login
-        </Link>
-
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-2 mx-4 glass-bg rounded-2xl border border-white/30 shadow-sh-2 overflow-hidden">
+          <div className="md:hidden mt-2 mx-4 bg-white/95 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
             <div className="p-4 space-y-1">
               {navItems.map((item) => (
                 <Link
@@ -160,15 +157,15 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                   className={`
                     block px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
                     ${isActive(item.path)
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-ink-soft hover:bg-gray-100 hover:text-blue-900'
+                      ? 'bg-orange-50 text-orange-600'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-blue-900'
                     }
                   `}
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="pt-3 border-t border-gray-200/50">
+              <div className="pt-3 mt-2 border-t border-gray-200">
                 <Link
                   to="/login"
                   className="block px-4 py-3 text-center text-sm font-bold text-white bg-orange-500 rounded-xl hover:bg-orange-600 transition-colors"
@@ -181,7 +178,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         )}
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - No extra padding, hero section starts immediately */}
       <main className="flex-1">
         {children}
       </main>

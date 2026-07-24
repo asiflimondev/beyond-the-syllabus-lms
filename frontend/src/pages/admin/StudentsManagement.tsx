@@ -574,72 +574,149 @@ const StudentsManagement: React.FC = () => {
   </div>
 )}
 
-      {/* View Student Modal - Keep existing but with glass styling */}
-      {isViewModalOpen && selectedStudent && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
-          <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/50 animate-scale-in">
-              <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <Eye className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Student Details</h3>
-                    <p className="text-sm text-primary-100">View student information</p>
-                  </div>
-                </div>
-                <button onClick={() => setIsViewModalOpen(false)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105">
-                  <X className="w-5 h-5" />
-                </button>
+      {/* View Student Modal - UPDATED with all fields including parent info */}
+{isViewModalOpen && selectedStudent && (
+  <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
+    <div className="relative min-h-screen flex items-center justify-center p-4">
+      <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-white/50 animate-scale-in">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <Eye className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Student Details</h3>
+              <p className="text-sm text-primary-100">Complete student information</p>
+            </div>
+          </div>
+          <button onClick={() => setIsViewModalOpen(false)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-200 text-white hover:scale-105">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 space-y-6">
+          {/* Personal Information */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-primary-500 rounded-full"></span>
+              Personal Information
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 rounded-xl p-4">
+              <div>
+                <p className="text-xs font-medium text-gray-500">Admission ID</p>
+                <p className="font-mono text-sm font-medium text-gray-900">{selectedStudent.admissionId}</p>
               </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Admission ID</p>
-                    <p className="font-mono text-sm font-medium text-gray-900">{selectedStudent.admissionId}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Full Name</p>
-                    <p className="text-sm font-medium text-gray-900">{selectedStudent.fullName}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Email</p>
-                    <p className="text-sm font-medium text-gray-900">{selectedStudent.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Phone</p>
-                    <p className="text-sm font-medium text-gray-900">{selectedStudent.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Program</p>
-                    <p className="text-sm font-medium text-gray-900">{selectedStudent.program?.displayName?.en || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Status</p>
-                    <span className={`badge ${getStatusColor(selectedStudent.status)}`}>
-                      {getStatusLabel(selectedStudent.status)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Account Status</p>
-                    <span className={`badge ${selectedStudent.user ? 'badge-success' : 'badge-warning'}`}>
-                      {selectedStudent.user ? 'Registered' : 'Not Registered'}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-500">Admission Date</p>
-                    <p className="text-sm font-medium text-gray-900">
-                      {new Date(selectedStudent.admissionDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Full Name</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.fullName}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Email</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.email}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Phone</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.phone}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Date of Birth</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Gender</p>
+                <p className="text-sm font-medium text-gray-900 capitalize">{selectedStudent.gender || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Blood Group</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.bloodGroup || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Status</p>
+                <span className={`badge ${getStatusColor(selectedStudent.status)}`}>
+                  {getStatusLabel(selectedStudent.status)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Parent Information */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-emerald-500 rounded-full"></span>
+              Parent Information
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 rounded-xl p-4">
+              <div>
+                <p className="text-xs font-medium text-gray-500">Father's Name</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.fatherName || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Mother's Name</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.motherName || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Parent Phone</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.parentPhone || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Address & Education */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+              Address & Education
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 rounded-xl p-4">
+              <div className="sm:col-span-2">
+                <p className="text-xs font-medium text-gray-500">Address</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.address || 'N/A'}</p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-xs font-medium text-gray-500">School/College</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.schoolCollege || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Program Information */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-orange-500 rounded-full"></span>
+              Program Information
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 rounded-xl p-4">
+              <div>
+                <p className="text-xs font-medium text-gray-500">Program</p>
+                <p className="text-sm font-medium text-gray-900">{selectedStudent.program?.displayName?.en || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Account Status</p>
+                <span className={`badge ${selectedStudent.user ? 'badge-success' : 'badge-warning'}`}>
+                  {selectedStudent.user ? 'Registered' : 'Not Registered'}
+                </span>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Admission Date</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {selectedStudent.admissionDate ? new Date(selectedStudent.admissionDate).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">Admitted By</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {selectedStudent.admittedBy?.email || 'N/A'}
+                </p>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Reset Password Modal - Keep existing with glass styling */}
       {isPasswordModalOpen && selectedStudent && (

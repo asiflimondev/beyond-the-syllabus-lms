@@ -46,6 +46,8 @@ export const updateStudentProfile = async (req: Request, res: Response): Promise
     const {
       fullName,
       phone,
+      fatherName,
+      motherName,
       parentPhone,
       dateOfBirth,
       gender,
@@ -63,9 +65,12 @@ export const updateStudentProfile = async (req: Request, res: Response): Promise
       return;
     }
 
+    // Build update object with all fields
     const updateData: any = {};
     if (fullName !== undefined) updateData.fullName = fullName;
     if (phone !== undefined) updateData.phone = phone;
+    if (fatherName !== undefined) updateData.fatherName = fatherName;
+    if (motherName !== undefined) updateData.motherName = motherName;
     if (parentPhone !== undefined) updateData.parentPhone = parentPhone;
     if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth;
     if (gender !== undefined) updateData.gender = gender;
