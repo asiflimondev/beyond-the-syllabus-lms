@@ -7,6 +7,7 @@ interface AuthContextType extends AuthState {
   register: (email: string, password: string, confirmPassword: string, role?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<User | null>;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,16 +40,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isActive: userData.isActive,
           lastLogin: userData.lastLogin,
           profile: userData.profile || null,
+          fullName: userData.fullName || userData.profile?.fullName || userData.email?.split('@')[0] || 'User',
+          phone: userData.phone || userData.profile?.phone || '',
         };
         setState({
           user,
           isAuthenticated: true,
           isLoading: false,
         });
+        // Update localStorage
+        localStorage.setItem('user', JSON.stringify(user));
         return user;
       } else {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
         setState({ user: null, isAuthenticated: false, isLoading: false });
         return null;
       }
@@ -56,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Refresh user error:', error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setState({ user: null, isAuthenticated: false, isLoading: false });
       return null;
     }
@@ -74,7 +81,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(userData));
         
         const user: User = {
           id: userData.id,
@@ -83,7 +89,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isActive: userData.isActive,
           lastLogin: userData.lastLogin,
           profile: userData.profile || null,
+          fullName: userData.fullName || userData.profile?.fullName || userData.email?.split('@')[0] || 'User',
+          phone: userData.phone || userData.profile?.phone || '',
         };
+        
+        localStorage.setItem('user', JSON.stringify(user));
         
         setState({
           user,
@@ -115,7 +125,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(userData));
         
         const user: User = {
           id: userData.id,
@@ -124,7 +133,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isActive: userData.isActive,
           lastLogin: userData.lastLogin,
           profile: userData.profile || null,
+          fullName: userData.fullName || userData.profile?.fullName || userData.email?.split('@')[0] || 'User',
+          phone: userData.phone || userData.profile?.phone || '',
         };
+        
+        localStorage.setItem('user', JSON.stringify(user));
         
         setState({
           user,
@@ -155,12 +168,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // ============================================
+  // UPDATE USER - Syncs user data across the app
+  // ============================================
+  const updateUser = (data: Partial<User>) => {
+    if (state.user) {
+      const updatedUser = { ...state.user, ...data };
+      
+      // Update state
+      setState({
+        ...state,
+        user: updatedUser,
+      });
+      
+      // Update localStorage
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          const mergedUser = { ...parsedUser, ...data };
+          localStorage.setItem('user', JSON.stringify(mergedUser));
+        } catch (e) {
+          console.error('Error updating user in localStorage:', e);
+        }
+      } else {
+        // If no user in localStorage, save the updated user
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    }
+  };
+
   const value: AuthContextType = {
     ...state,
     login,
     register,
     logout,
     refreshUser,
+    updateUser,
   };
 
   return (

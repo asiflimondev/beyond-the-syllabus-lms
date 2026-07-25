@@ -32,10 +32,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   };
 
   const getDisplayName = () => {
-    if (!user?.email) return 'User';
-    const name = user.email.split('@')[0];
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  };
+  // First check if user has fullName
+  if (user?.fullName) return user.fullName;
+  // Fallback to email
+  if (!user?.email) return 'User';
+  const name = user.email.split('@')[0];
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
 
   const getUserInitials = () => {
     if (!user?.email) return 'U';

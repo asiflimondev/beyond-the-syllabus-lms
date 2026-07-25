@@ -6,6 +6,8 @@ export interface User {
   isActive: boolean;
   lastLogin?: string;
   profile?: any;  // For student/teacher/office specific data
+  fullName?: string;  // <--- ADD THIS
+  phone?: string;     // <--- ADD THIS
 }
 
 // Auth Types

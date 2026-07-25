@@ -6,6 +6,8 @@ export interface IUser {
   password: string;
   role: 'admin' | 'teacher' | 'office' | 'student';
   isActive: boolean;
+  fullName?: string;  // <--- ADD THIS
+  phone?: string;     // <--- ADD THIS
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -32,7 +34,17 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't return password by default
+      select: false,
+    },
+    fullName: {           // <--- ADD THIS
+      type: String,
+      trim: true,
+      default: '',
+    },
+    phone: {              // <--- ADD THIS
+      type: String,
+      trim: true,
+      default: '',
     },
     role: {
       type: String,
@@ -64,7 +76,6 @@ const UserSchema = new Schema<IUserDocument>(
 
 // Hash password before saving
 UserSchema.pre<IUserDocument>('save', async function (next) {
-  // Only hash if password is modified (or new)
   if (!this.isModified('password')) return next();
 
   try {
@@ -76,11 +87,10 @@ UserSchema.pre<IUserDocument>('save', async function (next) {
   }
 });
 
-// ✅ FIXED: Method to compare password
+// Method to compare password
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
-  // ✅ Check if password exists
   if (!this.password) {
     console.error('❌ No password found for user');
     return false;
@@ -92,5 +102,7 @@ UserSchema.methods.comparePassword = async function (
 UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 UserSchema.index({ isActive: 1 });
+UserSchema.index({ fullName: 1 });
+UserSchema.index({ phone: 1 });
 
 export const User = mongoose.model<IUserDocument>('User', UserSchema);

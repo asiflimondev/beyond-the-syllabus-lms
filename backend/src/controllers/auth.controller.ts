@@ -97,6 +97,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password,
       role,
       isActive: true,
+      fullName: '',  // Will be updated later via profile
+      phone: '',     // Will be updated later via profile
     });
 
     const { accessToken, refreshToken } = generateTokens(
@@ -116,6 +118,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           email: user.email,
           role: user.role,
           isActive: user.isActive,
+          fullName: user.fullName || user.email.split('@')[0],
+          phone: user.phone || '',
+          profile: null,
         },
       },
     });
@@ -240,7 +245,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         break;
     }
 
+    // ✅ FIX: Always use User model for fullName and phone
+    const fullName = user.fullName || profileData?.fullName || user.email.split('@')[0];
+    const phone = user.phone || profileData?.phone || '';
+
     console.log('✅ Login successful for:', user.email);
+    console.log('✅ Returning fullName:', fullName);
+    console.log('✅ Returning phone:', phone);
     console.log('========================================');
 
     res.status(200).json({
@@ -255,6 +266,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
           role: user.role,
           isActive: user.isActive,
           lastLogin: user.lastLogin,
+          fullName: fullName,
+          phone: phone,
           profile: profileData,
         },
       },
@@ -319,12 +332,39 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       user.role
     );
 
+    // Get profile data for response
+    let profileData = null;
+    switch (user.role) {
+      case 'student':
+        profileData = await Student.findOne({ userId: user._id });
+        break;
+      case 'teacher':
+        profileData = await Teacher.findOne({ userId: user._id });
+        break;
+      case 'office':
+        profileData = await OfficeMember.findOne({ userId: user._id });
+        break;
+    }
+
+    const fullName = user.fullName || profileData?.fullName || user.email.split('@')[0];
+    const phone = user.phone || profileData?.phone || '';
+
     res.status(200).json({
       success: true,
       message: 'Tokens refreshed successfully',
       data: {
         accessToken,
         refreshToken: newRefreshToken,
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          fullName: fullName,
+          phone: phone,
+          profile: profileData,
+        },
       },
     });
   } catch (error: any) {
@@ -393,6 +433,16 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
         break;
     }
 
+    // ✅ FIX: Always use User model for fullName and phone
+    const fullName = user.fullName || profileData?.fullName || user.email.split('@')[0];
+    const phone = user.phone || profileData?.phone || '';
+
+    console.log('✅ getCurrentUser returning:', {
+      email: user.email,
+      fullName: fullName,
+      phone: phone
+    });
+
     res.status(200).json({
       success: true,
       data: {
@@ -402,6 +452,8 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
           role: user.role,
           isActive: user.isActive,
           lastLogin: user.lastLogin,
+          fullName: fullName,
+          phone: phone,
           profile: profileData,
         },
       },

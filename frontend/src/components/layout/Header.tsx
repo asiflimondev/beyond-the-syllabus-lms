@@ -25,9 +25,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   };
 
   const getDisplayName = () => {
-    if (!user?.email) return 'User';
-    return user.email.split('@')[0];
-  };
+  // First check if user has fullName
+  if (user?.fullName) return user.fullName;
+  // Fallback to email
+  if (!user?.email) return 'User';
+  return user.email.split('@')[0];
+};
 
   const getUserInitials = () => {
     if (!user?.email) return 'U';

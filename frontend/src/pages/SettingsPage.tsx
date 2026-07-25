@@ -1,32 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { settingsApi } from '@api/settings.api';
 import { 
   User, 
   Mail, 
   Lock, 
-  Shield, 
-  Bell, 
-  Globe,
   Save,
   Key,
   UserCircle,
   Phone,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  LogOut,
+  Sparkles
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-// Profile Section - Enhanced UI
-const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
-  const [fullName, setFullName] = useState(user?.profile?.fullName || '');
-  const [phone, setPhone] = useState(user?.profile?.phone || '');
+// Profile Section
+const ProfileSection: React.FC = () => {
+  const { user, updateUser } = useAuth();
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: profileData, isLoading } = useQuery({
+    queryKey: ['settings-profile'],
+    queryFn: () => settingsApi.getProfile(),
+  });
+
+  useEffect(() => {
+    if (profileData?.data?.data) {
+      const data = profileData.data.data;
+      const userData = data.user || {};
+      const profile = data.profile || {};
+      setFullName(profile.fullName || userData.fullName || '');
+      setPhone(profile.phone || userData.phone || '');
+    }
+  }, [profileData]);
+
+  const updateMutation = useMutation({
+    mutationFn: (data: { fullName: string; phone: string }) =>
+      settingsApi.updateProfile(data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['settings-profile'] });
+      
+      // Update the user context with new data from the response
+      const responseData = response?.data?.data;
+      if (responseData) {
+        const userData = responseData.user || {};
+        updateUser({
+          fullName: userData.fullName || fullName,
+          phone: userData.phone || phone,
+        });
+      } else {
+        // Fallback: update with the values we sent
+        updateUser({
+          fullName: fullName,
+          phone: phone,
+        });
+      }
+      
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update profile');
+    },
+  });
 
   const handleSave = async () => {
-    toast.success('Profile updated successfully!');
-    setIsEditing(false);
+    if (!fullName || !phone) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    updateMutation.mutate({ fullName, phone });
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 overflow-hidden">
@@ -56,7 +118,7 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
 
       <div className="p-6 space-y-5">
         <div>
-          <label className=" text-sm font-medium text-gray-700 mb-1.5 flex items-center">
+          <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center">
             <Mail className="w-4 h-4 mr-2 text-gray-400" />
             Email Address
           </label>
@@ -78,9 +140,9 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
         </div>
 
         <div>
-          <label className=" text-sm font-medium text-gray-700 mb-1.5 flex items-center">
+          <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center">
             <UserCircle className="w-4 h-4 mr-2 text-gray-400" />
-            Full Name
+            Full Name <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="text"
@@ -97,9 +159,9 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
         </div>
 
         <div>
-          <label className=" text-sm font-medium text-gray-700 mb-1.5 flex items-center">
+          <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center">
             <Phone className="w-4 h-4 mr-2 text-gray-400" />
-            Phone Number
+            Phone Number <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="tel"
@@ -118,10 +180,20 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
         {isEditing && (
           <button
             onClick={handleSave}
-            className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+            disabled={updateMutation.isPending}
+            className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>Save Profile</span>
+            {updateMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save Profile</span>
+              </>
+            )}
           </button>
         )}
       </div>
@@ -129,12 +201,25 @@ const ProfileSection: React.FC<{ user: any }> = ({ user }) => {
   );
 };
 
-// Password Section - Enhanced UI
+// Password Section
 const PasswordSection: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const changePasswordMutation = useMutation({
+    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
+      settingsApi.changePassword(data),
+    onSuccess: () => {
+      toast.success('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to change password');
+    },
+  });
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -152,18 +237,7 @@ const PasswordSection: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success('Password changed successfully!');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error) {
-      toast.error('Failed to change password. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    changePasswordMutation.mutate({ currentPassword, newPassword });
   };
 
   return (
@@ -213,10 +287,10 @@ const PasswordSection: React.FC = () => {
         </div>
         <button
           onClick={handleChangePassword}
-          disabled={isLoading}
+          disabled={changePasswordMutation.isPending}
           className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? (
+          {changePasswordMutation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Changing Password...</span>
@@ -233,204 +307,28 @@ const PasswordSection: React.FC = () => {
   );
 };
 
-// Notification Section - Enhanced UI
-const NotificationSection: React.FC = () => {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [smsNotifications, setSmsNotifications] = useState(false);
-  const [pushNotifications, setPushNotifications] = useState(true);
-
-  const handleSave = async () => {
-    toast.success('Notification preferences saved!');
-  };
-
-  const NotificationToggle = ({ 
-    title, 
-    description, 
-    enabled, 
-    onChange 
-  }: { 
-    title: string; 
-    description: string; 
-    enabled: boolean; 
-    onChange: () => void;
-  }) => (
-    <div className="flex items-center justify-between p-4 bg-gray-50/80 hover:bg-gray-100/80 rounded-xl transition-all duration-200 group">
-      <div>
-        <p className="font-medium text-gray-900 text-sm">{title}</p>
-        <p className="text-xs text-gray-500">{description}</p>
-      </div>
-      <button
-        onClick={onChange}
-        className={`relative w-12 h-7 rounded-full transition-all duration-300 flex-shrink-0 ${
-          enabled ? 'bg-primary-600 shadow-md shadow-primary-500/30' : 'bg-gray-300'
-        }`}
-      >
-        <span
-          className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-300 shadow-sm ${
-            enabled ? 'left-6' : 'left-1'
-          }`}
-        />
-      </button>
-    </div>
-  );
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50/50 to-white">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
-            <Bell className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h4 className="text-base font-semibold text-gray-900">Notifications</h4>
-            <p className="text-xs text-gray-500">Manage how you receive notifications</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-3">
-        <NotificationToggle
-          title="Email Notifications"
-          description="Receive updates via email"
-          enabled={emailNotifications}
-          onChange={() => setEmailNotifications(!emailNotifications)}
-        />
-        <NotificationToggle
-          title="SMS Notifications"
-          description="Receive updates via SMS"
-          enabled={smsNotifications}
-          onChange={() => setSmsNotifications(!smsNotifications)}
-        />
-        <NotificationToggle
-          title="Push Notifications"
-          description="Receive browser notifications"
-          enabled={pushNotifications}
-          onChange={() => setPushNotifications(!pushNotifications)}
-        />
-
-        <button
-          onClick={handleSave}
-          className="w-full mt-3 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Preferences</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Language Section - Enhanced UI
-const LanguageSection: React.FC = () => {
-  const [language, setLanguage] = useState<'en' | 'bn'>('en');
-
-  const handleSave = async () => {
-    toast.success(`Language changed to ${language === 'en' ? 'English' : 'Bangla'}!`);
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50/50 to-white">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-sm">
-            <Globe className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h4 className="text-base font-semibold text-gray-900">Language</h4>
-            <p className="text-xs text-gray-500">Choose your preferred language</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setLanguage('en')}
-            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-              language === 'en'
-                ? 'border-primary-600 bg-primary-50/50 text-primary-700 shadow-sm'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <span className="font-medium">🇬🇧 English</span>
-          </button>
-          <button
-            onClick={() => setLanguage('bn')}
-            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-              language === 'bn'
-                ? 'border-primary-600 bg-primary-50/50 text-primary-700 shadow-sm'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <span className="font-medium">🇧🇩 বাংলা</span>
-          </button>
-        </div>
-        <button
-          onClick={handleSave}
-          className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Language</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Danger Zone (Admin only) - Enhanced UI
-const DangerZone: React.FC = () => {
-  const handleClearData = () => {
-    if (window.confirm('Are you sure you want to clear all data? This action is irreversible!')) {
-      toast.error('This feature is not yet implemented');
-    }
-  };
-
-  return (
-    <div className="bg-gradient-to-r from-red-50/80 to-rose-50/80 border-2 border-red-200/60 rounded-2xl p-6 shadow-sm">
-      <div className="flex items-start space-x-4">
-        <div className="w-11 h-11 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Shield className="w-5 h-5 text-red-600" />
-        </div>
-        <div className="flex-1">
-          <h4 className="text-base font-semibold text-red-800">Danger Zone</h4>
-          <p className="text-sm text-red-600/80 mb-4">These actions are irreversible. Proceed with caution.</p>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={handleClearData}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg"
-            >
-              Clear All Data
-            </button>
-            <button
-              className="px-4 py-2 border-2 border-red-600 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 text-sm font-medium"
-            >
-              Reset System
-            </button>
-            <button
-              className="px-4 py-2 border-2 border-red-600 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 text-sm font-medium"
-            >
-              Export Data
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// MAIN SETTINGS PAGE - Enhanced
+// MAIN SETTINGS PAGE
 const SettingsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Safely get user role with fallback
   const userRole = user?.role || 'user';
   const displayRole = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-5 h-5 text-primary-500" />
+            <span className="text-sm font-medium text-primary-600">Settings</span>
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Settings</h2>
           <p className="text-sm text-gray-500 mt-1">Manage your account settings and preferences</p>
         </div>
@@ -442,17 +340,36 @@ const SettingsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <ProfileSection user={user} />
+          <ProfileSection />
           <PasswordSection />
         </div>
 
         <div className="space-y-6">
-          <NotificationSection />
-          <LanguageSection />
+          {/* Logout Section */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50/50 to-white">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center shadow-sm">
+                  <LogOut className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-base font-semibold text-gray-900">Logout</h4>
+                  <p className="text-xs text-gray-500">Sign out of your account</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-
-      {user?.role === 'admin' && <DangerZone />}
     </div>
   );
 };

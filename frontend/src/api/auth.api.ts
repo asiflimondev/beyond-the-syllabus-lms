@@ -25,6 +25,8 @@ export interface AuthResponse {
       isActive: boolean;
       lastLogin?: string;
       profile?: any;
+      fullName?: string;  // <--- ADD THIS
+      phone?: string;     // <--- ADD THIS
     };
   };
 }
