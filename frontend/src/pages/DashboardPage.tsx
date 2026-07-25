@@ -113,6 +113,9 @@ const DashboardPage: React.FC = () => {
 
   const isLoading = statsLoading || programsLoading;
 
+  // Get display name from user context
+  const displayName = user?.fullName || user?.email?.split('@')[0] || 'User';
+
   return (
     <div className="space-y-6">
       {/* Welcome */}
@@ -125,7 +128,7 @@ const DashboardPage: React.FC = () => {
               <span className="text-sm font-medium text-primary-600">Dashboard</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-display">
-              Welcome back, {user?.email?.split('@')[0]}!
+              Welcome back, {displayName}!
             </h1>
             <p className="text-sm text-gray-500 mt-1">
               Here's what's happening with your admin dashboard today.

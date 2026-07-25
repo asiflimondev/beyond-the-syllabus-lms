@@ -5,13 +5,14 @@ import { Link } from 'react-router-dom';
 import { studentManagementApi } from '@api/admin/student.api';
 import {
   Users,
-  UserPlus,
   BookOpen,
   FileText,
   Clock,
   CheckCircle,
   Calendar,
-  Sparkles
+  Sparkles,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 
 const OfficeDashboard: React.FC = () => {
@@ -33,36 +34,40 @@ const OfficeDashboard: React.FC = () => {
     { title: 'Total Programs', value: '0', icon: BookOpen, color: 'from-purple-500 to-violet-500' },
   ];
 
+  // ✅ Office Quick Actions - Only what's in the sidebar
   const quickActions = [
     {
-      title: 'Admit New Student',
-      description: 'Register a new student in the system',
-      icon: UserPlus,
-      path: '/admin/admission',
-      color: 'from-primary-500 to-primary-600'
-    },
-    {
-      title: 'View Students',
-      description: 'See all registered students',
-      icon: Users,
-      path: '/admin/students',
-      color: 'from-blue-500 to-blue-600'
-    },
-    {
       title: 'Manage Programs',
-      description: 'View and manage programs',
+      description: 'View all programs',
       icon: BookOpen,
       path: '/admin/programs',
       color: 'from-emerald-500 to-emerald-600'
     },
     {
+      title: 'Mock Tests',
+      description: 'Manage mock tests',
+      icon: FileText,
+      path: '/office/mock-tests',
+      color: 'from-blue-500 to-blue-600'
+    },
+    {
       title: 'Generate Reports',
       description: 'Create student reports',
-      icon: FileText,
+      icon: BarChart3,
       path: '/admin/reports',
       color: 'from-purple-500 to-purple-600'
     },
+    {
+      title: 'Settings',
+      description: 'Manage your account settings',
+      icon: Settings,
+      path: '/office/settings',
+      color: 'from-gray-500 to-gray-600'
+    },
   ];
+
+  // Get display name from user context
+  const displayName = user?.fullName || user?.email?.split('@')[0] || 'User';
 
   return (
     <div className="space-y-6">
@@ -76,7 +81,7 @@ const OfficeDashboard: React.FC = () => {
               <span className="text-sm font-medium text-primary-600">Office Dashboard</span>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 font-display">
-              Welcome, {user?.email}!
+              Welcome, {displayName}!
             </h2>
             <p className="mt-1 text-sm text-gray-500">
               Office Dashboard - Manage student admissions and records
@@ -111,7 +116,7 @@ const OfficeDashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Office Only */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {quickActions.map((action) => (
           <Link

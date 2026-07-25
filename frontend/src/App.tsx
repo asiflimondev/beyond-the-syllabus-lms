@@ -46,6 +46,9 @@ import OfficeDashboard from '@pages/office/OfficeDashboard';
 import OfficeMockTests from '@pages/office/OfficeMockTests';
 import OfficeMarkEntry from '@pages/office/OfficeMarkEntry';
 
+// Office Member Management (Admin)
+import OfficeMemberManagement from '@pages/admin/OfficeMemberManagement'; // <--- ADD THIS IMPORT
+
 // Settings Page
 import SettingsPage from '@pages/SettingsPage';
 import ReceiptHistory from '@pages/admin/ReceiptHistory';
@@ -128,6 +131,7 @@ function App() {
             <Route path="/admin/admission" element={<ProtectedRoute><AdmissionPage /></ProtectedRoute>} />
             <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
             <Route path="/admin/teachers" element={<ProtectedRoute><TeacherManagement /></ProtectedRoute>} />
+            <Route path="/admin/office-members" element={<ProtectedRoute><OfficeMemberManagement /></ProtectedRoute>} /> {/* <--- ADD THIS ROUTE */}
             <Route path="/admin/receipts" element={<ProtectedRoute><ReceiptHistory /></ProtectedRoute>} />
             <Route path="/admin/mock-tests" element={<ProtectedRoute><AdminMockTests /></ProtectedRoute>} />
             <Route path="/admin/mark-entry/:mockTestId" element={<ProtectedRoute><AdminMarkEntry /></ProtectedRoute>} />

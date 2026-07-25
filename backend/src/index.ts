@@ -22,6 +22,7 @@ import officeMockTestRoutes from './routes/office/mockTest.routes.js'; // NEW
 import reportRoutes from './routes/report.routes.js';
 import publicRoutes from './routes/public.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
+import officeMemberRoutes from './routes/admin/officeMember.routes.js';
 
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
@@ -140,6 +141,9 @@ console.log('✅ Public routes mounted at /api/public');
 
 app.use('/api/settings', settingsRoutes);
 console.log('✅ Settings routes mounted at /api/settings');
+
+app.use('/api/admin/office-members', officeMemberRoutes);
+console.log('✅ Office Member routes mounted at /api/admin/office-members');
 
 // ============================================
 // ERROR HANDLING
