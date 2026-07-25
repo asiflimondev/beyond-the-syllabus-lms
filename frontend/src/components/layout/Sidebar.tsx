@@ -80,10 +80,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     }
 
     if (user?.role === 'office') {
+      // Office members only see: Dashboard, Programs, Mock Tests, Settings
       items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programs' });
-      items.push({ path: '/admin/students', icon: Users, label: 'Students' });
-      items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
-      items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
       items.push({ path: '/office/mock-tests', icon: FileText, label: 'Mock Tests' });
       items.push({ path: '/office/settings', icon: Settings, label: 'Settings' });
     }
