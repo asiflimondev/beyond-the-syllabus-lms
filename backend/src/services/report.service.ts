@@ -12,7 +12,7 @@ export interface BatchReportData {
   program: {
     id: string;
     name: string;
-    displayName: { en: string; bn: string };
+    displayName: { en: string };
   };
   teacher: {
     id: string;
@@ -200,7 +200,9 @@ export const generateBatchReport = async (
     program: {
       id: program._id.toString(),
       name: program.name,
-      displayName: program.displayName,
+      displayName: {
+        en: program.displayName?.en || program.name,
+      },
     },
     teacher: teacher
       ? {
@@ -283,6 +285,9 @@ export const generateIndividualReport = async (
       ? completedResults.reduce((sum, r) => sum + r.percentage, 0) / completedResults.length
       : 0;
 
+  // Get program name from displayName.en
+  const programName = program.displayName?.en || program.name || 'N/A';
+
   return {
     student: {
       id: student._id.toString(),
@@ -290,7 +295,7 @@ export const generateIndividualReport = async (
       admissionId: student.admissionId,
       phone: student.phone,
       email: student.email,
-      programName: program.displayName?.en || program.name || 'N/A',
+      programName: programName,
       profileImage: student.profileImage,
     },
     teacher: teacher
