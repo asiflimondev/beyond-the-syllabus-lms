@@ -5,15 +5,7 @@ export interface Program {
   name: string;
   displayName: {
     en: string;
-    bn: string;
   };
-  description: {
-    en: string;
-    bn: string;
-  };
-  duration: number;
-  fee: number;
-  teacherIds: string[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -23,15 +15,8 @@ export interface CreateProgramRequest {
   name: string;
   displayName: {
     en: string;
-    bn: string;
   };
-  description: {
-    en: string;
-    bn: string;
-  };
-  duration: number;
-  fee: number;
-  teacherIds?: string[];
+  isActive?: boolean;
 }
 
 export const programsApi = {

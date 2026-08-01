@@ -11,6 +11,8 @@ export interface IUser {
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
+  fullName?: string;
+  phone?: string;
 }
 
 // ============================================
@@ -98,26 +100,19 @@ export interface IOfficeMember {
 }
 
 // ============================================
-// PROGRAM TYPES
+// PROGRAM TYPES - SIMPLIFIED
 // ============================================
 export interface IProgram {
   name: string;
   displayName: {
     en: string;
-    bn: string;
   };
-  description: {
-    en: string;
-    bn: string;
-  };
-  duration: number;
-  fee: number;
-  teacherIds: Types.ObjectId[];
+  isActive: boolean;
   createdBy: Types.ObjectId;
   updatedBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-  isActive: boolean;
+  isDeleted?: boolean;
   deletedAt?: Date;
 }
 

@@ -8,9 +8,7 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
-  BookOpen,
-  Clock,
-  DollarSign
+  BookOpen
 } from 'lucide-react';
 import { programsApi, Program } from '@api/programs.api';
 import { useAuth } from '@context/AuthContext';
@@ -170,16 +168,10 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
                     <thead>
                       <tr className="bg-gradient-to-r from-gray-50/80 to-gray-50/40">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                          Name
+                          Program Code
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                           Display Name
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                          Duration
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                          Fee (BDT)
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                           Status
@@ -204,19 +196,6 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
                           </td>
                           <td className="px-4 py-3">
                             <div className="text-sm text-gray-700">{program.displayName?.en || 'N/A'}</div>
-                            <div className="text-xs text-gray-400">{program.displayName?.bn || 'N/A'}</div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1 text-sm text-gray-600">
-                              <Clock className="w-3.5 h-3.5 text-gray-400" />
-                              {program.duration} months
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1 text-sm font-medium text-gray-900">
-                              <DollarSign className="w-3.5 h-3.5 text-gray-400" />
-                              ৳{program.fee?.toLocaleString() || 0}
-                            </span>
                           </td>
                           <td className="px-4 py-3">
                             <span

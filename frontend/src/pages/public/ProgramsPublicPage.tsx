@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { publicApi, PublicProgram } from '@api/public.api';
 import PublicLayout from '@components/layout/PublicLayout';
 import {
   Clock,
@@ -15,168 +13,104 @@ import {
   Award
 } from 'lucide-react';
 
+// Hardcoded program data - NOT fetching from database anymore
+interface HardcodedProgram {
+  id: string;
+  name: string;
+  displayName: { en: string };
+  duration: string;
+  fee: number | null;
+  level: string;
+  cefr: string;
+  description: string;
+  image: string;
+  link: string;
+  color: string;
+  gradient: string;
+}
+
+const HARDCODED_PROGRAMS: HardcodedProgram[] = [
+  {
+    id: 'movers',
+    name: 'Movers',
+    displayName: { en: 'Movers' },
+    duration: '7-9',
+    fee: null,
+    level: 'Elementary',
+    cefr: 'A1',
+    description: 'Build confidence in English with fun, activity-based learning designed for young learners. Focus on basic communication skills and vocabulary development through interactive activities and games.',
+    image: 'a1.png',
+    link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/young-learners/',
+    color: '#10b981',
+    gradient: 'from-emerald-500 to-emerald-600'
+  },
+  {
+    id: 'ket',
+    name: 'KET',
+    displayName: { en: 'KET' },
+    duration: '7-9',
+    fee: null,
+    level: 'Elementary',
+    cefr: 'A2',
+    description: 'Develop practical English skills for everyday situations. KET certification demonstrates the ability to communicate in basic English in real-life contexts, preparing you for further study.',
+    image: 'a2.png',
+    link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/key/format/',
+    color: '#3b82f6',
+    gradient: 'from-blue-500 to-blue-600'
+  },
+  {
+    id: 'pet',
+    name: 'PET',
+    displayName: { en: 'PET' },
+    duration: '7-9',
+    fee: null,
+    level: 'Intermediate',
+    cefr: 'B1',
+    description: 'Master intermediate English skills for work, study, and travel. PET certification shows you can handle everyday situations with confidence and communicate effectively in English.',
+    image: 'b1.png',
+    link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/preliminary/format/',
+    color: '#f59e0b',
+    gradient: 'from-amber-500 to-amber-600'
+  },
+  {
+    id: 'fce',
+    name: 'FCE',
+    displayName: { en: 'FCE' },
+    duration: '7-9',
+    fee: null,
+    level: 'Upper-Intermediate',
+    cefr: 'B2',
+    description: 'Achieve the most popular Cambridge qualification. FCE certification proves you have the language skills needed to live and work independently in an English-speaking country.',
+    image: 'b2.png',
+    link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/first/format/',
+    color: '#8b5cf6',
+    gradient: 'from-purple-500 to-purple-600'
+  },
+  {
+    id: 'cae',
+    name: 'CAE',
+    displayName: { en: 'CAE' },
+    duration: '7-9',
+    fee: null,
+    level: 'Advanced',
+    cefr: 'C1',
+    description: 'Reach the highest level of Cambridge English. CAE certification is recognized by universities and employers worldwide as proof of advanced English proficiency.',
+    image: 'c1.png',
+    link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/advanced/format/',
+    color: '#ef4444',
+    gradient: 'from-red-500 to-red-600'
+  }
+];
+
 const ProgramsPublicPage: React.FC = () => {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['public-programs'],
-    queryFn: () => publicApi.getPrograms({ limit: 100 }),
-  });
+  // Using hardcoded data - no API fetching
+  const programs = HARDCODED_PROGRAMS;
 
-  const extractPrograms = (): PublicProgram[] => {
-    if (!data) return [];
-    const responseData = data.data;
-    if (!responseData) return [];
-    if (responseData.data?.programs) return responseData.data.programs;
-    if (responseData.programs) return responseData.programs;
-    return [];
+  // Helper function to format fee
+  const formatFee = (fee: number | null): string => {
+    if (fee === null || fee === undefined) return 'Contact for pricing';
+    return `৳${fee.toLocaleString()}`;
   };
-
-  const programs = extractPrograms();
-
-  // Program-specific data with illustrated images (no humans)
-  const getProgramDetails = (name: string) => {
-    const details: Record<string, {
-      level: string;
-      cefr: string;
-      description: string;
-      image: string;
-      link: string;
-      color: string;
-      gradient: string;
-    }> = {
-      'Movers': {
-        level: 'Elementary',
-        cefr: 'A1',
-        description: 'Build confidence in English with fun, activity-based learning designed for young learners. Focus on basic communication skills and vocabulary development through interactive activities and games.',
-        image: 'a1.png',
-        link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/young-learners/',
-        color: '#10b981',
-        gradient: 'from-emerald-500 to-emerald-600'
-      },
-      'KET': {
-        level: 'Elementary',
-        cefr: 'A2',
-        description: 'Develop practical English skills for everyday situations. KET certification demonstrates the ability to communicate in basic English in real-life contexts, preparing you for further study.',
-        image: 'a2.png',
-        link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/key/format/',
-        color: '#3b82f6',
-        gradient: 'from-blue-500 to-blue-600'
-      },
-      'PET': {
-        level: 'Intermediate',
-        cefr: 'B1',
-        description: 'Master intermediate English skills for work, study, and travel. PET certification shows you can handle everyday situations with confidence and communicate effectively in English.',
-        image: 'b1.png',
-        link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/preliminary/format/',
-        color: '#f59e0b',
-        gradient: 'from-amber-500 to-amber-600'
-      },
-      'FCE': {
-        level: 'Upper-Intermediate',
-        cefr: 'B2',
-        description: 'Achieve the most popular Cambridge qualification. FCE certification proves you have the language skills needed to live and work independently in an English-speaking country.',
-        image: 'b2.png',
-        link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/first/format/',
-        color: '#8b5cf6',
-        gradient: 'from-purple-500 to-purple-600'
-      },
-      'CAE': {
-        level: 'Advanced',
-        cefr: 'C1',
-        description: 'Reach the highest level of Cambridge English. CAE certification is recognized by universities and employers worldwide as proof of advanced English proficiency.',
-        image: 'c1.png',
-        link: 'https://www.cambridgeenglish.org/exams-and-tests/qualifications/advanced/format/',
-        color: '#ef4444',
-        gradient: 'from-red-500 to-red-600'
-      },
-      'CSE with NEO': {
-        level: 'Comprehensive',
-        cefr: 'A1-C1',
-        description: 'Complete English language development program combining Cambridge preparation with modern teaching methodologies. Covers all levels from beginner to advanced with comprehensive support.',
-        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80',
-        link: '',
-        color: '#f1592a',
-        gradient: 'from-orange-500 to-orange-600'
-      }
-    };
-    return details[name] || details['CSE with NEO'];
-  };
-
-  const getProgramImage = (name: string) => {
-    const details = getProgramDetails(name);
-    return details.image;
-  };
-
-  const getProgramLink = (name: string) => {
-    const details = getProgramDetails(name);
-    return details.link;
-  };
-
-  // Skeleton loading state
-  if (isLoading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen bg-gray-50">
-          {/* Hero Skeleton */}
-          <div className="relative overflow-hidden pt-32 pb-16" style={{ 
-            background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
-          }}>
-            <div className="container-fluid text-center">
-              <div className="inline-block h-8 w-32 bg-white/10 rounded-full animate-pulse mb-4"></div>
-              <div className="h-12 w-64 bg-white/10 rounded-lg mx-auto animate-pulse mb-4"></div>
-              <div className="h-6 w-96 bg-white/10 rounded-lg mx-auto animate-pulse"></div>
-            </div>
-          </div>
-          
-          {/* Program Cards Skeleton */}
-          <div className="container-fluid py-16">
-            <div className="max-w-5xl mx-auto space-y-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="md:w-1/3 h-48 md:h-[280px] bg-gray-200"></div>
-                    <div className="flex-1 p-6 md:p-8 space-y-4">
-                      <div className="h-7 bg-gray-200 rounded w-1/3"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
-                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                        <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                      </div>
-                      <div className="h-10 bg-gray-200 rounded w-32"></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
-  if (isError) {
-    return (
-      <PublicLayout>
-        <div className="min-h-[60vh] flex items-center justify-center pt-24">
-          <div className="text-center">
-            <div className="text-6xl mb-4">😕</div>
-            <p className="text-red-600 text-lg">Failed to load programs. Please try again later.</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
 
   return (
     <PublicLayout>
@@ -204,13 +138,8 @@ const ProgramsPublicPage: React.FC = () => {
       <section className="py-16 bg-gray-50">
         <div className="container-fluid">
           <div className="max-w-5xl mx-auto">
-            {/* Program Cards */}
-            {programs.map((program: PublicProgram) => {
-              const details = getProgramDetails(program.name);
-              const imageUrl = getProgramImage(program.name);
-              const linkUrl = getProgramLink(program.name);
-              const isCSE = program.name === 'CSE with NEO';
-              
+            {/* Program Cards - Hardcoded */}
+            {programs.map((program) => {
               return (
                 <div
                   key={program.id}
@@ -220,7 +149,7 @@ const ProgramsPublicPage: React.FC = () => {
                     {/* Image Section - 1/3 width */}
                     <div className="md:w-1/3 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 min-h-[200px] md:min-h-[280px]">
                       <img 
-                        src={imageUrl} 
+                        src={program.image} 
                         alt={program.displayName?.en || program.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         loading="lazy"
@@ -231,15 +160,15 @@ const ProgramsPublicPage: React.FC = () => {
                       <div className="absolute top-4 left-4">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full text-xs font-bold text-gray-900 shadow-lg border border-white/20">
                           <Target className="w-3.5 h-3.5" />
-                          {details.cefr}
+                          {program.cefr}
                         </span>
                       </div>
                       
                       {/* Level badge on image */}
                       <div className="absolute bottom-4 left-4 right-4 md:bottom-auto md:top-4 md:right-4 md:left-auto">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg bg-gradient-to-r ${details.gradient}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg bg-gradient-to-r ${program.gradient}`}>
                           <GraduationCap className="w-3.5 h-3.5" />
-                          {details.level}
+                          {program.level}
                         </span>
                       </div>
 
@@ -262,24 +191,24 @@ const ProgramsPublicPage: React.FC = () => {
                             </h3>
                             <p className="text-sm text-gray-500 mt-1">Program Code: {program.name}</p>
                           </div>
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${details.gradient}`}>
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${program.gradient}`}>
                             <Award className="w-3.5 h-3.5" />
-                            {details.cefr} Level
+                            {program.cefr} Level
                           </span>
                         </div>
 
                         <p className="text-gray-600 mt-3 leading-relaxed">
-                          {details.description}
+                          {program.description}
                         </p>
 
                         <div className="flex flex-wrap items-center gap-6 mt-4">
                           <div className="flex items-center text-sm text-gray-600">
                             <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                            <span>{program.duration || '7-9'} months</span>
+                            <span>{program.duration} months</span>
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
                             <DollarSign className="w-4 h-4 mr-2 text-orange-500" />
-                            <span>৳{program.fee?.toLocaleString() || 'Contact for pricing'}</span>
+                            <span>{formatFee(program.fee)}</span>
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
                             <Users className="w-4 h-4 mr-2 text-orange-500" />
@@ -290,39 +219,21 @@ const ProgramsPublicPage: React.FC = () => {
 
                       {/* Learn More Button */}
                       <div className="mt-6 pt-4 border-t border-gray-100">
-                        {isCSE ? (
-                          <button
-                            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-200 text-gray-500 rounded-xl text-sm font-semibold cursor-not-allowed"
-                            disabled
-                          >
-                            <BookOpen className="w-4 h-4" />
-                            Contact for Details
-                          </button>
-                        ) : (
-                          <a
-                            href={linkUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 group"
-                          >
-                            Learn More
-                            <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                          </a>
-                        )}
+                        <a
+                          href={program.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 group"
+                        >
+                          Learn More
+                          <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                        </a>
                       </div>
                     </div>
                   </div>
                 </div>
               );
             })}
-
-            {programs.length === 0 && (
-              <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-                <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700">No Programs Available</h3>
-                <p className="text-gray-500 mt-2">Please check back later for our program offerings.</p>
-              </div>
-            )}
           </div>
         </div>
       </section>

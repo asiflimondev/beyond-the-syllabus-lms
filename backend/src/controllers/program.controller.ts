@@ -9,21 +9,15 @@ export const createProgram = async (req: Request, res: Response): Promise<void> 
     const {
       name,
       displayName,
-      description,
-      duration,
-      fee,
-      teacherIds = [],
     } = req.body;
 
     const userId = (req as any).user?.id;
 
     // Validate required fields
-    if (!name || !displayName?.en || !displayName?.bn || 
-        !description?.en || !description?.bn || 
-        !duration || fee === undefined || fee === null) {
+    if (!name || !displayName?.en) {
       res.status(400).json({
         success: false,
-        message: 'Missing required fields: name, displayName (en, bn), description (en, bn), duration, fee',
+        message: 'Missing required fields: name, displayName.en',
       });
       return;
     }
@@ -42,10 +36,6 @@ export const createProgram = async (req: Request, res: Response): Promise<void> 
     const program = await Program.create({
       name,
       displayName,
-      description,
-      duration,
-      fee,
-      teacherIds,
       createdBy: userId,
       updatedBy: userId,
       isActive: true,
@@ -60,10 +50,6 @@ export const createProgram = async (req: Request, res: Response): Promise<void> 
         id: programData._id,
         name: program.name,
         displayName: program.displayName,
-        description: program.description,
-        duration: program.duration,
-        fee: program.fee,
-        teacherIds: program.teacherIds,
         isActive: program.isActive,
         createdAt: program.createdAt,
         updatedAt: program.updatedAt,
@@ -95,7 +81,6 @@ export const getPrograms = async (req: Request, res: Response): Promise<void> =>
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
         { 'displayName.en': { $regex: search, $options: 'i' } },
-        { 'displayName.bn': { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -106,8 +91,7 @@ export const getPrograms = async (req: Request, res: Response): Promise<void> =>
     const programs = await Program.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(Number(limit))
-      .populate('teacherIds', 'fullName email');
+      .limit(Number(limit));
 
     const total = await Program.countDocuments(filter);
 
@@ -118,10 +102,6 @@ export const getPrograms = async (req: Request, res: Response): Promise<void> =>
           id: p._id,
           name: p.name,
           displayName: p.displayName,
-          description: p.description,
-          duration: p.duration,
-          fee: p.fee,
-          teacherIds: p.teacherIds,
           isActive: p.isActive,
           createdAt: p.createdAt,
           updatedAt: p.updatedAt,
@@ -151,7 +131,7 @@ export const getProgramById = async (req: Request, res: Response): Promise<void>
   try {
     const { id } = req.params;
 
-    const program = await Program.findById(id).populate('teacherIds', 'fullName email');
+    const program = await Program.findById(id);
 
     if (!program) {
       res.status(404).json({
@@ -169,10 +149,6 @@ export const getProgramById = async (req: Request, res: Response): Promise<void>
         id: programData._id,
         name: program.name,
         displayName: program.displayName,
-        description: program.description,
-        duration: program.duration,
-        fee: program.fee,
-        teacherIds: program.teacherIds,
         isActive: program.isActive,
         createdAt: program.createdAt,
         updatedAt: program.updatedAt,
@@ -197,10 +173,6 @@ export const updateProgram = async (req: Request, res: Response): Promise<void> 
     const {
       name,
       displayName,
-      description,
-      duration,
-      fee,
-      teacherIds,
       isActive,
     } = req.body;
 
@@ -232,10 +204,6 @@ export const updateProgram = async (req: Request, res: Response): Promise<void> 
     const updateData: any = { updatedBy: userId };
     if (name) updateData.name = name;
     if (displayName) updateData.displayName = displayName;
-    if (description) updateData.description = description;
-    if (duration !== undefined) updateData.duration = duration;
-    if (fee !== undefined) updateData.fee = fee;
-    if (teacherIds) updateData.teacherIds = teacherIds;
     if (isActive !== undefined) updateData.isActive = isActive;
 
     // Update program
@@ -243,7 +211,7 @@ export const updateProgram = async (req: Request, res: Response): Promise<void> 
       id,
       updateData,
       { new: true, runValidators: true }
-    ).populate('teacherIds', 'fullName email');
+    );
 
     if (!updatedProgram) {
       res.status(404).json({
@@ -262,10 +230,6 @@ export const updateProgram = async (req: Request, res: Response): Promise<void> 
         id: programData._id,
         name: updatedProgram.name,
         displayName: updatedProgram.displayName,
-        description: updatedProgram.description,
-        duration: updatedProgram.duration,
-        fee: updatedProgram.fee,
-        teacherIds: updatedProgram.teacherIds,
         isActive: updatedProgram.isActive,
         createdAt: updatedProgram.createdAt,
         updatedAt: updatedProgram.updatedAt,
