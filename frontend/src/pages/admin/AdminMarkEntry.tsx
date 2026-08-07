@@ -14,9 +14,7 @@ import {
   FileText,
   Calendar,
   TrendingUp,
-  Clock,
-  Award,
-  ChevronRight
+  Clock
 } from 'lucide-react';
 
 const AdminMarkEntry: React.FC = () => {
