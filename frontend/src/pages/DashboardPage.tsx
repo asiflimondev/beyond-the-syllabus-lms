@@ -11,29 +11,42 @@ import {
   ChevronRight,
   BarChart3,
   Sparkles,
-  Clock
+  Clock,
+  GraduationCap,
+  FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { studentManagementApi } from '@api/admin/student.api';
 import { programsApi } from '@api/programs.api';
+import { activityApi, Activity } from '@api/admin/activity.api';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
 
-  // Fetch real data
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  // Fetch dashboard stats
+  const { data: dashboardStatsData, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
-    queryFn: () => studentManagementApi.getStats(),
+    queryFn: () => activityApi.getDashboardStats(),
   });
 
+  // Fetch programs
   const { data: programsData, isLoading: programsLoading } = useQuery({
     queryKey: ['dashboard-programs'],
     queryFn: () => programsApi.getAll({ isActive: true, limit: 100 }),
   });
 
-  const totalStudents = statsData?.data?.data?.total || 0;
-  const activeStudents = statsData?.data?.data?.active || 0;
-  const pendingStudents = statsData?.data?.data?.pending || 0;
+  // Fetch recent activities (limit 5)
+  const { data: activitiesData, isLoading: activitiesLoading } = useQuery({
+    queryKey: ['recent-activities'],
+    queryFn: () => activityApi.getRecentActivities(5), // Request exactly 5
+  });
+
+  const stats = dashboardStatsData?.data?.data;
+  
+  const totalStudents = stats?.students?.total || 0;
+  const activeStudents = stats?.students?.active || 0;
+  const pendingStudents = stats?.students?.pending || 0;
+  const totalTeachers = stats?.teachers?.total || 0;
+  const totalMockTests = stats?.mockTests?.total || 0;
 
   // Extract programs from the response
   const extractPrograms = (): any[] => {
@@ -55,7 +68,10 @@ const DashboardPage: React.FC = () => {
   const programs = extractPrograms();
   const activePrograms = programs.filter((p: any) => p.isActive !== false).length;
 
-  const stats = [
+  // Get recent activities (should be exactly 5 from API)
+  const recentActivities = activitiesData?.data?.data || [];
+
+  const statCards = [
     { 
       title: 'Total Students', 
       value: totalStudents, 
@@ -98,12 +114,6 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
-  const recentActivities = [
-    { user: 'Asif Limon', action: 'Completed FCE Mock Test', time: '2 hours ago', type: 'test' },
-    { user: 'Rifat Hossain', action: 'Admitted to KET Program', time: '4 hours ago', type: 'admission' },
-    { user: 'Mahmoud', action: 'Submitted PET Writing', time: '6 hours ago', type: 'submission' },
-  ];
-
   const quickActions = [
     { title: 'Admit Student', icon: UserPlus, path: '/admin/admission', color: 'from-primary-500 to-primary-600' },
     { title: 'Create Program', icon: BookOpen, path: '/admin/programs', color: 'from-emerald-500 to-emerald-600' },
@@ -111,10 +121,50 @@ const DashboardPage: React.FC = () => {
     { title: 'View Reports', icon: BarChart3, path: '/admin/reports', color: 'from-orange-500 to-orange-600' },
   ];
 
-  const isLoading = statsLoading || programsLoading;
+  const isLoading = statsLoading || programsLoading || activitiesLoading;
 
   // Get display name from user context
   const displayName = user?.fullName || user?.email?.split('@')[0] || 'User';
+
+  // Helper to format time
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  // Helper to get activity icon color
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'admission': return 'bg-emerald-500';
+      case 'mocktest': return 'bg-purple-500';
+      case 'teacher': return 'bg-blue-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  // Helper to get activity icon
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'admission': return <GraduationCap className="w-3 h-3 text-white" />;
+      case 'mocktest': return <FileText className="w-3 h-3 text-white" />;
+      case 'teacher': return <Users className="w-3 h-3 text-white" />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -148,7 +198,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div 
             key={stat.title} 
             className="group relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-xl shadow-primary-500/5 p-5 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
@@ -181,30 +231,42 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity */}
         <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-xl shadow-primary-500/5 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-gray-200/50">
             <h3 className="text-base font-semibold text-gray-900">Recent Activity</h3>
-            <button className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
-              View All
-            </button>
           </div>
           <div className="divide-y divide-gray-100/50">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="px-6 py-3.5 flex items-center gap-3 hover:bg-gray-50/50 transition-colors">
-                <div className={`w-2.5 h-2.5 rounded-full ${
-                  activity.type === 'test' ? 'bg-purple-500' :
-                  activity.type === 'admission' ? 'bg-emerald-500' :
-                  'bg-blue-500'
-                }`} />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{activity.user}</span>
-                    {' '}{activity.action}
-                  </p>
-                  <p className="text-xs text-gray-400">{activity.time}</p>
+            {isLoading ? (
+              // Loading skeletons - exactly 5
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="px-6 py-3.5 flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200 animate-pulse" />
+                  <div className="flex-1">
+                    <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3 w-24 bg-gray-200 rounded animate-pulse mt-1" />
+                  </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-300" />
+              ))
+            ) : recentActivities.length === 0 ? (
+              <div className="px-6 py-8 text-center text-gray-500">
+                <p className="text-sm">No recent activities</p>
               </div>
-            ))}
+            ) : (
+              recentActivities.map((activity: Activity) => (
+                <div key={activity.id} className="px-6 py-3.5 flex items-center gap-3 hover:bg-gray-50/50 transition-colors">
+                  <div className={`w-2.5 h-2.5 rounded-full ${getActivityColor(activity.type)} flex items-center justify-center flex-shrink-0`}>
+                    {getActivityIcon(activity.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900 truncate">
+                      <span className="font-medium">{activity.user}</span>
+                      {' '}{activity.action}
+                    </p>
+                    <p className="text-xs text-gray-400">{formatTime(activity.time)}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -256,11 +318,19 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="bg-white/80 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-4 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Teachers</p>
-          <p className="text-xl font-bold text-gray-900 mt-0.5">12</p>
+          {isLoading ? (
+            <div className="h-7 w-12 mx-auto bg-gray-200 rounded-lg animate-pulse mt-1" />
+          ) : (
+            <p className="text-xl font-bold text-gray-900 mt-0.5">{totalTeachers}</p>
+          )}
         </div>
         <div className="bg-white/80 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-4 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Mock Tests</p>
-          <p className="text-xl font-bold text-gray-900 mt-0.5">24</p>
+          {isLoading ? (
+            <div className="h-7 w-12 mx-auto bg-gray-200 rounded-lg animate-pulse mt-1" />
+          ) : (
+            <p className="text-xl font-bold text-gray-900 mt-0.5">{totalMockTests}</p>
+          )}
         </div>
       </div>
     </div>

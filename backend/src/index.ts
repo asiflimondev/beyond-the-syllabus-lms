@@ -17,13 +17,14 @@ import studentRoutes from './routes/student.routes.js';
 import adminTeacherRoutes from './routes/admin/teacherManagement.routes.js';
 import adminStudentRoutes from './routes/admin/studentManagement.routes.js';
 import adminReceiptRoutes from './routes/admin/receipt.routes.js';
-import adminMockTestRoutes from './routes/admin/mockTest.routes.js'; // NEW
-import officeMockTestRoutes from './routes/office/mockTest.routes.js'; // NEW
+import adminMockTestRoutes from './routes/admin/mockTest.routes.js';
+import officeMockTestRoutes from './routes/office/mockTest.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import publicRoutes from './routes/public.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import officeMemberRoutes from './routes/admin/officeMember.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import adminActivityRoutes from './routes/admin/activity.routes.js'; // NEW
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
@@ -125,15 +126,13 @@ console.log('✅ Admin Student routes mounted at /api/admin/students');
 app.use('/api/admin/receipts', adminReceiptRoutes);
 console.log('✅ Admin Receipt routes mounted at /api/admin/receipts');
 
-// NEW: Admin Mock Test routes
 app.use('/api/admin', adminMockTestRoutes);
 console.log('✅ Admin Mock Test routes mounted at /api/admin');
 
-// NEW: Office Mock Test routes
 app.use('/api/office', officeMockTestRoutes);
 console.log('✅ Office Mock Test routes mounted at /api/office');
 
-app.use('/api/reports', reportRoutes); // NEW
+app.use('/api/reports', reportRoutes);
 console.log('✅ Report routes mounted at /api/reports');
 
 app.use('/api/public', publicRoutes);
@@ -147,6 +146,9 @@ console.log('✅ Office Member routes mounted at /api/admin/office-members');
 
 app.use('/api/contact', contactRoutes);
 console.log('✅ Contact routes mounted at /api/contact');
+
+app.use('/api/admin/activities', adminActivityRoutes); // NEW
+console.log('✅ Admin Activity routes mounted at /api/admin/activities'); // NEW
 
 // ============================================
 // ERROR HANDLING
@@ -184,8 +186,9 @@ const startServer = async (): Promise<void> => {
       console.log(`   👑 /api/admin/teachers    - Admin Teacher Management`);
       console.log(`   👑 /api/admin/students    - Admin Student Management`);
       console.log(`   📄 /api/admin/receipts    - Admin Receipt Management`);
-      console.log(`   📝 /api/admin/mock-tests  - Admin Mock Test Management`); // NEW
-      console.log(`   📝 /api/office/mock-tests - Office Mock Test Management`); // NEW
+      console.log(`   📝 /api/admin/mock-tests  - Admin Mock Test Management`);
+      console.log(`   📝 /api/office/mock-tests - Office Mock Test Management`);
+      console.log(`   📊 /api/admin/activities  - Admin Dashboard Activities`); // NEW
       console.log(`   🌐 /api/public            - Public Routes`);
       console.log('=================================\n');
     });
