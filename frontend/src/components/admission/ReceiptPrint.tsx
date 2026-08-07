@@ -1,7 +1,6 @@
 import { forwardRef } from 'react';
 import btsLogo from '/bts-logo.png';
 import cambridgeLogo from '/cambridge-logo.png';
-import msign from '/msign.png';
 
 interface ReceiptPrintProps {
   data: {
@@ -86,7 +85,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(({ data }, re
               <img src={btsLogo} alt="BTS Logo" className="h-14 w-auto object-contain print:h-12" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight print:text-xl">Beyond the Syllabus</h1>
-                <p className="text-sm text-gray-500 print:text-xs">Cambridge English Training Center</p>
+                <p className="text-sm text-gray-500 print:text-xs">Cambridge English Preparation Centre</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -163,17 +162,13 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(({ data }, re
             </div>
           </div>
 
-          {/* Signature Section - Admin/Teacher Left, Guardian/Student Right */}
+          {/* Signature Section - Left Empty, Right Guardian/Student */}
           <div className="mt-6 pt-4 border-t border-gray-200 print:mt-4 print:pt-3">
             <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto print:gap-6">
-              {/* Admin/Teacher Signature - Left */}
+              {/* Left Signature - Empty */}
               <div className="text-center">
                 <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12">
-                  <img 
-                    src={msign} 
-                    alt="Signature" 
-                    className="h-12 w-auto object-contain opacity-80 print:h-10"
-                  />
+                  {/* Empty - no signature */}
                 </div>
                 <p className="text-sm font-semibold text-gray-700 print:text-xs">Head of Accounts</p>
               </div>
@@ -195,7 +190,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(({ data }, re
             </p>
             <div className="mt-3 pt-3 border-t border-gray-100 print:mt-2 print:pt-2">
               <p className="text-xs text-gray-400 print:text-[10px]">
-                Beyond the Syllabus · Cambridge English Training Center · Dhaka, Bangladesh
+                Beyond the Syllabus · Cambridge English Preparation Centre · Dhaka, Bangladesh
               </p>
               <p className="text-xs text-gray-400 mt-1 print:text-[10px] print:mt-0.5">
                 www.beyondthesyllabus.org

@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import { Printer, Download, RefreshCw, FileText } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { Link, useLocation } from 'react-router-dom';
-import btsLogo from '/bts-logo-t.png';
+import btsLogo from '/bts-logo.png';
 import cambridgeLogo from '/cambridge-logo.png';
 import msign from '/msign.png';
 
@@ -66,7 +66,7 @@ const BatchReport: React.FC = () => {
           left: 0;
           width: 100%;
           height: 100vh;
-          padding: 8mm;
+          padding: 10mm;
           display: flex;
           flex-direction: column;
         }
@@ -84,58 +84,57 @@ const BatchReport: React.FC = () => {
         .date-time {
           display: none !important;
         }
-        /* Larger print sizes */
-        .report-title {
-          font-size: 22px !important;
-        }
-        .report-subtitle {
-          font-size: 13px !important;
-        }
-        .brand-name {
-          font-size: 18px !important;
-        }
-        .brand-sub {
-          font-size: 10px !important;
-        }
         .logo-bts {
-          height: 55px !important;
+          height: 65px !important;
+          width: auto !important;
         }
         .logo-cambridge {
-          height: 40px !important;
+          height: 55px !important;
+          width: auto !important;
         }
-        .info-label {
-          font-size: 9px !important;
+        .brand-name {
+          font-size: 22px !important;
         }
-        .info-value {
-          font-size: 12px !important;
+        .brand-sub {
+          font-size: 13px !important;
+        }
+        .receipt-title {
+          font-size: 26px !important;
+        }
+        .receipt-label {
+          font-size: 11px !important;
+        }
+        .receipt-value {
+          font-size: 16px !important;
         }
         table {
-          font-size: 10px !important;
+          font-size: 11px !important;
         }
         th, td {
-          padding: 4px 6px !important;
+          padding: 5px 8px !important;
         }
         .report-header {
-          margin-bottom: 10px !important;
-          padding-bottom: 8px !important;
+          margin-bottom: 8px !important;
+          padding-bottom: 6px !important;
         }
         .report-info-grid {
-          padding: 8px 12px !important;
+          padding: 10px 14px !important;
           margin-bottom: 10px !important;
+          gap: 4px !important;
         }
         .summary-box {
           padding: 6px 10px !important;
         }
         .summary-box p {
-          font-size: 16px !important;
+          font-size: 18px !important;
         }
         .summary-box .label {
-          font-size: 8px !important;
+          font-size: 9px !important;
         }
         .table-container {
           flex: 1;
           overflow: visible;
-          margin-bottom: 12px !important;
+          margin-bottom: 10px !important;
         }
         .signature-section {
           margin-top: auto !important;
@@ -143,16 +142,19 @@ const BatchReport: React.FC = () => {
           border-top: 1px solid #e5e7eb !important;
         }
         .signature-section .signature-line {
-          height: 30px !important;
+          height: 45px !important;
         }
         .signature-section .signature-img {
-          height: 35px !important;
+          height: 40px !important;
         }
         .signature-label {
-          font-size: 11px !important;
+          font-size: 12px !important;
         }
         .footer-text {
-          font-size: 9px !important;
+          font-size: 11px !important;
+        }
+        .footer-address {
+          font-size: 10px !important;
         }
         .content-area {
           flex: 1;
@@ -181,7 +183,7 @@ const BatchReport: React.FC = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric',
     });
   };
@@ -320,51 +322,54 @@ const BatchReport: React.FC = () => {
 
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
                 <div ref={printRef} id="report-print-area" className="p-8 print:p-4">
-                  {/* Report Header - Orange "Beyond" */}
-                  <div className="flex items-start justify-between mb-5 print:mb-4">
+                  {/* Report Header - Larger Logos */}
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4 print:pb-4 print:mb-4">
                     <div className="flex items-center gap-4">
-                      <img src={btsLogo} alt="Beyond the Syllabus" className="h-16 w-auto object-contain print:h-14 logo-bts" />
+                      <img src={btsLogo} alt="BTS Logo" className="h-20 w-auto object-contain print:h-16 logo-bts" />
                       <div>
-                        <p className="text-2xl font-bold print:text-xl brand-name">
-                          <span className="text-[#f1592a]">Beyond</span>
-                          <span className="text-[#0a0f2a]"> the</span>
-                          <span className="text-[#0a0f2a]"> Syllabus</span>
-                        </p>
-                        <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Centre</p>
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight print:text-2xl brand-name">Beyond the Syllabus</h1>
+                        <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Center</p>
                       </div>
                     </div>
-                    <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain print:h-11 logo-cambridge" />
+                    <div className="flex items-center gap-3">
+                      <img src={cambridgeLogo} alt="Cambridge English" className="h-16 w-auto object-contain print:h-14 logo-cambridge" />
+                    </div>
                   </div>
 
-                  <div className="text-center border-b-2 border-gray-200 pb-5 mb-5 print:pb-4 print:mb-4 report-header">
-                    <h2 className="text-3xl font-bold text-gray-800 print:text-2xl report-title">Course Progress Report</h2>
-                    <p className="text-gray-600 text-base print:text-sm report-subtitle">Batch / Program Report</p>
+                  {/* Title with Premium Styling */}
+                  <div className="text-center mb-6 print:mb-4 report-header">
+                    <h2 className="text-4xl font-extrabold text-gray-900 tracking-wider uppercase relative inline-block print:text-3xl receipt-title">
+                      Course Progress Report
+                      <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-full print:h-0.5"></span>
+                    </h2>
+                    <p className="text-base text-gray-500 mt-2 print:text-sm">Batch / Program Report</p>
                   </div>
 
                   <div className="content-area">
+                    {/* Report Info */}
                     <div className="grid grid-cols-3 gap-4 mb-5 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-3 print:mb-4 print:gap-3 report-info-grid">
                       <div>
-                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Program</p>
-                        <p className="font-semibold text-gray-900 text-base print:text-sm info-value">{report.program.displayName?.en || report.program.name}</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Program</p>
+                        <p className="font-semibold text-gray-900 text-lg print:text-base receipt-value">{report.program.displayName?.en || report.program.name}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Total Students</p>
-                        <p className="font-bold text-gray-900 text-base print:text-sm info-value">{report.totalStudents}</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Total Students</p>
+                        <p className="font-bold text-gray-900 text-lg print:text-base receipt-value">{report.totalStudents}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Generated</p>
-                        <p className="font-semibold text-gray-900 text-base print:text-sm info-value">{formatDate(report.generatedDate)}</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Generated</p>
+                        <p className="font-semibold text-gray-900 text-lg print:text-base receipt-value">{formatDate(report.generatedDate)}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 mb-5 print:gap-3 print:mb-4">
                       <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
                         <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.totalStudents}</p>
-                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Total Students</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Total Students</p>
                       </div>
                       <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
                         <p className="text-2xl font-bold text-emerald-600 print:text-xl">{report.totalMockTests}</p>
-                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Total Mock Tests</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Total Mock Tests</p>
                       </div>
                       <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
                         <p className="text-2xl font-bold text-orange-500 print:text-xl">
@@ -377,13 +382,14 @@ const BatchReport: React.FC = () => {
                               )
                             : 0}%
                         </p>
-                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Avg Completion</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Avg Completion</p>
                       </div>
                     </div>
 
+                    {/* Table */}
                     {report.students.length > 0 && report.totalMockTests > 0 ? (
                       <div className="overflow-x-auto print:overflow-visible table-container">
-                        <table className="w-full text-sm border-collapse print:text-[10px]">
+                        <table className="w-full text-sm border-collapse print:text-xs">
                           <thead>
                             <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
                               <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">ID</th>
@@ -474,14 +480,14 @@ const BatchReport: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Signature Section - Pushed to bottom */}
+                  {/* Signature Section */}
                   <div className="mt-6 pt-4 border-t border-gray-200 print:mt-auto print:pt-3 signature-section">
                     <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto print:gap-6">
                       <div className="text-center">
                         <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
-                          {/* Empty - placeholder for signature image */}
+                          {/* Empty - no signature */}
                         </div>
-                        <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Exam Coordinator</p>
+                        <p className="text-sm font-semibold text-gray-700 print:text-xs signature-label">Exam Coordinator</p>
                       </div>
                       <div className="text-center">
                         <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
@@ -491,14 +497,24 @@ const BatchReport: React.FC = () => {
                             className="h-12 w-auto object-contain opacity-80 print:h-10 signature-img"
                           />
                         </div>
-                        <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Academic Director</p>
+                        <p className="text-sm font-semibold text-gray-700 print:text-xs signature-label">Academic Director</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-4 pt-3 border-t border-gray-200 text-center text-sm text-gray-400 print:mt-3 print:pt-2 footer-text">
-                    <p>Beyond the Syllabus — Cambridge English Preparation Centre</p>
+                  <div className="mt-6 pt-4 border-t border-gray-200 text-center print:mt-4 print:pt-3 footer-text">
+                    <p className="text-sm font-semibold text-gray-700 print:text-xs footer-text">
+                      Thank you for choosing Beyond the Syllabus.
+                    </p>
+                    <div className="mt-3 pt-3 border-t border-gray-100 print:mt-2 print:pt-2">
+                      <p className="text-xs text-gray-400 print:text-[10px] footer-address">
+                        Beyond the Syllabus · Cambridge English Preparation Center · Dhaka, Bangladesh
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1 print:text-[10px] print:mt-0.5 footer-address">
+                        www.beyondthesyllabus.org
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

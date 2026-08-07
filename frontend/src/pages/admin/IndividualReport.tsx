@@ -5,7 +5,7 @@ import { studentManagementApi } from '@api/admin/student.api';
 import { toast } from 'react-hot-toast';
 import { Printer, Download, Search, UserCircle, AlertCircle } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
-import btsLogo from '/bts-logo-t.png';
+import btsLogo from '/bts-logo.png';
 import cambridgeLogo from '/cambridge-logo.png';
 import msign from '/msign.png';
 
@@ -57,7 +57,7 @@ const IndividualReport: React.FC = () => {
           left: 0;
           width: 100%;
           height: 100vh;
-          padding: 10mm;
+          padding: 12mm;
           display: flex;
           flex-direction: column;
         }
@@ -81,56 +81,79 @@ const IndividualReport: React.FC = () => {
         .email-field {
           display: none !important;
         }
-        /* Larger print sizes */
-        .report-title {
-          font-size: 22px !important;
-        }
-        .report-subtitle {
-          font-size: 13px !important;
-        }
-        .brand-name {
-          font-size: 18px !important;
-        }
-        .brand-sub {
-          font-size: 10px !important;
-        }
         .logo-bts {
-          height: 55px !important;
+          height: 65px !important;
+          width: auto !important;
         }
         .logo-cambridge {
-          height: 40px !important;
+          height: 55px !important;
+          width: auto !important;
         }
-        .student-info-label {
-          font-size: 9px !important;
+        .brand-name {
+          font-size: 22px !important;
         }
-        .student-info-value {
-          font-size: 12px !important;
+        .brand-sub {
+          font-size: 13px !important;
+        }
+        .receipt-title {
+          font-size: 26px !important;
+        }
+        .receipt-label {
+          font-size: 11px !important;
+        }
+        .receipt-value {
+          font-size: 16px !important;
+        }
+        .receipt-section-title {
+          font-size: 13px !important;
         }
         table {
-          font-size: 11px !important;
+          font-size: 12px !important;
         }
         th, td {
-          padding: 5px 8px !important;
+          padding: 6px 10px !important;
         }
         .summary-box p {
-          font-size: 18px !important;
+          font-size: 20px !important;
         }
         .summary-box .label {
-          font-size: 9px !important;
+          font-size: 10px !important;
         }
         .signature-label {
-          font-size: 11px !important;
+          font-size: 13px !important;
         }
         .footer-text {
-          font-size: 9px !important;
+          font-size: 11px !important;
+        }
+        .signature-line {
+          height: 55px !important;
+        }
+        .signature-img {
+          height: 45px !important;
         }
         .content-area {
           flex: 1;
         }
         .signature-section {
           margin-top: auto !important;
-          padding-top: 8px !important;
+          padding-top: 10px !important;
           border-top: 1px solid #e5e7eb !important;
+        }
+        .report-header {
+          margin-bottom: 6px !important;
+          padding-bottom: 6px !important;
+        }
+        .student-info-grid {
+          padding: 12px 16px !important;
+          margin-bottom: 10px !important;
+          gap: 6px !important;
+        }
+        .summary-grid {
+          gap: 4px !important;
+          margin-bottom: 8px !important;
+        }
+        .footer-address {
+          font-size: 10px !important;
         }
       }
     `,
@@ -204,7 +227,7 @@ const IndividualReport: React.FC = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric',
     });
   };
@@ -378,95 +401,99 @@ const IndividualReport: React.FC = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
             <div ref={printRef} id="report-print-area" className="p-8 print:p-6">
-              {/* Report Header - Orange "Beyond" */}
-              <div className="flex items-start justify-between mb-6 print:mb-4">
+              {/* Report Header - Larger Logos */}
+              <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4 print:pb-4 print:mb-4">
                 <div className="flex items-center gap-4">
-                  <img src={btsLogo} alt="Beyond the Syllabus" className="h-16 w-auto object-contain print:h-14 logo-bts" />
+                  <img src={btsLogo} alt="BTS Logo" className="h-20 w-auto object-contain print:h-16 logo-bts" />
                   <div>
-                    <p className="text-2xl font-bold print:text-xl brand-name">
-                      <span className="text-[#f1592a]">Beyond</span>
-                      <span className="text-[#0a0f2a]"> the</span>
-                      <span className="text-[#0a0f2a]"> Syllabus</span>
-                    </p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight print:text-2xl brand-name">Beyond the Syllabus</h1>
                     <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Center</p>
                   </div>
                 </div>
-                <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain print:h-11 logo-cambridge" />
+                <div className="flex items-center gap-3">
+                  <img src={cambridgeLogo} alt="Cambridge English" className="h-16 w-auto object-contain print:h-14 logo-cambridge" />
+                </div>
               </div>
 
-              <div className="text-center border-b-2 border-gray-200 pb-5 mb-5 print:pb-4 print:mb-4 report-header">
-                <h2 className="text-3xl font-bold text-gray-800 print:text-2xl report-title">Student Progress Report</h2>
-                <p className="text-gray-600 text-base print:text-sm report-subtitle">Individual Student Report</p>
+              {/* Title with Premium Styling */}
+              <div className="text-center mb-6 print:mb-4 report-header">
+                <h2 className="text-4xl font-extrabold text-gray-900 tracking-wider uppercase relative inline-block print:text-3xl receipt-title">
+                  Student Progress Report
+                  <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-full print:h-0.5"></span>
+                </h2>
+                <p className="text-base text-gray-500 mt-2 print:text-sm">Individual Student Report</p>
               </div>
 
               <div className="content-area">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-3 print:mb-4 print:gap-3">
+                {/* Student Info */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5 p-5 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-4 print:mb-4 print:gap-4 student-info-grid">
                   <div>
-                    <p className="text-xs text-gray-500 font-medium print:text-[9px] student-info-label">Student Name</p>
-                    <p className="font-semibold text-gray-900 text-base print:text-sm student-info-value">{report.student.fullName}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Student Name</p>
+                    <p className="font-semibold text-gray-900 text-lg print:text-base receipt-value">{report.student.fullName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 font-medium print:text-[9px] student-info-label">Admission ID</p>
-                    <p className="font-mono font-semibold text-gray-900 text-base print:text-sm student-info-value">{report.student.admissionId}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Admission ID</p>
+                    <p className="font-mono font-semibold text-gray-900 text-lg print:text-base receipt-value">{report.student.admissionId}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 font-medium print:text-[9px] student-info-label">Program</p>
-                    <p className="font-semibold text-gray-900 text-base print:text-sm student-info-value">{report.student.programName}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Program</p>
+                    <p className="font-semibold text-gray-900 text-lg print:text-base receipt-value">{report.student.programName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 font-medium print:text-[9px] student-info-label">Phone</p>
-                    <p className="text-gray-900 text-base print:text-sm student-info-value">{report.student.phone}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Phone</p>
+                    <p className="text-gray-900 text-lg print:text-base receipt-value">{report.student.phone}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 font-medium print:text-[9px] student-info-label">Total Tests</p>
-                    <p className="font-bold text-gray-900 text-base print:text-sm student-info-value">{report.totalTests}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider print:text-[10px] receipt-label">Total Tests</p>
+                    <p className="font-bold text-gray-900 text-lg print:text-base receipt-value">{report.totalTests}</p>
                   </div>
                 </div>
 
+                {/* Results Table */}
                 {report.results.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm border-collapse print:text-[11px]">
+                    <table className="w-full text-sm border-collapse print:text-xs">
                       <thead>
                         <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
-                          <th className="border border-gray-200 px-4 py-2.5 text-left text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">Test</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">Date</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">R / {report.results[0]?.reading.total || 0}</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">W / {report.results[0]?.writing.total || 0}</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">L / {report.results[0]?.listening.total || 0}</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">S</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">P / {report.results[0]?.presentation.total || 0}</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">Total</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">%</th>
-                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-2 print:py-1.5 print:text-[10px]">Grade</th>
+                          <th className="border border-gray-200 px-4 py-2.5 text-left text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">Test</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">Date</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">R / {report.results[0]?.reading.total || 0}</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">W / {report.results[0]?.writing.total || 0}</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">L / {report.results[0]?.listening.total || 0}</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">S</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">P / {report.results[0]?.presentation.total || 0}</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">Total</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">%</th>
+                          <th className="border border-gray-200 px-3 py-2.5 text-center text-xs font-semibold text-gray-600 print:px-3 print:py-2 print:text-[10px]">Grade</th>
                         </tr>
                       </thead>
                       <tbody>
                         {report.results.map((result, idx) => (
                           <tr key={result.mockTestId} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                            <td className="border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-800 print:px-2 print:py-1.5 print:text-[11px]">{result.mockTestTitle}</td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-xs text-gray-500 print:px-2 print:py-1.5 print:text-[10px]">{formatDate(result.testDate)}</td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-800 print:px-3 print:py-2 print:text-xs">{result.mockTestTitle}</td>
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-xs text-gray-500 print:px-3 print:py-2 print:text-[10px]">{formatDate(result.testDate)}</td>
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-3 print:py-2 print:text-xs">
                               {result.reading.total > 0 ? <span className="font-medium">{result.reading.obtained}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-3 print:py-2 print:text-xs">
                               {result.writing.total > 0 ? <span className="font-medium">{result.writing.obtained}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-3 print:py-2 print:text-xs">
                               {result.listening.total > 0 ? <span className="font-medium">{result.listening.obtained}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-3 print:py-2 print:text-xs">
                               {result.speaking.grade !== 'F' ? <span>{result.speaking.grade}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm print:px-3 print:py-2 print:text-xs">
                               {result.presentation.total > 0 ? <span className="font-medium">{result.presentation.marks}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-3 print:py-2 print:text-xs">
                               {result.totalMarks > 0 ? <span className="text-gray-900">{result.totalMarks}</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center text-sm font-semibold print:px-3 print:py-2 print:text-xs">
                               {result.percentage > 0 ? <span className="text-gray-900">{Math.round(result.percentage)}%</span> : <span className="text-gray-300">-</span>}
                             </td>
-                            <td className="border border-gray-200 px-3 py-2.5 text-center print:px-2 print:py-1.5 print:text-[11px]">
+                            <td className="border border-gray-200 px-3 py-2.5 text-center print:px-3 print:py-2 print:text-xs">
                               {result.grade && result.grade !== 'F' ? (
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${getGradeColor(result.grade)}`}>
                                   {result.grade}
@@ -486,25 +513,25 @@ const IndividualReport: React.FC = () => {
                   </div>
                 )}
 
-                <div className="mt-5">
-                  <div className="grid grid-cols-4 gap-3 max-w-2xl mx-auto print:gap-2">
-                    <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-2 summary-box">
-                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider print:text-[8px] label">Total Tests</p>
-                      <p className="text-2xl font-bold text-gray-900 print:text-lg">{report.totalTests}</p>
+                <div className="mt-5 summary-grid">
+                  <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto print:gap-3">
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider print:text-[9px] label">Total Tests</p>
+                      <p className="text-2xl font-bold text-gray-900 print:text-xl">{report.totalTests}</p>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-2 summary-box">
-                      <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider print:text-[8px] label">Completed</p>
-                      <p className="text-2xl font-bold text-emerald-600 print:text-lg">
+                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider print:text-[9px] label">Completed</p>
+                      <p className="text-2xl font-bold text-emerald-600 print:text-xl">
                         {report.results.filter(r => r.percentage > 0).length}
                       </p>
                     </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200 p-4 text-center print:p-2 summary-box">
-                      <p className="text-[10px] font-medium text-blue-600 uppercase tracking-wider print:text-[8px] label">Average</p>
-                      <p className="text-2xl font-bold text-blue-600 print:text-lg">{report.averagePercentage}%</p>
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-[10px] font-medium text-blue-600 uppercase tracking-wider print:text-[9px] label">Average</p>
+                      <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.averagePercentage}%</p>
                     </div>
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-2 summary-box">
-                      <p className="text-[10px] font-medium text-orange-600 uppercase tracking-wider print:text-[8px] label">Best Grade</p>
-                      <p className="text-2xl font-bold text-orange-500 print:text-lg">
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-[10px] font-medium text-orange-600 uppercase tracking-wider print:text-[9px] label">Best Grade</p>
+                      <p className="text-2xl font-bold text-orange-500 print:text-xl">
                         {report.results.length > 0
                           ? [...report.results].sort((a, b) => {
                               const order = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F'];
@@ -517,31 +544,41 @@ const IndividualReport: React.FC = () => {
                 </div>
               </div>
 
-              {/* Signature Section - Pushed to bottom */}
+              {/* Signature Section */}
               <div className="mt-6 pt-4 border-t border-gray-200 print:mt-auto print:pt-3 signature-section">
                 <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto print:gap-6">
                   <div className="text-center">
-                    <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
-                      {/* Empty - placeholder for signature image */}
+                    <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-14 signature-line">
+                      {/* Empty - no signature */}
                     </div>
-                    <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Exam Coordinator</p>
+                    <p className="text-sm font-semibold text-gray-700 print:text-xs signature-label">Exam Coordinator</p>
                   </div>
                   <div className="text-center">
-                    <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
+                    <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-14 signature-line">
                       <img 
                         src={msign} 
                         alt="Academic Director Signature" 
-                        className="h-12 w-auto object-contain opacity-80 print:h-10"
+                        className="h-12 w-auto object-contain opacity-80 print:h-12 signature-img"
                       />
                     </div>
-                    <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Academic Director</p>
+                    <p className="text-sm font-semibold text-gray-700 print:text-xs signature-label">Academic Director</p>
                   </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="mt-4 pt-3 border-t border-gray-200 text-center text-sm text-gray-400 print:mt-3 print:pt-2 footer-text">
-                <p>Beyond the Syllabus — Cambridge English Preparation Center</p>
+              <div className="mt-6 pt-4 border-t border-gray-200 text-center print:mt-4 print:pt-3 footer-text">
+                <p className="text-sm font-semibold text-gray-700 print:text-xs footer-text">
+                  Thank you for choosing Beyond the Syllabus.
+                </p>
+                <div className="mt-3 pt-3 border-t border-gray-100 print:mt-2 print:pt-2">
+                  <p className="text-xs text-gray-400 print:text-[10px] footer-address">
+                    Beyond the Syllabus · Cambridge English Preparation Center · Dhaka, Bangladesh
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1 print:text-[10px] print:mt-0.5 footer-address">
+                    www.beyondthesyllabus.org
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -205,12 +205,12 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                     Beyond the Syllabus
                   </span>
                   <span className="block text-xs font-bold tracking-widest uppercase text-orange-500">
-                    Cambridge English
+                    Cambridge English Preparation Centre
                   </span>
                 </div>
               </div>
               <p className="text-sm text-on-dark-soft max-w-sm leading-relaxed">
-                A Cambridge English Language Training Center in Dhaka, Bangladesh — helping learners achieve their English goals, one level at a time.
+                A Cambridge English Language Preparation Centre in Dhaka, Bangladesh — helping learners achieve their English goals, one level at a time.
               </p>
               <div className="flex gap-2 pt-2">
                 <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300">
@@ -287,8 +287,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
           </div>
 
           <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row justify-between gap-3 text-sm text-on-dark-soft/70">
-            <span>© {new Date().getFullYear()} Beyond the Syllabus · Cambridge English Training Center</span>
-            <span>Official Cambridge Assessment English preparation center · Dhaka, Bangladesh</span>
+            <span>© {new Date().getFullYear()} Beyond the Syllabus · Cambridge English Preparation Centre</span>
+            <span>Official Cambridge Assessment English preparation centre · Dhaka, Bangladesh</span>
           </div>
         </div>
       </footer>

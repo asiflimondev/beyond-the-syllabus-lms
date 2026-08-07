@@ -39,6 +39,7 @@ import TeacherMarkEntry from '@pages/teacher/TeacherMarkEntry';
 // Protected Pages (Student)
 import StudentDashboard from '@pages/student/StudentDashboard';
 import MockTestsPage from '@pages/student/MockTestsPage';
+import MockTestDetail from '@pages/student/MockTestDetail';  // <--- ADD THIS IMPORT
 import StudentProfile from '@pages/student/StudentProfile';
 
 // Protected Pages (Office)
@@ -47,7 +48,7 @@ import OfficeMockTests from '@pages/office/OfficeMockTests';
 import OfficeMarkEntry from '@pages/office/OfficeMarkEntry';
 
 // Office Member Management (Admin)
-import OfficeMemberManagement from '@pages/admin/OfficeMemberManagement'; // <--- ADD THIS IMPORT
+import OfficeMemberManagement from '@pages/admin/OfficeMemberManagement';
 
 // Settings Page
 import SettingsPage from '@pages/SettingsPage';
@@ -131,7 +132,7 @@ function App() {
             <Route path="/admin/admission" element={<ProtectedRoute><AdmissionPage /></ProtectedRoute>} />
             <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
             <Route path="/admin/teachers" element={<ProtectedRoute><TeacherManagement /></ProtectedRoute>} />
-            <Route path="/admin/office-members" element={<ProtectedRoute><OfficeMemberManagement /></ProtectedRoute>} /> {/* <--- ADD THIS ROUTE */}
+            <Route path="/admin/office-members" element={<ProtectedRoute><OfficeMemberManagement /></ProtectedRoute>} />
             <Route path="/admin/receipts" element={<ProtectedRoute><ReceiptHistory /></ProtectedRoute>} />
             <Route path="/admin/mock-tests" element={<ProtectedRoute><AdminMockTests /></ProtectedRoute>} />
             <Route path="/admin/mark-entry/:mockTestId" element={<ProtectedRoute><AdminMarkEntry /></ProtectedRoute>} />
@@ -154,7 +155,7 @@ function App() {
             <Route path="/student" element={<ProtectedRoute><Navigate to="/student/dashboard" /></ProtectedRoute>} />
             <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/mock-tests" element={<ProtectedRoute><MockTestsPage /></ProtectedRoute>} />
-            <Route path="/student/mock-tests/:id" element={<ProtectedRoute><div className="p-8 text-center text-gray-500">Mock Test Detail - Coming Soon</div></ProtectedRoute>} />
+            <Route path="/student/mock-tests/:id" element={<ProtectedRoute><MockTestDetail /></ProtectedRoute>} />  {/* <--- UPDATED ROUTE */}
             <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
 
             {/* Protected Routes - Office */}
