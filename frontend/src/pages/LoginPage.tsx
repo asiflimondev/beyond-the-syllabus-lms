@@ -182,7 +182,7 @@ const LoginPage: React.FC = () => {
               <div className="p-1.5 rounded-full bg-white/5">
                 <Users className="w-4 h-4" />
               </div>
-              <span>200+ Students</span>
+              <span>5+ Courses</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-full bg-white/5">

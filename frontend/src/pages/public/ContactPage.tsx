@@ -23,18 +23,6 @@ const FacebookIcon = () => (
   </svg>
 );
 
-const YoutubeIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-  </svg>
-);
-
-const LinkedinIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-  </svg>
-);
-
 const contactSchema = yup.object({
   name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
   email: yup.string().email('Please enter a valid email').required('Email is required'),
@@ -61,14 +49,36 @@ const ContactPage: React.FC = () => {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      console.log('Contact form data:', data);
+      // TODO: Integrate with backend email API when ready
+      // const response = await fetch('/api/contact/send', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     name: data.name,
+      //     email: data.email,
+      //     phone: data.phone || '',
+      //     subject: data.subject,
+      //     message: data.message,
+      //   }),
+      // });
+      //
+      // if (!response.ok) {
+      //   throw new Error('Failed to send message');
+      // }
+
+      // For now, simulate successful send (remove this when backend is ready)
       await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Form data:', data);
+
       toast.success('Message sent successfully! We\'ll get back to you soon.');
       setIsSubmitted(true);
       reset();
       setTimeout(() => setIsSubmitted(false), 5000);
     } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+      console.error('Contact form error:', error);
+      toast.error('Failed to send message. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -78,33 +88,43 @@ const ContactPage: React.FC = () => {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+880 1712 345 678', '+880 1812 345 678'],
-      description: 'Mon-Fri: 9:00 AM - 8:00 PM'
+      details: ['01887307587', '01550551235'],
+      description: 'Call us for immediate assistance'
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['info@beyondsyllabus.com', 'admissions@beyondsyllabus.com'],
+      details: ['info@beyondthesyllabus.org', 'beyondthesyllabus121@gmail.com'],
       description: 'We\'ll respond within 24 hours'
     },
     {
       icon: MapPin,
       title: 'Address',
-      details: ['House #123, Road #4', 'Dhanmondi, Dhaka - 1205', 'Bangladesh'],
+      details: [
+        'House-19/1/1, Ground & First Floors',
+        'Sheikh Shaheb Bazar Road, Azimpur',
+        'Dhaka-1205, Bangladesh'
+      ],
       description: 'View on Google Maps'
     },
     {
       icon: Clock,
       title: 'Working Hours',
-      details: ['Saturday - Thursday: 9:00 AM - 8:00 PM', 'Friday: Closed'],
-      description: 'Closed on public holidays'
+      details: [
+        'Saturday - Tuesday: 9:00 AM - 8:00 PM',
+        'Thursday: 9:00 AM - 8:00 PM',
+        'Wednesday & Friday: Closed'
+      ],
+      description: ''
     }
   ];
 
   const socialLinks = [
-    { icon: FacebookIcon, label: 'Facebook', url: 'https://facebook.com' },
-    { icon: YoutubeIcon, label: 'YouTube', url: 'https://youtube.com' },
-    { icon: LinkedinIcon, label: 'LinkedIn', url: 'https://linkedin.com' },
+    { 
+      icon: FacebookIcon, 
+      label: 'Facebook', 
+      url: 'https://www.facebook.com/BeyondTheSyllabusedu' 
+    },
   ];
 
   return (
@@ -120,8 +140,11 @@ const ContactPage: React.FC = () => {
             className="w-full h-full object-cover opacity-20"
           />
         </div>
+        <div className="absolute inset-0 z-0 opacity-30 pointer-events-none" style={{
+          backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(241,89,42,0.08) 0%, transparent 60%)'
+        }} />
         <div className="relative z-10 container-fluid text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4 backdrop-blur-sm border border-orange-500/10">
             <Mail className="w-4 h-4" />
             Contact Us
           </div>
@@ -152,7 +175,9 @@ const ContactPage: React.FC = () => {
                       {info.details.map((detail, i) => (
                         <p key={i} className="text-sm text-gray-600">{detail}</p>
                       ))}
-                      <p className="text-xs text-gray-400 mt-1">{info.description}</p>
+                      {info.description && (
+                        <p className="text-xs text-gray-400 mt-1">{info.description}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -181,14 +206,14 @@ const ContactPage: React.FC = () => {
               <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
                 <div className="h-48 bg-gray-200">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.3482577192387!2d90.38028807498936!3d23.736629889790923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b9ac9b8f9b8d%3A0x8f9b8d9b8f9b8d9!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                    src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3652.8891788523627!2d90.384965!3d23.724806!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjPCsDQzJzI5LjMiTiA5MMKwMjMnMDYuMCJF!5e0!3m2!1sen!2sbd!4v1700000000000"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Beyond the Syllabus Location"
+                    title="Beyond the Syllabus Location - Azimpur, Dhaka"
                   />
                 </div>
               </div>
@@ -338,11 +363,11 @@ const ContactPage: React.FC = () => {
             We'd love to hear from you! Reach out to us by phone, email, or through our contact form.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="tel:+8801712345678" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300">
+            <a href="tel:+8801887307587" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300">
               <Phone className="w-4 h-4" />
               Call Now
             </a>
-            <a href="mailto:info@beyondsyllabus.com" className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/60 text-white font-bold rounded-full hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300">
+            <a href="mailto:info@beyondthesyllabus.org" className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/60 text-white font-bold rounded-full hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300">
               <Mail className="w-4 h-4" />
               Email Us
             </a>

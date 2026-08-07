@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import PublicLayout from '@components/layout/PublicLayout';
 import {
   Clock,
-  DollarSign,
   BookOpen,
   ChevronRight,
   GraduationCap,
@@ -19,7 +18,6 @@ interface HardcodedProgram {
   name: string;
   displayName: { en: string };
   duration: string;
-  fee: number | null;
   level: string;
   cefr: string;
   description: string;
@@ -35,7 +33,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
     name: 'Movers',
     displayName: { en: 'Movers' },
     duration: '7-9',
-    fee: null,
     level: 'Elementary',
     cefr: 'A1',
     description: 'Build confidence in English with fun, activity-based learning designed for young learners. Focus on basic communication skills and vocabulary development through interactive activities and games.',
@@ -49,7 +46,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
     name: 'KET',
     displayName: { en: 'KET' },
     duration: '7-9',
-    fee: null,
     level: 'Elementary',
     cefr: 'A2',
     description: 'Develop practical English skills for everyday situations. KET certification demonstrates the ability to communicate in basic English in real-life contexts, preparing you for further study.',
@@ -63,7 +59,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
     name: 'PET',
     displayName: { en: 'PET' },
     duration: '7-9',
-    fee: null,
     level: 'Intermediate',
     cefr: 'B1',
     description: 'Master intermediate English skills for work, study, and travel. PET certification shows you can handle everyday situations with confidence and communicate effectively in English.',
@@ -77,7 +72,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
     name: 'FCE',
     displayName: { en: 'FCE' },
     duration: '7-9',
-    fee: null,
     level: 'Upper-Intermediate',
     cefr: 'B2',
     description: 'Achieve the most popular Cambridge qualification. FCE certification proves you have the language skills needed to live and work independently in an English-speaking country.',
@@ -91,7 +85,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
     name: 'CAE',
     displayName: { en: 'CAE' },
     duration: '7-9',
-    fee: null,
     level: 'Advanced',
     cefr: 'C1',
     description: 'Reach the highest level of Cambridge English. CAE certification is recognized by universities and employers worldwide as proof of advanced English proficiency.',
@@ -105,12 +98,6 @@ const HARDCODED_PROGRAMS: HardcodedProgram[] = [
 const ProgramsPublicPage: React.FC = () => {
   // Using hardcoded data - no API fetching
   const programs = HARDCODED_PROGRAMS;
-
-  // Helper function to format fee
-  const formatFee = (fee: number | null): string => {
-    if (fee === null || fee === undefined) return 'Contact for pricing';
-    return `৳${fee.toLocaleString()}`;
-  };
 
   return (
     <PublicLayout>
@@ -164,15 +151,15 @@ const ProgramsPublicPage: React.FC = () => {
                         </span>
                       </div>
                       
-                      {/* Level badge on image */}
+                      {/* Level badge on image - HIDE on mobile, show on desktop */}
                       <div className="absolute bottom-4 left-4 right-4 md:bottom-auto md:top-4 md:right-4 md:left-auto">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg bg-gradient-to-r ${program.gradient}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg bg-gradient-to-r ${program.gradient} hidden md:inline-flex`}>
                           <GraduationCap className="w-3.5 h-3.5" />
                           {program.level}
                         </span>
                       </div>
 
-                      {/* Program Name Overlay on Image (Mobile) */}
+                      {/* Program Name Overlay on Image (Mobile Only) */}
                       <div className="absolute bottom-4 left-4 md:hidden">
                         <h3 className="text-xl font-bold text-white drop-shadow-lg">
                           {program.displayName?.en || program.name}
@@ -183,7 +170,7 @@ const ProgramsPublicPage: React.FC = () => {
                     {/* Content Section - 2/3 width */}
                     <div className="md:w-2/3 p-6 md:p-8 flex flex-col justify-between">
                       <div>
-                        {/* Desktop Title */}
+                        {/* Desktop Title - HIDE on mobile */}
                         <div className="hidden md:flex items-start justify-between">
                           <div>
                             <h3 className="text-2xl font-bold text-gray-900 font-display">
@@ -197,22 +184,36 @@ const ProgramsPublicPage: React.FC = () => {
                           </span>
                         </div>
 
-                        <p className="text-gray-600 mt-3 leading-relaxed">
+                        {/* Mobile Title - Show only on mobile */}
+                        <div className="md:hidden mb-3">
+                          <h3 className="text-xl font-bold text-gray-900 font-display">
+                            {program.displayName?.en || program.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${program.gradient}`}>
+                              <Award className="w-2.5 h-2.5" />
+                              {program.cefr}
+                            </span>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${program.gradient}`}>
+                              <GraduationCap className="w-2.5 h-2.5" />
+                              {program.level}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">Program Code: {program.name}</p>
+                        </div>
+
+                        <p className="text-gray-600 mt-3 leading-relaxed text-sm md:text-base">
                           {program.description}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-6 mt-4">
+                        <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-4">
                           <div className="flex items-center text-sm text-gray-600">
                             <Clock className="w-4 h-4 mr-2 text-orange-500" />
                             <span>{program.duration} months</span>
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
-                            <DollarSign className="w-4 h-4 mr-2 text-orange-500" />
-                            <span>{formatFee(program.fee)}</span>
-                          </div>
-                          <div className="flex items-center text-sm text-gray-600">
                             <Users className="w-4 h-4 mr-2 text-orange-500" />
-                            <span>Class size: 12-15</span>
+                            <span>Class size: 15-20 </span>
                           </div>
                         </div>
                       </div>
@@ -255,7 +256,7 @@ const ProgramsPublicPage: React.FC = () => {
                 <GraduationCap className="w-7 h-7 text-orange-500 group-hover:text-white transition-colors duration-300" />
               </div>
               <h3 className="font-semibold text-gray-900">Expert Teachers</h3>
-              <p className="text-sm text-gray-500 mt-1">Cambridge-certified instructors with years of experience</p>
+              <p className="text-sm text-gray-500 mt-1">Expert instructors with years of experience</p>
             </div>
             <div className="text-center p-6 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors group">
               <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-500 transition-colors duration-300">
@@ -268,7 +269,7 @@ const ProgramsPublicPage: React.FC = () => {
               <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-500 transition-colors duration-300">
                 <Users className="w-7 h-7 text-orange-500 group-hover:text-white transition-colors duration-300" />
               </div>
-              <h3 className="font-semibold text-gray-900">Small Batches</h3>
+              <h3 className="font-semibold text-gray-900">Small Groups</h3>
               <p className="text-sm text-gray-500 mt-1">Personalized attention with class sizes of 12-15 students</p>
             </div>
           </div>

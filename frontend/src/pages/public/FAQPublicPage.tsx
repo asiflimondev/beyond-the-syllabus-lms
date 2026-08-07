@@ -34,32 +34,32 @@ const FAQPublicPage: React.FC = () => {
     {
       id: 'g1',
       question: 'What is Beyond the Syllabus?',
-      answer: 'Beyond the Syllabus is a Cambridge English Language Training Center dedicated to helping students achieve their English language goals. We offer comprehensive preparation courses for Cambridge English Qualifications including Movers, KET, PET, FCE, and CAE.',
+      answer: 'Beyond the Syllabus is a Cambridge English Language Preparation Centre dedicated to helping students achieve their English language goals. We offer comprehensive preparation courses for Cambridge English Qualifications including Movers, KET, PET, FCE, and CAE.',
       category: 'general'
     },
     {
       id: 'g2',
       question: 'Is Beyond the Syllabus affiliated with Cambridge?',
-      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation center. Our programs follow the Cambridge curriculum and our teachers are Cambridge-certified instructors.',
+      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation centre. Our programs follow the Cambridge curriculum and our teachers are Cambridge-certified instructors.',
       category: 'general'
     },
     {
       id: 'g3',
-      question: 'Where is the center located?',
-      answer: 'We are located in Dhaka, Bangladesh. Our center is easily accessible and equipped with modern facilities including smart classrooms, a library, and a student lounge.',
+      question: 'Where is the centre located?',
+      answer: 'We are located in Dhaka, Bangladesh. Our centre is easily accessible and equipped with modern facilities including smart classrooms, a library, and a student lounge.',
       category: 'general'
     },
     // Admission FAQs
     {
       id: 'a1',
-      question: 'How do I enroll in a program?',
-      answer: 'To enroll in a program, you can visit our center for a placement test, or you can contact us to schedule a consultation. Our team will help you choose the right program based on your English level and goals.',
+      question: 'How do I enroll in a programme?',
+      answer: 'To enroll in a programme, you can visit our centre for a placement test, or you can contact us to schedule a consultation. Our team will help you choose the right programme based on your English level and goals.',
       category: 'admission'
     },
     {
       id: 'a2',
       question: 'What is the admission process?',
-      answer: 'The admission process includes a placement test to assess your current English level, followed by a consultation to discuss your goals and program options. Once you\'ve chosen a program, you can complete the registration and payment.',
+      answer: 'The admission process includes a placement test to assess your current English level, followed by a consultation to discuss your goals and programme options. Once you\'ve chosen a programme, you can complete the registration and payment.',
       category: 'admission'
     },
     {
@@ -68,29 +68,17 @@ const FAQPublicPage: React.FC = () => {
       answer: 'Yes, all new students take a placement test to ensure they are placed in the appropriate level. This helps us provide the most effective learning experience tailored to your needs.',
       category: 'admission'
     },
-    // Programs FAQs
+    // Programmes FAQs
     {
       id: 'p1',
-      question: 'What programs do you offer?',
-      answer: 'We offer preparation programs for Cambridge English Qualifications including Movers (A1), Key English Test - KET (A2), Preliminary English Test - PET (B1), First Certificate in English - FCE (B2), and Cambridge Advanced English - CAE (C1).',
+      question: 'What programmes do you offer?',
+      answer: 'We offer preparation programmes for Cambridge English Qualifications including Movers (A1), Key English Test - KET (A2), Preliminary English Test - PET (B1), First Certificate in English - FCE (B2), and Cambridge Advanced English - CAE (C1).',
       category: 'programs'
     },
     {
       id: 'p2',
-      question: 'How long do the programs last?',
-      answer: 'Program durations vary by level. Typically, programs run for 7-9 months. We also offer intensive courses for students who want to prepare more quickly.',
-      category: 'programs'
-    },
-    {
-      id: 'p3',
-      question: 'What is the schedule like?',
-      answer: 'We offer flexible schedules with morning, afternoon, and evening batches. Classes are usually held 3-4 times a week, with each session lasting 2-3 hours.',
-      category: 'programs'
-    },
-    {
-      id: 'p4',
-      question: 'Do you offer online classes?',
-      answer: 'Yes, we offer both in-person and online classes. Our online classes use interactive platforms that allow students to participate in real-time with their teachers and classmates.',
+      question: 'How long do the programmes last?',
+      answer: 'Programme durations vary by level. Typically, programmes run for 7-9 months. We also offer intensive courses for students who want to prepare more quickly.',
       category: 'programs'
     },
     // Exam FAQs
@@ -103,7 +91,7 @@ const FAQPublicPage: React.FC = () => {
     {
       id: 'e2',
       question: 'What is the exam format?',
-      answer: 'The exam format varies by level but generally includes Reading & Use of English, Writing, Listening, and Speaking sections. Our programs cover all sections to ensure complete preparation.',
+      answer: 'The exam format varies by level but generally includes Reading & Use of English, Writing, Listening, and Speaking sections. Our programmes cover all sections to ensure complete preparation.',
       category: 'exam'
     },
     {
@@ -115,20 +103,14 @@ const FAQPublicPage: React.FC = () => {
     // Fees FAQs
     {
       id: 'f1',
-      question: 'How much do the programs cost?',
-      answer: 'Program fees vary based on the level and duration. Our fees are competitive and we offer flexible payment plans. Contact us for detailed fee information for specific programs.',
+      question: 'How much do the programmes cost?',
+      answer: 'Programme fees vary based on the level and duration. Our fees are competitive and we offer flexible payment plans. Contact us for detailed fee information for specific programmes.',
       category: 'fees'
     },
     {
       id: 'f2',
-      question: 'Are there any scholarships available?',
-      answer: 'Yes, we offer merit-based scholarships for outstanding students. We also have installment payment options to make our programs accessible to all students.',
-      category: 'fees'
-    },
-    {
-      id: 'f3',
-      question: 'What is included in the program fee?',
-      answer: 'Program fees include tuition, course materials, access to our learning management system, practice tests, and mock exams. Exam registration fees are typically not included.',
+      question: 'What is included in the programme fee?',
+      answer: 'Programme fees include tuition, course materials, access to our learning management system, practice tests, and mock exams. Exam registration fees are not included.',
       category: 'fees'
     }
   ];
@@ -211,7 +193,7 @@ const FAQPublicPage: React.FC = () => {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold font-display mb-4">Frequently Asked Questions</h1>
           <p className="text-lg text-white/80 max-w-3xl mx-auto">
-            Find answers to common questions about our programs, admission process, exams, and more.
+            Find answers to common questions about our programmes, admission process, exams, and more.
           </p>
         </div>
       </section>

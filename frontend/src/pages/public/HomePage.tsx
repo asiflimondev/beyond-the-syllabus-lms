@@ -222,7 +222,7 @@ const HomePage: React.FC = () => {
     { icon: PenTool, label: 'Writing Development', color: 'bg-green-100 text-green-600' },
     { icon: ClipboardList, label: 'Mock Tests', color: 'bg-orange-100 text-orange-600' },
     { icon: Users, label: 'Expert Trainers', color: 'bg-cyan-100 text-cyan-600' },
-    { icon: UsersIcon, label: 'Small Batches', color: 'bg-pink-100 text-pink-600' },
+    { icon: UsersIcon, label: 'Small Groups', color: 'bg-pink-100 text-pink-600' },
     { icon: Building, label: 'University Support', color: 'bg-indigo-100 text-indigo-600' },
     { icon: BookOpen, label: 'Study Materials', color: 'bg-emerald-100 text-emerald-600' },
   ];
@@ -305,7 +305,7 @@ const HomePage: React.FC = () => {
 
   const facilities = [
     { icon: BookOpen, title: 'Modern Classrooms', description: 'Smart classrooms with interactive technology' },
-    { icon: Users, title: 'Expert Teachers', description: 'Cambridge-certified experienced instructors' },
+    { icon: Users, title: 'Expert Teachers', description: 'Expert experienced instructors' },
     { icon: Award, title: 'Cambridge Affiliated', description: 'Official Cambridge preparation center' },
     { icon: Clock, title: 'Flexible Schedule', description: 'Morning, afternoon & evening batches' },
   ];
@@ -396,7 +396,7 @@ const HomePage: React.FC = () => {
         <div className="relative z-10 container-fluid py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-3 text-orange-200 font-bold text-sm reveal">
+              <div className="inline-flex items-center gap-3 text-orange-200 font-bold text-sm reveal mt-4">
                 <span className="w-7 h-7 rounded-lg bg-orange-500/30 text-orange-200 flex items-center justify-center">
                   <Check className="w-4 h-4" />
                 </span>
@@ -406,14 +406,14 @@ const HomePage: React.FC = () => {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold font-display leading-tight tracking-tight mt-6 reveal" style={{ transitionDelay: '60ms' }}>
                 English that goes{' '}
                 <span className="relative inline-block text-orange-500">
-                  beyond
+                  Beyond
                   <span className="absolute bottom-1 left-0 right-0 h-[0.14em] rounded-full bg-orange-500/40 -z-10" />
                 </span>{' '}
-                the syllabus.
+                the Syllabus.
               </h1>
 
               <p className="text-lg text-white/80 max-w-2xl mt-6 leading-relaxed reveal" style={{ transitionDelay: '140ms' }}>
-                Cambridge-certified teachers, a proven level-by-level path, and real classroom energy — guiding learners from their first words to confident, exam-ready fluency and the world beyond.
+                Cambridge-certified courses, a proven level-by-level path, and real classroom energy — guiding learners from their first words to confident, exam-ready fluency and the world beyond.
               </p>
 
               <div className="flex flex-wrap gap-4 mt-8 reveal" style={{ transitionDelay: '220ms' }}>
@@ -509,7 +509,7 @@ const HomePage: React.FC = () => {
               </span>
               Cambridge Qualifications
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Climb the staircase, step by step.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Climb the staircase, <br></br>step by step.</h2>
             <p className="text-gray-500 text-lg">Every learner is placed at the right level, then rises one confident Cambridge step at a time — each stage mapped to the Common European Framework (CEFR).</p>
           </div>
 
@@ -615,7 +615,7 @@ const HomePage: React.FC = () => {
                   Study Abroad &amp; Scholarships
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Your English, a passport to the world.</h2>
-                <p className="text-gray-500 text-lg">A Cambridge qualification is recognised by universities and employers across the globe — the first step from a classroom in Dhaka to a campus abroad.</p>
+                <p className="text-gray-500 text-lg">A Cambridge Qualification is recognised by universities and employers across the globe — the first step from a classroom in Dhaka to a campus abroad.</p>
               </div>
 
               <div className="space-y-4">
@@ -625,7 +625,7 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-display font-bold text-blue-900 text-lg">Globally recognised certificates</h4>
-                    <p className="text-ink-soft text-sm">Cambridge English qualifications trusted by thousands of institutions worldwide.</p>
+                    <p className="text-ink-soft text-sm">Cambridge English Qualifications trusted by thousands of institutions worldwide.</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start reveal" style={{ transitionDelay: '80ms' }}>
@@ -850,7 +850,7 @@ const HomePage: React.FC = () => {
               </span>
               What drives us
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Beyond the syllabus, on purpose.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Beyond the Syllabus, on purpose.</h2>
             <p className="text-gray-500 text-lg">We believe language learning should reach past textbooks — into confidence, character and real communication.</p>
           </div>
 
@@ -913,7 +913,7 @@ const HomePage: React.FC = () => {
             Ready to Start Your Journey?
           </h2>
           <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
-            Join Beyond the Syllabus today and discover the path to achieving your Cambridge English qualification.
+            Join Beyond the Syllabus today and discover the path to achieving your Cambridge English Qualification.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

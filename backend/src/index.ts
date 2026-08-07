@@ -23,7 +23,7 @@ import reportRoutes from './routes/report.routes.js';
 import publicRoutes from './routes/public.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import officeMemberRoutes from './routes/admin/officeMember.routes.js';
-
+import contactRoutes from './routes/contact.routes.js';
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
@@ -144,6 +144,9 @@ console.log('✅ Settings routes mounted at /api/settings');
 
 app.use('/api/admin/office-members', officeMemberRoutes);
 console.log('✅ Office Member routes mounted at /api/admin/office-members');
+
+app.use('/api/contact', contactRoutes);
+console.log('✅ Contact routes mounted at /api/contact');
 
 // ============================================
 // ERROR HANDLING
