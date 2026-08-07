@@ -4,7 +4,8 @@ import {
   getReceiptByIdController,
   getReceiptsByStudentController,
   deleteReceiptController,
-  permanentlyDeleteReceipt,  // <--- ADD THIS
+  restoreReceipt,
+  permanentlyDeleteReceipt,
 } from '../../controllers/receipt.controller.js';
 import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 
@@ -25,7 +26,10 @@ router.get('/student/:studentId', authorize('admin', 'office'), getReceiptsByStu
 // Admin only - Delete receipt (soft delete)
 router.delete('/:id', authorize('admin'), deleteReceiptController);
 
-// Admin only - Permanently delete receipt  // <--- ADD THIS
+// Admin only - Restore receipt
+router.patch('/:id/restore', authorize('admin'), restoreReceipt);
+
+// Admin only - Permanently delete receipt
 router.delete('/:id/permanent', authorize('admin'), permanentlyDeleteReceipt);
 
 export default router;

@@ -88,10 +88,29 @@ export const getReceipts = async (options: {
   endDate?: string;
   minAmount?: number;
   maxAmount?: number;
+  showDeleted?: boolean;
 }): Promise<{ receipts: IReceipt[]; total: number }> => {
-  const { page = 1, limit = 10, search, studentId, startDate, endDate, minAmount, maxAmount } = options;
+  const { 
+    page = 1, 
+    limit = 10, 
+    search, 
+    studentId, 
+    startDate, 
+    endDate, 
+    minAmount, 
+    maxAmount,
+    showDeleted = false,
+  } = options;
 
-  const filter: any = { isDeleted: false };
+  const filter: any = {};
+
+  // If showDeleted is true, only show deleted receipts
+  // If showDeleted is false, only show active receipts
+  if (showDeleted) {
+    filter.isDeleted = true;
+  } else {
+    filter.isDeleted = false;
+  }
 
   if (studentId) {
     filter.studentId = studentId;
@@ -134,7 +153,7 @@ export const getReceipts = async (options: {
     .sort({ receiptDate: -1 })
     .skip(skip)
     .limit(Number(limit))
-    .populate('studentId', 'fullName admissionId')
+    .populate('studentId', 'fullName admissionId phone email')
     .populate('programId', 'name displayName')
     .populate('generatedBy', 'email');
 

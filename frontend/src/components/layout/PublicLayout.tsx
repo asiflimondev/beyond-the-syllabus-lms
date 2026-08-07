@@ -27,7 +27,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
   const navItems = [
     { path: '/', label: 'Home' },
-    { path: '/programs', label: 'Programs' },
+    { path: '/programs', label: 'Programmes' },
     { path: '/about', label: 'About' },
     { path: '/gallery', label: 'Gallery' },
     { path: '/faq', label: 'FAQ' },

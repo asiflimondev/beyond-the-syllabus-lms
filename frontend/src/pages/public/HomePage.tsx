@@ -400,7 +400,7 @@ const HomePage: React.FC = () => {
                 <span className="w-7 h-7 rounded-lg bg-orange-500/30 text-orange-200 flex items-center justify-center">
                   <Check className="w-4 h-4" />
                 </span>
-                Official Cambridge preparation · Dhaka
+                Official Cambridge preparation centre · Dhaka
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold font-display leading-tight tracking-tight mt-6 reveal" style={{ transitionDelay: '60ms' }}>
@@ -920,7 +920,7 @@ const HomePage: React.FC = () => {
               to="/programs"
               className="px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300"
             >
-              Explore Programs
+              Explore Programmes
             </Link>
             <Link
               to="/contact"

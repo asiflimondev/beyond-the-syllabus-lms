@@ -18,7 +18,6 @@ const BatchReport: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Fetch filters
   const { data: filtersData, isLoading: filtersLoading } = useQuery({
     queryKey: ['report-filters'],
     queryFn: () => reportApi.getFilters(),
@@ -26,7 +25,6 @@ const BatchReport: React.FC = () => {
 
   const filters = filtersData?.data?.data;
 
-  // Fetch batch report
   const { data: reportData, isLoading: reportLoading, refetch, isError } = useQuery({
     queryKey: ['batch-report', selectedProgram, selectedTeacher],
     queryFn: () => reportApi.getBatchReport({
@@ -86,19 +84,36 @@ const BatchReport: React.FC = () => {
         .date-time {
           display: none !important;
         }
+        /* Larger print sizes */
+        .report-title {
+          font-size: 22px !important;
+        }
+        .report-subtitle {
+          font-size: 13px !important;
+        }
+        .brand-name {
+          font-size: 18px !important;
+        }
+        .brand-sub {
+          font-size: 10px !important;
+        }
+        .logo-bts {
+          height: 55px !important;
+        }
+        .logo-cambridge {
+          height: 40px !important;
+        }
+        .info-label {
+          font-size: 9px !important;
+        }
+        .info-value {
+          font-size: 12px !important;
+        }
         table {
           font-size: 10px !important;
         }
         th, td {
           padding: 4px 6px !important;
-        }
-        .logo-bts {
-          height: 55px !important;
-          width: auto !important;
-        }
-        .logo-cambridge {
-          height: 45px !important;
-          width: auto !important;
         }
         .report-header {
           margin-bottom: 10px !important;
@@ -113,6 +128,9 @@ const BatchReport: React.FC = () => {
         }
         .summary-box p {
           font-size: 16px !important;
+        }
+        .summary-box .label {
+          font-size: 8px !important;
         }
         .table-container {
           flex: 1;
@@ -130,13 +148,14 @@ const BatchReport: React.FC = () => {
         .signature-section .signature-img {
           height: 35px !important;
         }
-        .footer-text {
-          margin-top: 6px !important;
-          padding-top: 6px !important;
+        .signature-label {
+          font-size: 11px !important;
         }
-        /* Hide test number from headers */
-        .test-number {
-          display: none !important;
+        .footer-text {
+          font-size: 9px !important;
+        }
+        .content-area {
+          flex: 1;
         }
       }
     `,
@@ -180,7 +199,6 @@ const BatchReport: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Tabs */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display">Reports</h2>
         <p className="text-sm text-gray-500 mt-1">Generate batch or individual student progress reports</p>
@@ -211,7 +229,6 @@ const BatchReport: React.FC = () => {
 
       {!isIndividual ? (
         <>
-          {/* Filters */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -272,7 +289,6 @@ const BatchReport: React.FC = () => {
             </div>
           </div>
 
-          {/* Report Content */}
           {isError && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
               Failed to generate report. Please try again.
@@ -281,7 +297,6 @@ const BatchReport: React.FC = () => {
 
           {report && (
             <>
-              {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 no-print">
                 <button
                   onClick={handlePrintReport}
@@ -303,241 +318,187 @@ const BatchReport: React.FC = () => {
                 </button>
               </div>
 
-              {/* Report Preview */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
                 <div ref={printRef} id="report-print-area" className="p-8 print:p-4">
-                  {/* Report Header - With Logos */}
-                  <div className="flex items-center justify-between mb-4 print:mb-3">
-                    <img src={btsLogo} alt="Beyond the Syllabus" className="h-20 w-auto object-contain print:h-14 logo-bts" />
-                    <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain print:h-10 logo-cambridge" />
+                  {/* Report Header - Orange "Beyond" */}
+                  <div className="flex items-start justify-between mb-5 print:mb-4">
+                    <div className="flex items-center gap-4">
+                      <img src={btsLogo} alt="Beyond the Syllabus" className="h-16 w-auto object-contain print:h-14 logo-bts" />
+                      <div>
+                        <p className="text-2xl font-bold print:text-xl brand-name">
+                          <span className="text-[#f1592a]">Beyond</span>
+                          <span className="text-[#0a0f2a]"> the</span>
+                          <span className="text-[#0a0f2a]"> Syllabus</span>
+                        </p>
+                        <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Centre</p>
+                      </div>
+                    </div>
+                    <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain print:h-11 logo-cambridge" />
                   </div>
 
-                  <div className="text-center border-b-2 border-gray-200 pb-4 mb-4 print:pb-3 print:mb-3 report-header">
-                    <h1 className="text-3xl font-bold font-display tracking-tight print:text-2xl">
-                      <span className="text-[#f1592a]">Beyond</span>
-                      <span className="text-[#0a0f2a]"> the</span>
-                      <span className="text-[#0a0f2a]"> Syllabus</span>
-                    </h1>
-                    <p className="text-gray-500 text-sm print:text-xs">Cambridge English Preparation Center</p>
-                    <div className="flex items-center justify-center gap-2 mt-2 print:mt-1">
-                      <div className="w-12 h-0.5 bg-gradient-to-r from-orange-500 to-blue-600 print:w-10"></div>
-                      <h2 className="text-xl font-bold text-gray-800 print:text-lg">Course Progress Report</h2>
-                      <div className="w-12 h-0.5 bg-gradient-to-r from-blue-600 to-orange-500 print:w-10"></div>
-                    </div>
-                    <p className="text-gray-600 text-sm print:text-xs">Batch / Program Report</p>
+                  <div className="text-center border-b-2 border-gray-200 pb-5 mb-5 print:pb-4 print:mb-4 report-header">
+                    <h2 className="text-3xl font-bold text-gray-800 print:text-2xl report-title">Course Progress Report</h2>
+                    <p className="text-gray-600 text-base print:text-sm report-subtitle">Batch / Program Report</p>
                   </div>
 
-                  {/* Report Info - Removed Teacher */}
-                  <div className="grid grid-cols-3 gap-4 mb-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-3 print:mb-3 print:gap-3 report-info-grid">
-                    <div>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Program</p>
-                      <p className="font-semibold text-gray-900 text-sm print:text-xs">{report.program.displayName?.en || report.program.name}</p>
+                  <div className="content-area">
+                    <div className="grid grid-cols-3 gap-4 mb-5 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-3 print:mb-4 print:gap-3 report-info-grid">
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Program</p>
+                        <p className="font-semibold text-gray-900 text-base print:text-sm info-value">{report.program.displayName?.en || report.program.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Total Students</p>
+                        <p className="font-bold text-gray-900 text-base print:text-sm info-value">{report.totalStudents}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium print:text-[9px] info-label">Generated</p>
+                        <p className="font-semibold text-gray-900 text-base print:text-sm info-value">{formatDate(report.generatedDate)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Students</p>
-                      <p className="font-bold text-gray-900 text-sm print:text-xs">{report.totalStudents}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Generated</p>
-                      <p className="font-semibold text-gray-900 text-sm print:text-xs">{formatDate(report.generatedDate)}</p>
-                    </div>
-                  </div>
 
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-3 gap-4 mb-4 print:gap-3 print:mb-3">
-                    <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
-                      <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.totalStudents}</p>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Students</p>
+                    <div className="grid grid-cols-3 gap-4 mb-5 print:gap-3 print:mb-4">
+                      <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
+                        <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.totalStudents}</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Total Students</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
+                        <p className="text-2xl font-bold text-emerald-600 print:text-xl">{report.totalMockTests}</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Total Mock Tests</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
+                        <p className="text-2xl font-bold text-orange-500 print:text-xl">
+                          {report.totalMockTests > 0 && report.students.length > 0
+                            ? Math.round(
+                                report.students.reduce((acc, s) => {
+                                  const completed = s.results.filter(r => r.percentage > 0).length;
+                                  return acc + (completed / Math.max(report.totalMockTests, 1)) * 100;
+                                }, 0) / report.students.length
+                              )
+                            : 0}%
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[8px] label">Avg Completion</p>
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
-                      <p className="text-2xl font-bold text-emerald-600 print:text-xl">{report.totalMockTests}</p>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Mock Tests</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
-                      <p className="text-2xl font-bold text-orange-500 print:text-xl">
-                        {report.totalMockTests > 0 && report.students.length > 0
-                          ? Math.round(
-                              report.students.reduce((acc, s) => {
-                                const completed = s.results.filter(r => r.percentage > 0).length;
-                                return acc + (completed / Math.max(report.totalMockTests, 1)) * 100;
-                              }, 0) / report.students.length
-                            )
-                          : 0}%
-                      </p>
-                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Avg Completion</p>
-                    </div>
-                  </div>
 
-                  {/* Table - No test numbers */}
-                  {report.students.length > 0 && report.totalMockTests > 0 ? (
-                    <div className="overflow-x-auto print:overflow-visible table-container">
-                      <table className="w-full text-sm border-collapse print:text-[10px]">
-                        <thead>
-                          <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
-                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
-                              ID
-                            </th>
-                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
-                              Student
-                            </th>
-                            {report.mockTests.map((mt) => {
-                              const hasSections = mt.hasReading || mt.hasWriting || mt.hasListening || mt.hasSpeaking || mt.hasPresentation;
-                              const sectionCount = [mt.hasReading, mt.hasWriting, mt.hasListening, mt.hasSpeaking, mt.hasPresentation].filter(Boolean).length;
+                    {report.students.length > 0 && report.totalMockTests > 0 ? (
+                      <div className="overflow-x-auto print:overflow-visible table-container">
+                        <table className="w-full text-sm border-collapse print:text-[10px]">
+                          <thead>
+                            <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">ID</th>
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">Student</th>
+                              {report.mockTests.map((mt) => {
+                                const hasSections = mt.hasReading || mt.hasWriting || mt.hasListening || mt.hasSpeaking || mt.hasPresentation;
+                                const sectionCount = [mt.hasReading, mt.hasWriting, mt.hasListening, mt.hasSpeaking, mt.hasPresentation].filter(Boolean).length;
+                                return (
+                                  <th
+                                    key={mt.id}
+                                    className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold text-gray-600 min-w-[100px] print:px-1.5 print:py-1 print:text-[10px] print:min-w-[70px]"
+                                    colSpan={hasSections ? sectionCount + 1 : 1}
+                                  >
+                                    <div className="text-xs print:text-[10px]">{mt.title}</div>
+                                  </th>
+                                );
+                              })}
+                            </tr>
+                            <tr className="bg-gray-50/70">
+                              <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-0 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
+                              <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-16 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
+                              {report.mockTests.map((mt) => (
+                                <React.Fragment key={mt.id}>
+                                  {mt.hasReading && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">R({mt.readingTotal})</th>}
+                                  {mt.hasWriting && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">W({mt.writingTotal})</th>}
+                                  {mt.hasListening && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">L({mt.listeningTotal})</th>}
+                                  {mt.hasSpeaking && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">S</th>}
+                                  {mt.hasPresentation && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">P({mt.presentationTotal})</th>}
+                                  <th className="border border-gray-200 px-2 py-1 text-[10px] font-semibold text-gray-700 text-center bg-orange-50/80 print:px-1.5 print:py-0.5 print:text-[9px]">Total</th>
+                                </React.Fragment>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {report.students.map((student, idx) => {
+                              const studentResults = student.results || [];
                               return (
-                                <th
-                                  key={mt.id}
-                                  className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold text-gray-600 min-w-[100px] print:px-1.5 print:py-1 print:text-[10px] print:min-w-[70px]"
-                                  colSpan={hasSections ? sectionCount + 1 : 1}
-                                >
-                                  <div className="text-xs print:text-[10px]">{mt.title}</div>
-                                </th>
+                                <tr key={student.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                                  <td className="border border-gray-200 px-3 py-2 text-xs font-mono text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[9px]">{student.admissionId}</td>
+                                  <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">{student.fullName}</td>
+                                  {report.mockTests.map((mt) => {
+                                    const result = studentResults.find((r) => r.mockTestId === mt.id);
+                                    const totalMarks = result?.totalMarks || 0;
+                                    return (
+                                      <React.Fragment key={mt.id}>
+                                        {mt.hasReading && (
+                                          <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
+                                            {result && result.reading.total > 0 ? <span className="text-gray-700">{result.reading.obtained}</span> : <span className="text-gray-300">-</span>}
+                                          </td>
+                                        )}
+                                        {mt.hasWriting && (
+                                          <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
+                                            {result && result.writing.total > 0 ? <span className="text-gray-700">{result.writing.obtained}</span> : <span className="text-gray-300">-</span>}
+                                          </td>
+                                        )}
+                                        {mt.hasListening && (
+                                          <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
+                                            {result && result.listening.total > 0 ? <span className="text-gray-700">{result.listening.obtained}</span> : <span className="text-gray-300">-</span>}
+                                          </td>
+                                        )}
+                                        {mt.hasSpeaking && (
+                                          <td className="border border-gray-200 px-1.5 py-2 text-center text-xs font-semibold print:px-1 print:py-1.5 print:text-[9px]">
+                                            {result && result.speaking.grade !== 'F' ? <span className="text-gray-700">{result.speaking.grade}</span> : <span className="text-gray-300">-</span>}
+                                          </td>
+                                        )}
+                                        {mt.hasPresentation && (
+                                          <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
+                                            {result && result.presentation.total > 0 ? <span className="text-gray-700">{result.presentation.marks}</span> : <span className="text-gray-300">-</span>}
+                                          </td>
+                                        )}
+                                        <td className="border border-gray-200 px-2 py-2 text-center text-sm font-bold text-gray-900 bg-orange-50/50 print:px-1.5 print:py-1.5 print:text-[11px]">
+                                          {totalMarks > 0 ? totalMarks : '-'}
+                                        </td>
+                                      </React.Fragment>
+                                    );
+                                  })}
+                                </tr>
                               );
                             })}
-                          </tr>
-                          <tr className="bg-gray-50/70">
-                            <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-0 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
-                            <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-16 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
-                            {report.mockTests.map((mt) => (
-                              <React.Fragment key={mt.id}>
-                                {mt.hasReading && (
-                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
-                                    R({mt.readingTotal})
-                                  </th>
-                                )}
-                                {mt.hasWriting && (
-                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
-                                    W({mt.writingTotal})
-                                  </th>
-                                )}
-                                {mt.hasListening && (
-                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
-                                    L({mt.listeningTotal})
-                                  </th>
-                                )}
-                                {mt.hasSpeaking && (
-                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
-                                    S
-                                  </th>
-                                )}
-                                {mt.hasPresentation && (
-                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
-                                    P({mt.presentationTotal})
-                                  </th>
-                                )}
-                                <th className="border border-gray-200 px-2 py-1 text-[10px] font-semibold text-gray-700 text-center bg-orange-50/80 print:px-1.5 print:py-0.5 print:text-[9px]">
-                                  Total
-                                </th>
-                              </React.Fragment>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {report.students.map((student, idx) => {
-                            const studentResults = student.results || [];
-                            return (
-                              <tr key={student.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                                <td className="border border-gray-200 px-3 py-2 text-xs font-mono text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[9px]">
-                                  {student.admissionId}
-                                </td>
-                                <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
-                                  {student.fullName}
-                                </td>
-                                {report.mockTests.map((mt) => {
-                                  const result = studentResults.find(
-                                    (r) => r.mockTestId === mt.id
-                                  );
-                                  const totalMarks = result?.totalMarks || 0;
-                                  return (
-                                    <React.Fragment key={mt.id}>
-                                      {mt.hasReading && (
-                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
-                                          {result && result.reading.total > 0 ? (
-                                            <span className="text-gray-700">{result.reading.obtained}</span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </td>
-                                      )}
-                                      {mt.hasWriting && (
-                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
-                                          {result && result.writing.total > 0 ? (
-                                            <span className="text-gray-700">{result.writing.obtained}</span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </td>
-                                      )}
-                                      {mt.hasListening && (
-                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
-                                          {result && result.listening.total > 0 ? (
-                                            <span className="text-gray-700">{result.listening.obtained}</span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </td>
-                                      )}
-                                      {mt.hasSpeaking && (
-                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs font-semibold print:px-1 print:py-1.5 print:text-[9px]">
-                                          {result && result.speaking.grade !== 'F' ? (
-                                            <span className="text-gray-700">{result.speaking.grade}</span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </td>
-                                      )}
-                                      {mt.hasPresentation && (
-                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
-                                          {result && result.presentation.total > 0 ? (
-                                            <span className="text-gray-700">{result.presentation.marks}</span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </td>
-                                      )}
-                                      <td className="border border-gray-200 px-2 py-2 text-center text-sm font-bold text-gray-900 bg-orange-50/50 print:px-1.5 print:py-1.5 print:text-[11px]">
-                                        {totalMarks > 0 ? totalMarks : '-'}
-                                      </td>
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p>No data available for this report</p>
-                    </div>
-                  )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                        <p>No data available for this report</p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Signature Section - Pushed to bottom */}
                   <div className="mt-6 pt-4 border-t border-gray-200 print:mt-auto print:pt-3 signature-section">
                     <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto print:gap-6">
                       <div className="text-center">
-                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-10 signature-line">
+                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
                           {/* Empty - placeholder for signature image */}
                         </div>
-                        <p className="text-sm font-semibold text-gray-700 print:text-xs">Exam Coordinator</p>
+                        <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Exam Coordinator</p>
                       </div>
                       <div className="text-center">
-                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-10 signature-line">
+                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-12 signature-line">
                           <img 
                             src={msign} 
                             alt="Academic Director Signature" 
                             className="h-12 w-auto object-contain opacity-80 print:h-10 signature-img"
                           />
                         </div>
-                        <p className="text-sm font-semibold text-gray-700 print:text-xs">Academic Director</p>
+                        <p className="text-base font-semibold text-gray-700 print:text-sm signature-label">Academic Director</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-4 pt-3 border-t border-gray-200 text-center text-xs text-gray-400 print:mt-2 print:pt-2 footer-text">
-                    <p>Beyond the Syllabus — Cambridge English Preparation Center</p>
+                  <div className="mt-4 pt-3 border-t border-gray-200 text-center text-sm text-gray-400 print:mt-3 print:pt-2 footer-text">
+                    <p>Beyond the Syllabus — Cambridge English Preparation Centre</p>
                   </div>
                 </div>
               </div>

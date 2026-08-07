@@ -114,7 +114,7 @@ const ProgramsPublicPage: React.FC = () => {
             <Sparkles className="w-4 h-4" />
             Cambridge English Programs
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4">Our Programs</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4">Our Programmes</h1>
           <p className="text-lg text-white/80 max-w-3xl mx-auto">
             Choose from our comprehensive range of Cambridge English preparation courses designed to take you from beginner to advanced.
           </p>

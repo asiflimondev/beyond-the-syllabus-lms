@@ -40,7 +40,7 @@ const FAQPublicPage: React.FC = () => {
     {
       id: 'g2',
       question: 'Is Beyond the Syllabus affiliated with Cambridge?',
-      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation centre. Our programs follow the Cambridge curriculum and our teachers are Cambridge-certified instructors.',
+      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation centre. Our programmes follow the Cambridge curriculum and our teachers are Cambridge-certified instructors.',
       category: 'general'
     },
     {

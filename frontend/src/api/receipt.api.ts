@@ -1,8 +1,8 @@
 import apiClient from './client';
 
 export interface Receipt {
-  id: string; // Keep this for frontend use
-  _id?: string; // Optional, from MongoDB
+  id: string;
+  _id?: string;
   receiptNumber: string;
   studentId: string | { _id: string; fullName: string; admissionId: string; phone: string; email: string };
   studentName: string;
@@ -17,6 +17,7 @@ export interface Receipt {
   generatedBy: string | { _id: string; email: string };
   createdAt: string;
   updatedAt: string;
+  isDeleted?: boolean;
 }
 
 export interface ReceiptsResponse {
@@ -42,6 +43,7 @@ export const receiptApi = {
     endDate?: string;
     minAmount?: number;
     maxAmount?: number;
+    showDeleted?: boolean;  // <--- ADDED
   }) =>
     apiClient.get<ReceiptsResponse>('/admin/receipts', { params }),
 
@@ -54,6 +56,9 @@ export const receiptApi = {
   deleteReceipt: (id: string) =>
     apiClient.delete(`/admin/receipts/${id}`),
 
-  permanentlyDeleteReceipt: (id: string) =>  // <--- ADD THIS
+  restoreReceipt: (id: string) =>
+    apiClient.patch(`/admin/receipts/${id}/restore`),
+
+  permanentlyDeleteReceipt: (id: string) =>
     apiClient.delete(`/admin/receipts/${id}/permanent`),
 };

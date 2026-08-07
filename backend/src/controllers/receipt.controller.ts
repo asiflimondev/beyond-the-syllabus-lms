@@ -5,7 +5,7 @@ import {
   getReceiptsByStudentId,
   deleteReceipt,
 } from '../services/receipt.service.js';
-import { Receipt } from '../models/Receipt.model.js'; // <--- ADD THIS IMPORT
+import { Receipt } from '../models/Receipt.model.js';
 
 // ============================================
 // GET ALL RECEIPTS
@@ -21,6 +21,7 @@ export const getAllReceipts = async (req: Request, res: Response): Promise<void>
       endDate,
       minAmount,
       maxAmount,
+      showDeleted,  // <--- ADDED
     } = req.query;
 
     const { receipts, total } = await getReceipts({
@@ -32,6 +33,7 @@ export const getAllReceipts = async (req: Request, res: Response): Promise<void>
       endDate: endDate as string,
       minAmount: minAmount ? Number(minAmount) : undefined,
       maxAmount: maxAmount ? Number(maxAmount) : undefined,
+      showDeleted: showDeleted === 'true',  // <--- ADDED
     });
 
     res.status(200).json({
@@ -143,13 +145,12 @@ export const deleteReceiptController = async (req: Request, res: Response): Prom
 };
 
 // ============================================
-// PERMANENTLY DELETE RECEIPT
+// RESTORE RECEIPT
 // ============================================
-export const permanentlyDeleteReceipt = async (req: Request, res: Response): Promise<void> => {
+export const restoreReceipt = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    // Find the receipt first to get info for response
     const receipt = await Receipt.findById(id);
     if (!receipt) {
       res.status(404).json({
@@ -159,7 +160,41 @@ export const permanentlyDeleteReceipt = async (req: Request, res: Response): Pro
       return;
     }
 
-    // Store info for response
+    receipt.isDeleted = false;
+    receipt.deletedAt = undefined;
+    await receipt.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Receipt restored successfully',
+      data: receipt,
+    });
+  } catch (error: any) {
+    console.error('Restore receipt error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to restore receipt',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// PERMANENTLY DELETE RECEIPT
+// ============================================
+export const permanentlyDeleteReceipt = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const receipt = await Receipt.findById(id);
+    if (!receipt) {
+      res.status(404).json({
+        success: false,
+        message: 'Receipt not found',
+      });
+      return;
+    }
+
     const receiptInfo = {
       id: receipt._id,
       receiptNumber: receipt.receiptNumber,
@@ -168,7 +203,6 @@ export const permanentlyDeleteReceipt = async (req: Request, res: Response): Pro
       paymentAmount: receipt.paymentAmount,
     };
 
-    // Permanently delete the receipt
     await Receipt.findByIdAndDelete(id);
 
     res.status(200).json({

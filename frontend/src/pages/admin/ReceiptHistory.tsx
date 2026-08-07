@@ -4,14 +4,15 @@ import { toast } from 'react-hot-toast';
 import { 
   Receipt as ReceiptIcon, 
   Search, 
-  Printer,
+  Printer, 
   Eye,
   Calendar,
   DollarSign,
   X,
   ChevronLeft,
   ChevronRight,
-  Trash2
+  Trash2,
+  RotateCcw
 } from 'lucide-react';
 import { receiptApi } from '@api/receipt.api';
 import ReceiptPreview from '@components/admission/ReceiptPreview';
@@ -41,6 +42,7 @@ const ReceiptHistory: React.FC = () => {
         endDate: endDate || undefined,
         minAmount: minAmount ? Number(minAmount) : undefined,
         maxAmount: maxAmount ? Number(maxAmount) : undefined,
+        showDeleted: showDeleted,  // <--- ADDED
       }),
   });
 
@@ -51,7 +53,6 @@ const ReceiptHistory: React.FC = () => {
   const receipts = rawReceipts.map((receipt: any) => ({
     ...receipt,
     id: receipt._id || receipt.id,
-    // Handle populated fields
     studentName: typeof receipt.studentId === 'object' && receipt.studentId?.fullName 
       ? receipt.studentId.fullName 
       : receipt.studentName,
@@ -74,6 +75,30 @@ const ReceiptHistory: React.FC = () => {
   }));
 
   const pagination = data?.data?.data?.pagination;
+
+  // Soft Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => receiptApi.deleteReceipt(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      toast.success('Receipt deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to delete receipt');
+    },
+  });
+
+  // Restore mutation
+  const restoreMutation = useMutation({
+    mutationFn: (id: string) => receiptApi.restoreReceipt(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      toast.success('Receipt restored successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to restore receipt');
+    },
+  });
 
   // Permanent Delete mutation
   const permanentDeleteMutation = useMutation({
@@ -102,7 +127,6 @@ const ReceiptHistory: React.FC = () => {
   };
 
   const handleViewReceipt = (receipt: any) => {
-    // Prepare data for preview
     const previewData = {
       id: receipt.id,
       receiptNumber: receipt.receiptNumber,
@@ -135,10 +159,21 @@ const ReceiptHistory: React.FC = () => {
       generatedBy: receipt.generatedBy,
     };
     setSelectedReceipt(previewData);
-    // Open print after state update
     setTimeout(() => {
       window.print();
     }, 300);
+  };
+
+  const handleDelete = (id: string, receiptNumber: string) => {
+    if (window.confirm(`Are you sure you want to delete receipt "${receiptNumber}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleRestore = (id: string, receiptNumber: string) => {
+    if (window.confirm(`Are you sure you want to restore receipt "${receiptNumber}"?`)) {
+      restoreMutation.mutate(id);
+    }
   };
 
   const handlePermanentDelete = (id: string, receiptNumber: string) => {
@@ -174,11 +209,6 @@ const ReceiptHistory: React.FC = () => {
     setSelectedReceipt(null);
   };
 
-  // Filter receipts based on showDeleted
-  const filteredReceipts = showDeleted 
-    ? receipts.filter((r: any) => r.isDeleted === true)
-    : receipts.filter((r: any) => r.isDeleted !== true);
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -197,7 +227,6 @@ const ReceiptHistory: React.FC = () => {
       {/* Filters */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -209,7 +238,6 @@ const ReceiptHistory: React.FC = () => {
             />
           </div>
 
-          {/* Start Date */}
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -221,7 +249,6 @@ const ReceiptHistory: React.FC = () => {
             />
           </div>
 
-          {/* End Date */}
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -233,7 +260,6 @@ const ReceiptHistory: React.FC = () => {
             />
           </div>
 
-          {/* Amount Range */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -258,7 +284,6 @@ const ReceiptHistory: React.FC = () => {
           </div>
         </div>
 
-        {/* Filter Actions */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
           <label className="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
             <input
@@ -288,7 +313,7 @@ const ReceiptHistory: React.FC = () => {
             <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent"></div>
             <span className="ml-3 text-gray-600">Loading receipts...</span>
           </div>
-        ) : filteredReceipts.length === 0 ? (
+        ) : receipts.length === 0 ? (
           <div className="text-center py-16">
             <ReceiptIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
@@ -304,53 +329,25 @@ const ReceiptHistory: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Receipt #
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Student Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Admission ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Program
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt #</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredReceipts.map((receipt: any) => (
+                  {receipts.map((receipt: any) => (
                     <tr key={receipt.id || receipt._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                        {receipt.receiptNumber}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {receipt.studentName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {receipt.studentAdmissionId}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {receipt.programName}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-primary-600">
-                        {formatCurrency(receipt.paymentAmount)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {formatDate(receipt.receiptDate)}
-                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{receipt.receiptNumber}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{receipt.studentName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{receipt.studentAdmissionId}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{receipt.programName}</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-primary-600">{formatCurrency(receipt.paymentAmount)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{formatDate(receipt.receiptDate)}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                           receipt.isDeleted
@@ -377,20 +374,25 @@ const ReceiptHistory: React.FC = () => {
                             <Printer className="w-4 h-4" />
                           </button>
                           {receipt.isDeleted ? (
-                            <button
-                              onClick={() => handlePermanentDelete(receipt.id, receipt.receiptNumber)}
-                              className="p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all"
-                              title="Permanently Delete (irreversible)"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleRestore(receipt.id, receipt.receiptNumber)}
+                                className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                title="Restore"
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handlePermanentDelete(receipt.id, receipt.receiptNumber)}
+                                className="p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all"
+                                title="Permanently Delete (irreversible)"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
                           ) : (
                             <button
-                              onClick={() => {
-                                toast('Soft delete not implemented. Use permanent delete instead.', {
-                                  icon: '⚠️',
-                                });
-                              }}
+                              onClick={() => handleDelete(receipt.id, receipt.receiptNumber)}
                               className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                               title="Delete"
                             >
