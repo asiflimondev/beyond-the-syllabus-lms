@@ -10,6 +10,13 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Users,
+  FileText,
+  Calendar,
+  TrendingUp,
+  Clock,
+  Award,
+  ChevronRight
 } from 'lucide-react';
 
 const AdminMarkEntry: React.FC = () => {
@@ -167,7 +174,7 @@ const AdminMarkEntry: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
         <span className="ml-3 text-gray-600">Loading mark entry data...</span>
       </div>
     );
@@ -175,11 +182,14 @@ const AdminMarkEntry: React.FC = () => {
 
   if (isError) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-        <p className="text-red-700">Failed to load mark entry data</p>
-        <p className="text-sm text-red-600">{(error as any)?.message || 'Unknown error'}</p>
-        <button onClick={() => navigate('/admin/mock-tests')} className="mt-4 btn-primary">
+      <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-red-700">Failed to load mark entry data</h3>
+        <p className="text-sm text-red-600 mt-1">{(error as any)?.message || 'Unknown error'}</p>
+        <button 
+          onClick={() => navigate('/admin/mock-tests')} 
+          className="mt-4 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+        >
           Go Back
         </button>
       </div>
@@ -188,9 +198,14 @@ const AdminMarkEntry: React.FC = () => {
 
   if (!mockTest || marksData.length === 0) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-        <p className="text-yellow-700">No students found for this mock test</p>
-        <button onClick={() => navigate('/admin/mock-tests')} className="mt-4 btn-primary">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center">
+        <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-amber-700">No students found</h3>
+        <p className="text-sm text-amber-600 mt-1">No students are enrolled in this mock test</p>
+        <button 
+          onClick={() => navigate('/admin/mock-tests')} 
+          className="mt-4 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+        >
           Go Back
         </button>
       </div>
@@ -209,31 +224,48 @@ const AdminMarkEntry: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <button
             onClick={() => navigate('/admin/mock-tests')}
-            className="flex items-center text-sm text-primary-600 hover:text-primary-700 mb-2"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-xl border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all duration-200 text-gray-700 hover:text-gray-900 group"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Mock Tests
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            <span className="font-medium">Back to Mock Tests</span>
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display mt-3">
             {mockTest.title || `Mock Test ${mockTest.testNumber}`}
           </h2>
-          <p className="text-sm text-gray-500">
-            Test #{mockTest.testNumber} • {new Date(mockTest.testDate).toLocaleDateString()}
-          </p>
+          <div className="flex flex-wrap items-center gap-4 mt-1.5">
+            <p className="text-sm text-gray-500 flex items-center gap-1.5">
+              <FileText className="w-4 h-4" />
+              Test #{mockTest.testNumber}
+            </p>
+            <p className="text-sm text-gray-500 flex items-center gap-1.5">
+              <Calendar className="w-4 h-4" />
+              {new Date(mockTest.testDate).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-gray-500 flex items-center gap-1.5">
+              <Users className="w-4 h-4" />
+              {totalStudents} Students
+            </p>
+          </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <div className="text-sm text-gray-500">
-            <span className="font-medium">{savedCount}</span> saved,
-            <span className="font-medium ml-1 text-orange-600">{pendingCount}</span> pending
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm">
+            <span className="text-sm text-gray-500">
+              <span className="font-medium text-emerald-600">{savedCount}</span> saved
+            </span>
+            <span className="w-px h-4 bg-gray-200" />
+            <span className="text-sm text-gray-500">
+              <span className="font-medium text-amber-600">{pendingCount}</span> pending
+            </span>
           </div>
           <button
             onClick={handleSaveAll}
             disabled={saveMutation.isPending}
-            className="btn-primary flex items-center space-x-2"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
           >
             {saveMutation.isPending ? (
               <>
@@ -250,29 +282,31 @@ const AdminMarkEntry: React.FC = () => {
         </div>
       </div>
 
+      {/* Status Message */}
       {saveStatus.message && (
         <div
-          className={`p-3 rounded-lg flex items-center space-x-2 ${
+          className={`p-4 rounded-xl flex items-center gap-3 border ${
             saveStatus.success
-              ? 'bg-green-50 border border-green-200 text-green-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              : 'bg-red-50 border-red-200 text-red-700'
           }`}
         >
-          {saveStatus.success ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-          <span>{saveStatus.message}</span>
+          {saveStatus.success ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span className="font-medium">{saveStatus.message}</span>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gradient-to-r from-gray-50 to-blue-50/30 sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[120px]">
                   Student
                 </th>
                 {hasReading && (
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[80px]">
                     Reading
                     <span className="block text-[10px] font-normal text-gray-400">
                       /{mockTest.reading.totalMarks}
@@ -280,7 +314,7 @@ const AdminMarkEntry: React.FC = () => {
                   </th>
                 )}
                 {hasWriting && (
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[80px]">
                     Writing
                     <span className="block text-[10px] font-normal text-gray-400">
                       /{mockTest.writing.totalMarks}
@@ -288,7 +322,7 @@ const AdminMarkEntry: React.FC = () => {
                   </th>
                 )}
                 {hasListening && (
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[80px]">
                     Listening
                     <span className="block text-[10px] font-normal text-gray-400">
                       /{mockTest.listening.totalMarks}
@@ -297,50 +331,50 @@ const AdminMarkEntry: React.FC = () => {
                 )}
                 {hasSpeaking && (
                   <>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[90px]">
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[90px]">
                       Speaking Grade
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[120px]">
                       Speaking Comment
                     </th>
                   </>
                 )}
                 {hasPresentation && (
                   <>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[80px]">
                       Presentation
                       <span className="block text-[10px] font-normal text-gray-400">
                         /{mockTest.presentation.totalMarks}
                       </span>
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[120px]">
                       Presentation Comment
                     </th>
                   </>
                 )}
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[80px]">
+                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[80px]">
                   Total
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[60px]">
+                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[60px]">
                   %
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[60px]">
+                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[60px]">
                   Grade
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {marksData.map((student) => {
+            <tbody className="divide-y divide-gray-100">
+              {marksData.map((student, index) => {
                 const result = student.result;
                 return (
-                  <tr key={student.studentId} className="hover:bg-gray-50">
-                    <td className="px-3 py-2">
+                  <tr key={student.studentId} className={`hover:bg-gray-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
+                    <td className="px-4 py-3">
                       <div className="font-medium text-sm text-gray-900">{student.fullName}</div>
-                      <div className="text-xs text-gray-500">{student.admissionId}</div>
+                      <div className="text-xs text-gray-500 font-mono">{student.admissionId}</div>
                     </td>
 
                     {hasReading && (
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-3">
                         <input
                           type="number"
                           min="0"
@@ -349,13 +383,13 @@ const AdminMarkEntry: React.FC = () => {
                           onChange={(e) =>
                             updateStudentMarks(student.studentId, 'reading.obtained', parseFloat(e.target.value) || 0)
                           }
-                          className="w-16 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-16 px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white"
                         />
                       </td>
                     )}
 
                     {hasWriting && (
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-3">
                         <input
                           type="number"
                           min="0"
@@ -364,13 +398,13 @@ const AdminMarkEntry: React.FC = () => {
                           onChange={(e) =>
                             updateStudentMarks(student.studentId, 'writing.obtained', parseFloat(e.target.value) || 0)
                           }
-                          className="w-16 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-16 px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white"
                         />
                       </td>
                     )}
 
                     {hasListening && (
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-3">
                         <input
                           type="number"
                           min="0"
@@ -379,20 +413,20 @@ const AdminMarkEntry: React.FC = () => {
                           onChange={(e) =>
                             updateStudentMarks(student.studentId, 'listening.obtained', parseFloat(e.target.value) || 0)
                           }
-                          className="w-16 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-16 px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white"
                         />
                       </td>
                     )}
 
                     {hasSpeaking && (
                       <>
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-3">
                           <select
                             value={result?.speaking?.grade || 'F'}
                             onChange={(e) =>
                               updateStudentMarks(student.studentId, 'speaking.grade', e.target.value)
                             }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white"
                           >
                             {['A', 'B', 'C', 'D', 'F'].map((grade) => (
                               <option key={grade} value={grade}>
@@ -401,15 +435,15 @@ const AdminMarkEntry: React.FC = () => {
                             ))}
                           </select>
                         </td>
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-3">
                           <input
                             type="text"
-                            placeholder="Comment..."
+                            placeholder="Add comment..."
                             value={result?.speaking?.comment || ''}
                             onChange={(e) =>
                               updateStudentMarks(student.studentId, 'speaking.comment', e.target.value)
                             }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white placeholder:text-gray-400"
                           />
                         </td>
                       </>
@@ -417,7 +451,7 @@ const AdminMarkEntry: React.FC = () => {
 
                     {hasPresentation && (
                       <>
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-3">
                           <input
                             type="number"
                             min="0"
@@ -426,38 +460,38 @@ const AdminMarkEntry: React.FC = () => {
                             onChange={(e) =>
                               updateStudentMarks(student.studentId, 'presentation.marks', parseFloat(e.target.value) || 0)
                             }
-                            className="w-16 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            className="w-16 px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white"
                           />
                         </td>
-                        <td className="px-3 py-2">
+                        <td className="px-3 py-3">
                           <input
                             type="text"
-                            placeholder="Comment..."
+                            placeholder="Add comment..."
                             value={result?.presentation?.comment || ''}
                             onChange={(e) =>
                               updateStudentMarks(student.studentId, 'presentation.comment', e.target.value)
                             }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm bg-white placeholder:text-gray-400"
                           />
                         </td>
                       </>
                     )}
 
-                    <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                    <td className="px-3 py-3 text-sm font-semibold text-gray-900">
                       {result?.totalMarks ?? 0}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-3 py-3 text-sm font-medium text-gray-700">
                       {result?.percentage ? Math.round(result.percentage) : 0}%
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                           result?.grade === 'A+' || result?.grade === 'A' || result?.grade === 'A-'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-emerald-100 text-emerald-800'
                             : result?.grade === 'B+' || result?.grade === 'B' || result?.grade === 'B-'
                             ? 'bg-blue-100 text-blue-800'
                             : result?.grade === 'C+' || result?.grade === 'C'
-                            ? 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-amber-100 text-amber-800'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
@@ -472,13 +506,26 @@ const AdminMarkEntry: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <div>
-          Total Students: <span className="font-medium text-gray-900">{totalStudents}</span>
+      {/* Footer Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-gray-500 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm px-5 py-3">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-gray-400" />
+          <span>Total Students: <span className="font-semibold text-gray-900">{totalStudents}</span></span>
         </div>
-        <div>
-          Saved: <span className="font-medium text-green-600">{savedCount}</span> •
-          Pending: <span className="font-medium text-orange-600">{pendingCount}</span>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-emerald-500" />
+            Saved: <span className="font-semibold text-emerald-600">{savedCount}</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock className="w-4 h-4 text-amber-500" />
+            Pending: <span className="font-semibold text-amber-600">{pendingCount}</span>
+          </span>
+          <span className="w-px h-5 bg-gray-200" />
+          <span className="flex items-center gap-1.5">
+            <TrendingUp className="w-4 h-4 text-gray-400" />
+            Progress: <span className="font-semibold text-gray-900">{totalStudents > 0 ? Math.round((savedCount / totalStudents) * 100) : 0}%</span>
+          </span>
         </div>
       </div>
     </div>
