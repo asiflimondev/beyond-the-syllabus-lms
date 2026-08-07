@@ -67,14 +67,7 @@ const GalleryPublicPage: React.FC = () => {
       date: '2024-04-05'
     },
     // Events Images
-    {
-      id: '5',
-      title: 'Graduation Ceremony',
-      description: 'Celebrating our students\' success and achievements',
-      imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=600&h=400&fit=crop',
-      category: 'events',
-      date: '2024-05-15'
-    },
+    
     {
       id: '6',
       title: 'Award Ceremony',
