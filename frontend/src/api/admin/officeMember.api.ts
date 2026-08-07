@@ -51,6 +51,9 @@ export const officeMemberManagementApi = {
   restoreOfficeMember: (id: string) =>
     apiClient.patch(`/admin/office-members/${id}/restore`),
 
+  permanentlyDeleteOfficeMember: (id: string) =>  // <--- ADD THIS
+    apiClient.delete(`/admin/office-members/${id}/permanent`),
+
   getStats: () =>
     apiClient.get('/admin/office-members/stats'),
 };

@@ -116,6 +116,19 @@ const OfficeMemberManagement: React.FC = () => {
     },
   });
 
+  // Permanent Delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: (id: string) => officeMemberManagementApi.permanentlyDeleteOfficeMember(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['office-members'] });
+      queryClient.invalidateQueries({ queryKey: ['office-member-stats'] });
+      toast.success('Office member permanently deleted');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to permanently delete office member');
+    },
+  });
+
   const handleCreate = (data: any) => {
     createMutation.mutate(data);
   };
@@ -143,12 +156,32 @@ const OfficeMemberManagement: React.FC = () => {
     }
   };
 
+  const handlePermanentDelete = (id: string, fullName: string, employeeId: string) => {
+    if (window.confirm(
+      `⚠️ PERMANENT DELETE\n\n` +
+      `Are you sure you want to permanently delete "${fullName}" (${employeeId})?\n\n` +
+      `This action CANNOT be undone!\n` +
+      `• The office member record will be permanently removed\n` +
+      `• The associated user account will also be deleted`
+    )) {
+      const confirmText = window.prompt(
+        `Type "PERMANENT" to confirm permanent deletion of ${employeeId}:`
+      );
+      if (confirmText === 'PERMANENT') {
+        permanentDeleteMutation.mutate(id);
+      } else if (confirmText !== null) {
+        toast.error('Confirmation text did not match. Deletion cancelled.');
+      }
+    }
+  };
+
   const handleClose = () => {
     setIsFormOpen(false);
     setEditingOfficeMember(null);
   };
 
   const isLoadingMutation = createMutation.isPending || updateMutation.isPending;
+  const isPermanentDeleting = permanentDeleteMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -281,9 +314,19 @@ const OfficeMemberManagement: React.FC = () => {
                                   </button>
                                 </>
                               ) : (
-                                <button onClick={() => handleRestore(member.id)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Restore">
-                                  <RotateCcw className="w-4 h-4" />
-                                </button>
+                                <>
+                                  <button onClick={() => handleRestore(member.id)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Restore">
+                                    <RotateCcw className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handlePermanentDelete(member.id, member.fullName, member.employeeId)} 
+                                    className="p-2 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all" 
+                                    title="Permanently Delete (irreversible)"
+                                    disabled={isPermanentDeleting}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </>
                               )}
                             </div>
                           </td>

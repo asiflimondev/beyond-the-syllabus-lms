@@ -115,6 +115,19 @@ const TeacherManagement: React.FC = () => {
     },
   });
 
+  // Permanent Delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: (id: string) => teacherManagementApi.permanentlyDeleteTeacher(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teachers'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-stats'] });
+      toast.success('Teacher permanently deleted');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to permanently delete teacher');
+    },
+  });
+
   const handleCreate = (data: any) => {
     createMutation.mutate(data);
   };
@@ -142,12 +155,32 @@ const TeacherManagement: React.FC = () => {
     }
   };
 
+  const handlePermanentDelete = (id: string, fullName: string, employeeId: string) => {
+    if (window.confirm(
+      `⚠️ PERMANENT DELETE\n\n` +
+      `Are you sure you want to permanently delete "${fullName}" (${employeeId})?\n\n` +
+      `This action CANNOT be undone!\n` +
+      `• The teacher record will be permanently removed\n` +
+      `• The associated user account will also be deleted`
+    )) {
+      const confirmText = window.prompt(
+        `Type "PERMANENT" to confirm permanent deletion of ${employeeId}:`
+      );
+      if (confirmText === 'PERMANENT') {
+        permanentDeleteMutation.mutate(id);
+      } else if (confirmText !== null) {
+        toast.error('Confirmation text did not match. Deletion cancelled.');
+      }
+    }
+  };
+
   const handleClose = () => {
     setIsFormOpen(false);
     setEditingTeacher(null);
   };
 
   const isLoadingMutation = createMutation.isPending || updateMutation.isPending;
+  const isPermanentDeleting = permanentDeleteMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -282,9 +315,19 @@ const TeacherManagement: React.FC = () => {
                                   </button>
                                 </>
                               ) : (
-                                <button onClick={() => handleRestore(teacher.id)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Restore">
-                                  <RotateCcw className="w-4 h-4" />
-                                </button>
+                                <>
+                                  <button onClick={() => handleRestore(teacher.id)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Restore">
+                                    <RotateCcw className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handlePermanentDelete(teacher.id, teacher.fullName, teacher.employeeId)} 
+                                    className="p-2 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all" 
+                                    title="Permanently Delete (irreversible)"
+                                    disabled={isPermanentDeleting}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </>
                               )}
                             </div>
                           </td>
@@ -331,7 +374,7 @@ const TeacherManagement: React.FC = () => {
         </>
       )}
 
-      {/* Teacher Form Modal - Passed to TeacherForm component which should also be updated */}
+      {/* Teacher Form Modal */}
       <TeacherForm
         isOpen={isFormOpen}
         onClose={handleClose}

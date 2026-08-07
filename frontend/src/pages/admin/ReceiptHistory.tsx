@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { 
   Receipt as ReceiptIcon, 
   Search, 
-  Printer, 
-  Download, 
+  Printer,
   Eye,
   Calendar,
   DollarSign,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from 'lucide-react';
 import { receiptApi } from '@api/receipt.api';
 import ReceiptPreview from '@components/admission/ReceiptPreview';
 
 const ReceiptHistory: React.FC = () => {
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
@@ -25,11 +26,12 @@ const ReceiptHistory: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [minAmount, setMinAmount] = useState('');
   const [maxAmount, setMaxAmount] = useState('');
+  const [showDeleted, setShowDeleted] = useState(false);
 
   const limit = 10;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['receipts', page, search, startDate, endDate, minAmount, maxAmount],
+    queryKey: ['receipts', page, search, startDate, endDate, minAmount, maxAmount, showDeleted],
     queryFn: () =>
       receiptApi.getAllReceipts({
         page,
@@ -68,9 +70,22 @@ const ReceiptHistory: React.FC = () => {
     generatedBy: typeof receipt.generatedBy === 'object' && receipt.generatedBy?.email 
       ? receipt.generatedBy 
       : { email: 'System' },
+    isDeleted: receipt.isDeleted || false,
   }));
 
   const pagination = data?.data?.data?.pagination;
+
+  // Permanent Delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: (id: string) => receiptApi.permanentlyDeleteReceipt(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      toast.success('Receipt permanently deleted');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to permanently delete receipt');
+    },
+  });
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -126,12 +141,31 @@ const ReceiptHistory: React.FC = () => {
     }, 300);
   };
 
+  const handlePermanentDelete = (id: string, receiptNumber: string) => {
+    if (window.confirm(
+      `⚠️ PERMANENT DELETE\n\n` +
+      `Are you sure you want to permanently delete receipt "${receiptNumber}"?\n\n` +
+      `This action CANNOT be undone!\n` +
+      `• The receipt record will be permanently removed`
+    )) {
+      const confirmText = window.prompt(
+        `Type "PERMANENT" to confirm permanent deletion of ${receiptNumber}:`
+      );
+      if (confirmText === 'PERMANENT') {
+        permanentDeleteMutation.mutate(id);
+      } else if (confirmText !== null) {
+        toast.error('Confirmation text did not match. Deletion cancelled.');
+      }
+    }
+  };
+
   const handleClearFilters = () => {
     setSearch('');
     setStartDate('');
     setEndDate('');
     setMinAmount('');
     setMaxAmount('');
+    setShowDeleted(false);
     setPage(1);
   };
 
@@ -139,6 +173,11 @@ const ReceiptHistory: React.FC = () => {
     setIsPreviewOpen(false);
     setSelectedReceipt(null);
   };
+
+  // Filter receipts based on showDeleted
+  const filteredReceipts = showDeleted 
+    ? receipts.filter((r: any) => r.isDeleted === true)
+    : receipts.filter((r: any) => r.isDeleted !== true);
 
   return (
     <div className="space-y-6">
@@ -220,8 +259,17 @@ const ReceiptHistory: React.FC = () => {
         </div>
 
         {/* Filter Actions */}
-        {(search || startDate || endDate || minAmount || maxAmount) && (
-          <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <label className="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showDeleted}
+              onChange={(e) => setShowDeleted(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span>Show deleted</span>
+          </label>
+          {(search || startDate || endDate || minAmount || maxAmount || showDeleted) && (
             <button
               onClick={handleClearFilters}
               className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
@@ -229,8 +277,8 @@ const ReceiptHistory: React.FC = () => {
               <X className="w-4 h-4" />
               Clear Filters
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Receipts Table */}
@@ -240,11 +288,15 @@ const ReceiptHistory: React.FC = () => {
             <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent"></div>
             <span className="ml-3 text-gray-600">Loading receipts...</span>
           </div>
-        ) : receipts.length === 0 ? (
+        ) : filteredReceipts.length === 0 ? (
           <div className="text-center py-16">
             <ReceiptIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No receipts found</p>
-            <p className="text-sm text-gray-400 mt-1">Admit a student to generate the first receipt</p>
+            <p className="text-gray-500 text-lg">
+              {showDeleted ? 'No deleted receipts found' : 'No receipts found'}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">
+              {showDeleted ? 'Deleted receipts will appear here' : 'Admit a student to generate the first receipt'}
+            </p>
           </div>
         ) : (
           <>
@@ -271,12 +323,15 @@ const ReceiptHistory: React.FC = () => {
                       Date
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {receipts.map((receipt: any) => (
+                  {filteredReceipts.map((receipt: any) => (
                     <tr key={receipt.id || receipt._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                         {receipt.receiptNumber}
@@ -297,6 +352,15 @@ const ReceiptHistory: React.FC = () => {
                         {formatDate(receipt.receiptDate)}
                       </td>
                       <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          receipt.isDeleted
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          {receipt.isDeleted ? 'Deleted' : 'Active'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleViewReceipt(receipt)}
@@ -312,15 +376,27 @@ const ReceiptHistory: React.FC = () => {
                           >
                             <Printer className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => {
-                              toast.success('PDF download feature coming soon!');
-                            }}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                            title="Download PDF"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
+                          {receipt.isDeleted ? (
+                            <button
+                              onClick={() => handlePermanentDelete(receipt.id, receipt.receiptNumber)}
+                              className="p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all"
+                              title="Permanently Delete (irreversible)"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                toast('Soft delete not implemented. Use permanent delete instead.', {
+                                  icon: '⚠️',
+                                });
+                              }}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

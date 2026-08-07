@@ -7,6 +7,7 @@ import {
   updateOfficeMember,
   deleteOfficeMember,
   restoreOfficeMember,
+  permanentlyDeleteOfficeMember,  // <--- ADD THIS
 } from '../../controllers/admin/officeMember.controller.js';
 import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 
@@ -23,5 +24,6 @@ router.get('/:id', getOfficeMemberById);
 router.put('/:id', updateOfficeMember);
 router.delete('/:id', deleteOfficeMember);
 router.patch('/:id/restore', restoreOfficeMember);
+router.delete('/:id/permanent', permanentlyDeleteOfficeMember);  // <--- ADD THIS
 
 export default router;

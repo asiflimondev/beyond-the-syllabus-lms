@@ -7,6 +7,7 @@ import {
   deleteTeacher,
   restoreTeacher,
   getTeacherStats,
+  permanentlyDeleteTeacher,  // <--- ADD THIS
 } from '../../controllers/admin/teacherManagement.controller.js';
 import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 
@@ -23,5 +24,6 @@ router.get('/:id', getTeacherById);
 router.put('/:id', updateTeacher);
 router.delete('/:id', deleteTeacher);
 router.patch('/:id/restore', restoreTeacher);
+router.delete('/:id/permanent', permanentlyDeleteTeacher);  // <--- ADD THIS
 
 export default router;

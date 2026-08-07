@@ -53,6 +53,9 @@ export const teacherManagementApi = {
   restoreTeacher: (id: string) =>
     apiClient.patch(`/admin/teachers/${id}/restore`),
 
+  permanentlyDeleteTeacher: (id: string) =>  // <--- ADD THIS
+    apiClient.delete(`/admin/teachers/${id}/permanent`),
+
   getStats: () =>
     apiClient.get('/admin/teachers/stats'),
 };

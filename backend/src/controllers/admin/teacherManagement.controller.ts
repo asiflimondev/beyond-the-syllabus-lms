@@ -349,6 +349,67 @@ export const restoreTeacher = async (req: Request, res: Response): Promise<void>
   }
 };
 
+
+
+
+// ============================================
+// PERMANENTLY DELETE TEACHER
+// ============================================
+export const permanentlyDeleteTeacher = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const teacher = await Teacher.findById(id);
+    if (!teacher) {
+      res.status(404).json({
+        success: false,
+        message: 'Teacher not found',
+      });
+      return;
+    }
+
+    // Store info for response
+    const teacherInfo = {
+      id: teacher._id,
+      fullName: teacher.fullName,
+      employeeId: teacher.employeeId,
+      email: teacher.email,
+    };
+
+    // Delete the user account if exists
+    if (teacher.userId) {
+      await User.findByIdAndDelete(teacher.userId);
+    }
+
+    // Permanently delete the teacher
+    await Teacher.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: `Teacher "${teacherInfo.fullName}" (${teacherInfo.employeeId}) permanently deleted`,
+      data: teacherInfo,
+    });
+  } catch (error: any) {
+    console.error('Permanently delete teacher error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete teacher',
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 // ============================================
 // GET TEACHER STATISTICS
 // ============================================

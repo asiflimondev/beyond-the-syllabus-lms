@@ -53,4 +53,7 @@ export const receiptApi = {
 
   deleteReceipt: (id: string) =>
     apiClient.delete(`/admin/receipts/${id}`),
+
+  permanentlyDeleteReceipt: (id: string) =>  // <--- ADD THIS
+    apiClient.delete(`/admin/receipts/${id}/permanent`),
 };

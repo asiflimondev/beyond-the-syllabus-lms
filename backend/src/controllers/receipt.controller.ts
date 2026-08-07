@@ -5,6 +5,7 @@ import {
   getReceiptsByStudentId,
   deleteReceipt,
 } from '../services/receipt.service.js';
+import { Receipt } from '../models/Receipt.model.js'; // <--- ADD THIS IMPORT
 
 // ============================================
 // GET ALL RECEIPTS
@@ -136,6 +137,50 @@ export const deleteReceiptController = async (req: Request, res: Response): Prom
     res.status(500).json({
       success: false,
       message: 'Failed to delete receipt',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// PERMANENTLY DELETE RECEIPT
+// ============================================
+export const permanentlyDeleteReceipt = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Find the receipt first to get info for response
+    const receipt = await Receipt.findById(id);
+    if (!receipt) {
+      res.status(404).json({
+        success: false,
+        message: 'Receipt not found',
+      });
+      return;
+    }
+
+    // Store info for response
+    const receiptInfo = {
+      id: receipt._id,
+      receiptNumber: receipt.receiptNumber,
+      studentName: receipt.studentName,
+      studentAdmissionId: receipt.studentAdmissionId,
+      paymentAmount: receipt.paymentAmount,
+    };
+
+    // Permanently delete the receipt
+    await Receipt.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: `Receipt "${receiptInfo.receiptNumber}" permanently deleted`,
+      data: receiptInfo,
+    });
+  } catch (error: any) {
+    console.error('Permanently delete receipt error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete receipt',
       error: error.message,
     });
   }

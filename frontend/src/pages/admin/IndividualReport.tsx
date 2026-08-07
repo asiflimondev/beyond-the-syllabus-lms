@@ -5,6 +5,9 @@ import { studentManagementApi } from '@api/admin/student.api';
 import { toast } from 'react-hot-toast';
 import { Printer, Download, Search, UserCircle, AlertCircle } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
+import btsLogo from '/bts-logo-t.png';
+import cambridgeLogo from '/cambridge-logo.png';
+import msign from '/msign.png';
 
 const IndividualReport: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,9 +33,19 @@ const IndividualReport: React.FC = () => {
     pageStyle: `
       @page {
         size: portrait;
-        margin: 12mm;
+        margin: 10mm;
+        margin-top: 0;
+        margin-bottom: 0;
       }
       @media print {
+        @page {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+        }
         body * {
           visibility: hidden;
         }
@@ -51,6 +64,19 @@ const IndividualReport: React.FC = () => {
         .print-container {
           padding: 0 !important;
           margin: 0 !important;
+        }
+        .print-header,
+        .print-footer,
+        .page-number,
+        .url,
+        .date-time {
+          display: none !important;
+        }
+        .teacher-field {
+          display: none !important;
+        }
+        .email-field {
+          display: none !important;
         }
       }
     `,
@@ -102,7 +128,6 @@ const IndividualReport: React.FC = () => {
     setSearchTerm(student.fullName + ' (' + student.admissionId + ')');
     setShowResults(false);
     setSearchResults([]);
-    // Auto-fetch report
     setTimeout(() => refetch(), 100);
   };
 
@@ -136,37 +161,20 @@ const IndividualReport: React.FC = () => {
 
   const getGradeColor = (grade: string) => {
     const colors: Record<string, string> = {
-      'A+': 'bg-green-100 text-green-800',
-      'A': 'bg-green-100 text-green-800',
-      'A-': 'bg-green-100 text-green-800',
+      'A+': 'bg-emerald-100 text-emerald-800',
+      'A': 'bg-emerald-100 text-emerald-800',
+      'A-': 'bg-emerald-100 text-emerald-800',
       'B+': 'bg-blue-100 text-blue-800',
       'B': 'bg-blue-100 text-blue-800',
       'B-': 'bg-blue-100 text-blue-800',
-      'C+': 'bg-yellow-100 text-yellow-800',
-      'C': 'bg-yellow-100 text-yellow-800',
+      'C+': 'bg-amber-100 text-amber-800',
+      'C': 'bg-amber-100 text-amber-800',
       'D': 'bg-orange-100 text-orange-800',
       'F': 'bg-red-100 text-red-800',
     };
     return colors[grade] || 'bg-gray-100 text-gray-800';
   };
 
-  const getGradeEmoji = (grade: string) => {
-    const emojis: Record<string, string> = {
-      'A+': '🌟',
-      'A': '⭐',
-      'A-': '⭐',
-      'B+': '👍',
-      'B': '👍',
-      'B-': '👌',
-      'C+': '📖',
-      'C': '📖',
-      'D': '⚠️',
-      'F': '🔴',
-    };
-    return emojis[grade] || '📝';
-  };
-
-  // Reset when student is selected
   useEffect(() => {
     if (selectedStudentId) {
       refetch();
@@ -207,7 +215,7 @@ const IndividualReport: React.FC = () => {
                   }
                 }}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
               />
             </div>
 
@@ -220,13 +228,13 @@ const IndividualReport: React.FC = () => {
                     onClick={() => handleSelectStudent(student)}
                     className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-xs font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white text-xs font-bold">
                       {student.fullName?.charAt(0).toUpperCase() || 'S'}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{student.fullName}</p>
                       <p className="text-xs text-gray-500">
-                        {student.admissionId} • {student.email}
+                        {student.admissionId}
                       </p>
                     </div>
                   </button>
@@ -243,7 +251,7 @@ const IndividualReport: React.FC = () => {
             <button
               onClick={handleSearch}
               disabled={isSearching || !searchTerm}
-              className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+              className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
             >
               {isSearching ? (
                 <>
@@ -276,15 +284,15 @@ const IndividualReport: React.FC = () => {
 
         {/* Selected Student Indicator */}
         {selectedStudentId && report && (
-          <div className="mt-3 p-3 bg-green-50 rounded-xl border border-green-200 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-sm font-bold">
+          <div className="mt-3 p-3 bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl border border-emerald-200 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-sm font-bold">
               {report.student.fullName?.charAt(0).toUpperCase() || 'S'}
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">{report.student.fullName}</p>
-              <p className="text-xs text-gray-500">{report.student.admissionId} • {report.student.email}</p>
+              <p className="text-xs text-gray-500">{report.student.admissionId}</p>
             </div>
-            <span className="ml-auto text-xs text-green-600 font-medium">✓ Selected</span>
+            <span className="ml-auto text-xs text-emerald-600 font-medium">✓ Selected</span>
           </div>
         )}
       </div>
@@ -299,7 +307,7 @@ const IndividualReport: React.FC = () => {
 
       {reportLoading && selectedStudentId && (
         <div className="flex items-center justify-center py-16">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
           <span className="ml-3 text-gray-600">Loading report...</span>
         </div>
       )}
@@ -311,7 +319,7 @@ const IndividualReport: React.FC = () => {
             <button
               onClick={handlePrintReport}
               disabled={isPrinting}
-              className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+              className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
             >
               <Printer className="w-4 h-4" />
               {isPrinting ? 'Preparing...' : 'Print Report'}
@@ -331,47 +339,48 @@ const IndividualReport: React.FC = () => {
           {/* Report Preview */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
             <div ref={printRef} id="report-print-area" className="p-8 print:p-6">
-              {/* Report Header */}
+              {/* Report Header - With Logos - Left logo bigger */}
+              <div className="flex items-center justify-between mb-6">
+                <img src={btsLogo} alt="Beyond the Syllabus" className="h-20 w-auto object-contain" />
+                <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain" />
+              </div>
+
               <div className="text-center border-b-2 border-gray-200 pb-6 mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 font-display">Beyond the Syllabus</h1>
-                <p className="text-gray-500 text-sm">Cambridge English Training Center</p>
-                <h2 className="text-xl font-semibold text-gray-800 mt-4">Student Progress Report</h2>
+                <h1 className="text-3xl font-bold font-display tracking-tight">
+                  <span className="text-[#f1592a]">Beyond</span>
+                  <span className="text-[#0a0f2a]"> the</span>
+                  <span className="text-[#0a0f2a]"> Syllabus</span>
+                </h1>
+                <p className="text-gray-500 text-sm mt-1">Cambridge English Preparation Center</p>
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <div className="w-12 h-0.5 bg-gradient-to-r from-orange-500 to-blue-600"></div>
+                  <h2 className="text-xl font-bold text-gray-800">Student Progress Report</h2>
+                  <div className="w-12 h-0.5 bg-gradient-to-r from-blue-600 to-orange-500"></div>
+                </div>
                 <p className="text-gray-600 text-sm mt-1">Individual Student Report</p>
               </div>
 
-              {/* Student Info */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
+              {/* Student Info - No Teacher, No Email */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200">
                 <div>
-                  <p className="text-xs text-gray-500">Student Name</p>
+                  <p className="text-xs text-gray-500 font-medium">Student Name</p>
                   <p className="font-semibold text-gray-900">{report.student.fullName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Admission ID</p>
+                  <p className="text-xs text-gray-500 font-medium">Admission ID</p>
                   <p className="font-mono font-semibold text-gray-900">{report.student.admissionId}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Program</p>
+                  <p className="text-xs text-gray-500 font-medium">Program</p>
                   <p className="font-semibold text-gray-900">{report.student.programName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Teacher</p>
-                  <p className="font-semibold text-gray-900">{report.teacher?.fullName || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Phone</p>
+                  <p className="text-xs text-gray-500 font-medium">Phone</p>
                   <p className="text-gray-900">{report.student.phone}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Email</p>
-                  <p className="text-gray-900">{report.student.email}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Total Tests</p>
-                  <p className="font-semibold text-gray-900">{report.totalTests}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Average Score</p>
-                  <p className="font-semibold text-green-600">{report.averagePercentage}%</p>
+                  <p className="text-xs text-gray-500 font-medium">Total Tests</p>
+                  <p className="font-bold text-gray-900">{report.totalTests}</p>
                 </div>
               </div>
 
@@ -380,7 +389,7 @@ const IndividualReport: React.FC = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <thead>
-                      <tr className="bg-gray-50">
+                      <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
                         <th className="border border-gray-200 px-4 py-2 text-left text-xs font-semibold text-gray-600">
                           Test
                         </th>
@@ -411,9 +420,6 @@ const IndividualReport: React.FC = () => {
                         <th className="border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-600">
                           Grade
                         </th>
-                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600">
-                          Remarks
-                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -421,7 +427,6 @@ const IndividualReport: React.FC = () => {
                         <tr key={result.mockTestId} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                           <td className="border border-gray-200 px-4 py-2 text-sm font-medium text-gray-800">
                             {result.mockTestTitle}
-                            <span className="text-xs text-gray-400 ml-1">#{result.mockTestNumber}</span>
                           </td>
                           <td className="border border-gray-200 px-3 py-2 text-center text-xs text-gray-500">
                             {formatDate(result.testDate)}
@@ -477,15 +482,12 @@ const IndividualReport: React.FC = () => {
                           </td>
                           <td className="border border-gray-200 px-3 py-2 text-center">
                             {result.grade && result.grade !== 'F' ? (
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getGradeColor(result.grade)}`}>
-                                {getGradeEmoji(result.grade)} {result.grade}
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${getGradeColor(result.grade)}`}>
+                                {result.grade}
                               </span>
                             ) : (
                               <span className="text-gray-300">-</span>
                             )}
-                          </td>
-                          <td className="border border-gray-200 px-3 py-2 text-xs text-gray-500">
-                            {result.speaking.comment || result.presentation.comment || '-'}
                           </td>
                         </tr>
                       ))}
@@ -498,25 +500,25 @@ const IndividualReport: React.FC = () => {
                 </div>
               )}
 
-              {/* Summary */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div>
-                    <p className="text-xs text-gray-500">Total Tests</p>
+              {/* Summary - Smaller boxes */}
+              <div className="mt-6">
+                <div className="grid grid-cols-4 gap-3 max-w-2xl mx-auto">
+                  <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-3 text-center">
+                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Tests</p>
                     <p className="text-xl font-bold text-gray-900">{report.totalTests}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Completed</p>
-                    <p className="text-xl font-bold text-green-600">
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-3 text-center">
+                    <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider">Completed</p>
+                    <p className="text-xl font-bold text-emerald-600">
                       {report.results.filter(r => r.percentage > 0).length}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Average</p>
-                    <p className="text-xl font-bold text-primary-600">{report.averagePercentage}%</p>
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/30 rounded-xl border border-blue-200 p-3 text-center">
+                    <p className="text-[10px] font-medium text-blue-600 uppercase tracking-wider">Average</p>
+                    <p className="text-xl font-bold text-blue-600">{report.averagePercentage}%</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Best Grade</p>
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-3 text-center">
+                    <p className="text-[10px] font-medium text-orange-600 uppercase tracking-wider">Best Grade</p>
                     <p className="text-xl font-bold text-orange-500">
                       {report.results.length > 0
                         ? [...report.results].sort((a, b) => {
@@ -529,10 +531,34 @@ const IndividualReport: React.FC = () => {
                 </div>
               </div>
 
+              {/* Signature Section - Exam Coordinator empty, Academic Director with msign */}
+              <div className="mt-8 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
+                  {/* Left - Exam Coordinator (empty for signature image) */}
+                  <div className="text-center">
+                    <div className="h-12 border-b-2 border-gray-400 mb-2 flex items-center justify-center">
+                      {/* Empty - placeholder for signature image */}
+                    </div>
+                    <p className="text-sm font-semibold text-gray-700">Exam Coordinator</p>
+                  </div>
+
+                  {/* Right - Academic Director (with msign.png) */}
+                  <div className="text-center">
+                    <div className="h-12 border-b-2 border-gray-400 mb-2 flex items-center justify-center">
+                      <img 
+                        src={msign} 
+                        alt="Academic Director Signature" 
+                        className="h-10 w-auto object-contain opacity-80"
+                      />
+                    </div>
+                    <p className="text-sm font-semibold text-gray-700">Academic Director</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Footer */}
               <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-400">
-                <p>Generated on {formatDate(report.generatedDate)}</p>
-                <p className="mt-0.5">Beyond the Syllabus — Cambridge English Training Center</p>
+                <p>Beyond the Syllabus — Cambridge English Preparation Center</p>
               </div>
             </div>
           </div>

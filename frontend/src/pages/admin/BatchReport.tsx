@@ -5,6 +5,9 @@ import { toast } from 'react-hot-toast';
 import { Printer, Download, RefreshCw, FileText } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { Link, useLocation } from 'react-router-dom';
+import btsLogo from '/bts-logo-t.png';
+import cambridgeLogo from '/cambridge-logo.png';
+import msign from '/msign.png';
 
 const BatchReport: React.FC = () => {
   const location = useLocation();
@@ -40,9 +43,19 @@ const BatchReport: React.FC = () => {
     pageStyle: `
       @page {
         size: landscape;
-        margin: 12mm;
+        margin: 10mm;
+        margin-top: 0;
+        margin-bottom: 0;
       }
       @media print {
+        @page {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+        }
         body * {
           visibility: hidden;
         }
@@ -54,6 +67,10 @@ const BatchReport: React.FC = () => {
           top: 0;
           left: 0;
           width: 100%;
+          height: 100vh;
+          padding: 8mm;
+          display: flex;
+          flex-direction: column;
         }
         .no-print {
           display: none !important;
@@ -61,6 +78,65 @@ const BatchReport: React.FC = () => {
         .print-container {
           padding: 0 !important;
           margin: 0 !important;
+        }
+        .print-header,
+        .print-footer,
+        .page-number,
+        .url,
+        .date-time {
+          display: none !important;
+        }
+        table {
+          font-size: 10px !important;
+        }
+        th, td {
+          padding: 4px 6px !important;
+        }
+        .logo-bts {
+          height: 55px !important;
+          width: auto !important;
+        }
+        .logo-cambridge {
+          height: 45px !important;
+          width: auto !important;
+        }
+        .report-header {
+          margin-bottom: 10px !important;
+          padding-bottom: 8px !important;
+        }
+        .report-info-grid {
+          padding: 8px 12px !important;
+          margin-bottom: 10px !important;
+        }
+        .summary-box {
+          padding: 6px 10px !important;
+        }
+        .summary-box p {
+          font-size: 16px !important;
+        }
+        .table-container {
+          flex: 1;
+          overflow: visible;
+          margin-bottom: 12px !important;
+        }
+        .signature-section {
+          margin-top: auto !important;
+          padding-top: 8px !important;
+          border-top: 1px solid #e5e7eb !important;
+        }
+        .signature-section .signature-line {
+          height: 30px !important;
+        }
+        .signature-section .signature-img {
+          height: 35px !important;
+        }
+        .footer-text {
+          margin-top: 6px !important;
+          padding-top: 6px !important;
+        }
+        /* Hide test number from headers */
+        .test-number {
+          display: none !important;
         }
       }
     `,
@@ -91,13 +167,12 @@ const BatchReport: React.FC = () => {
     });
   };
 
-  // Get available programs for teacher
   const availablePrograms = filters?.programs || [];
 
   if (filtersLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
         <span className="ml-3 text-gray-600">Loading...</span>
       </div>
     );
@@ -110,13 +185,12 @@ const BatchReport: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display">Reports</h2>
         <p className="text-sm text-gray-500 mt-1">Generate batch or individual student progress reports</p>
         
-        {/* Tab Navigation */}
         <div className="flex gap-2 mt-4 border-b border-gray-200">
           <Link
             to="/admin/reports"
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               !isIndividual
-                ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-600'
+                ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-500'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -126,7 +200,7 @@ const BatchReport: React.FC = () => {
             to="/admin/reports/individual"
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               isIndividual
-                ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-600'
+                ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-500'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -136,9 +210,6 @@ const BatchReport: React.FC = () => {
       </div>
 
       {!isIndividual ? (
-        // ==========================================
-        // BATCH REPORT VIEW
-        // ==========================================
         <>
           {/* Filters */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -150,7 +221,7 @@ const BatchReport: React.FC = () => {
                 <select
                   value={selectedProgram}
                   onChange={(e) => setSelectedProgram(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 >
                   <option value="">Select a program</option>
                   {availablePrograms.map((p) => (
@@ -168,7 +239,7 @@ const BatchReport: React.FC = () => {
                 <select
                   value={selectedTeacher}
                   onChange={(e) => setSelectedTeacher(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 >
                   <option value="">All Teachers</option>
                   {filters?.teachers.map((t) => (
@@ -183,7 +254,7 @@ const BatchReport: React.FC = () => {
                 <button
                   onClick={handleGenerateReport}
                   disabled={reportLoading}
-                  className="w-full px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+                  className="w-full px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
                 >
                   {reportLoading ? (
                     <>
@@ -215,7 +286,7 @@ const BatchReport: React.FC = () => {
                 <button
                   onClick={handlePrintReport}
                   disabled={isPrinting}
-                  className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+                  className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
                 >
                   <Printer className="w-4 h-4" />
                   {isPrinting ? 'Preparing...' : 'Print Report'}
@@ -232,49 +303,58 @@ const BatchReport: React.FC = () => {
                 </button>
               </div>
 
-              {/* Report Preview - same as before */}
+              {/* Report Preview */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
-                <div ref={printRef} id="report-print-area" className="p-8 print:p-6">
-                  {/* Report Header */}
-                  <div className="text-center border-b-2 border-gray-200 pb-6 mb-6">
-                    <h1 className="text-3xl font-bold text-gray-900 font-display">Beyond the Syllabus</h1>
-                    <p className="text-gray-500 text-sm">Cambridge English Training Center</p>
-                    <h2 className="text-xl font-semibold text-gray-800 mt-4">Student Progress Report</h2>
-                    <p className="text-gray-600 text-sm mt-1">Batch / Program Report</p>
+                <div ref={printRef} id="report-print-area" className="p-8 print:p-4">
+                  {/* Report Header - With Logos */}
+                  <div className="flex items-center justify-between mb-4 print:mb-3">
+                    <img src={btsLogo} alt="Beyond the Syllabus" className="h-20 w-auto object-contain print:h-14 logo-bts" />
+                    <img src={cambridgeLogo} alt="Cambridge English" className="h-14 w-auto object-contain print:h-10 logo-cambridge" />
                   </div>
 
-                  {/* Report Info */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+                  <div className="text-center border-b-2 border-gray-200 pb-4 mb-4 print:pb-3 print:mb-3 report-header">
+                    <h1 className="text-3xl font-bold font-display tracking-tight print:text-2xl">
+                      <span className="text-[#f1592a]">Beyond</span>
+                      <span className="text-[#0a0f2a]"> the</span>
+                      <span className="text-[#0a0f2a]"> Syllabus</span>
+                    </h1>
+                    <p className="text-gray-500 text-sm print:text-xs">Cambridge English Preparation Center</p>
+                    <div className="flex items-center justify-center gap-2 mt-2 print:mt-1">
+                      <div className="w-12 h-0.5 bg-gradient-to-r from-orange-500 to-blue-600 print:w-10"></div>
+                      <h2 className="text-xl font-bold text-gray-800 print:text-lg">Course Progress Report</h2>
+                      <div className="w-12 h-0.5 bg-gradient-to-r from-blue-600 to-orange-500 print:w-10"></div>
+                    </div>
+                    <p className="text-gray-600 text-sm print:text-xs">Batch / Program Report</p>
+                  </div>
+
+                  {/* Report Info - Removed Teacher */}
+                  <div className="grid grid-cols-3 gap-4 mb-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 print:p-3 print:mb-3 print:gap-3 report-info-grid">
                     <div>
-                      <p className="text-gray-500">Program</p>
-                      <p className="font-semibold text-gray-900">{report.program.displayName?.en || report.program.name}</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Program</p>
+                      <p className="font-semibold text-gray-900 text-sm print:text-xs">{report.program.displayName?.en || report.program.name}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Teacher</p>
-                      <p className="font-semibold text-gray-900">{report.teacher?.fullName || 'N/A'}</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Students</p>
+                      <p className="font-bold text-gray-900 text-sm print:text-xs">{report.totalStudents}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Total Students</p>
-                      <p className="font-semibold text-gray-900">{report.totalStudents}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Generated</p>
-                      <p className="font-semibold text-gray-900">{formatDate(report.generatedDate)}</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Generated</p>
+                      <p className="font-semibold text-gray-900 text-sm print:text-xs">{formatDate(report.generatedDate)}</p>
                     </div>
                   </div>
 
                   {/* Summary Stats */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
-                    <div className="bg-blue-50 rounded-xl p-3 text-center">
-                      <p className="text-2xl font-bold text-blue-600">{report.totalStudents}</p>
-                      <p className="text-xs text-gray-500">Total Students</p>
+                  <div className="grid grid-cols-3 gap-4 mb-4 print:gap-3 print:mb-3">
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.totalStudents}</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Students</p>
                     </div>
-                    <div className="bg-green-50 rounded-xl p-3 text-center">
-                      <p className="text-2xl font-bold text-green-600">{report.totalMockTests}</p>
-                      <p className="text-xs text-gray-500">Total Mock Tests</p>
+                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-2xl font-bold text-emerald-600 print:text-xl">{report.totalMockTests}</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Total Mock Tests</p>
                     </div>
-                    <div className="bg-purple-50 rounded-xl p-3 text-center">
-                      <p className="text-2xl font-bold text-purple-600">
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
+                      <p className="text-2xl font-bold text-orange-500 print:text-xl">
                         {report.totalMockTests > 0 && report.students.length > 0
                           ? Math.round(
                               report.students.reduce((acc, s) => {
@@ -284,74 +364,69 @@ const BatchReport: React.FC = () => {
                             )
                           : 0}%
                       </p>
-                      <p className="text-xs text-gray-500">Avg Completion</p>
+                      <p className="text-xs text-gray-500 font-medium print:text-[10px]">Avg Completion</p>
                     </div>
                   </div>
 
-                  {/* Table - same as before */}
+                  {/* Table - No test numbers */}
                   {report.students.length > 0 && report.totalMockTests > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm border-collapse">
+                    <div className="overflow-x-auto print:overflow-visible table-container">
+                      <table className="w-full text-sm border-collapse print:text-[10px]">
                         <thead>
-                          <tr className="bg-gray-50">
-                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-gray-50 z-10">
+                          <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
                               ID
                             </th>
-                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-16 bg-gray-50 z-10">
+                            <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
                               Student
                             </th>
-                            {report.mockTests.map((mt) => (
-                              <th
-                                key={mt.id}
-                                className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold text-gray-600 min-w-[120px]"
-                                colSpan={(() => {
-                                  let count = 1;
-                                  if (mt.hasReading) count++;
-                                  if (mt.hasWriting) count++;
-                                  if (mt.hasListening) count++;
-                                  if (mt.hasSpeaking) count++;
-                                  if (mt.hasPresentation) count++;
-                                  return count;
-                                })()}
-                              >
-                                <div className="text-xs">{mt.title}</div>
-                                <div className="text-[10px] font-normal text-gray-400">#{mt.testNumber}</div>
-                              </th>
-                            ))}
+                            {report.mockTests.map((mt) => {
+                              const hasSections = mt.hasReading || mt.hasWriting || mt.hasListening || mt.hasSpeaking || mt.hasPresentation;
+                              const sectionCount = [mt.hasReading, mt.hasWriting, mt.hasListening, mt.hasSpeaking, mt.hasPresentation].filter(Boolean).length;
+                              return (
+                                <th
+                                  key={mt.id}
+                                  className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold text-gray-600 min-w-[100px] print:px-1.5 print:py-1 print:text-[10px] print:min-w-[70px]"
+                                  colSpan={hasSections ? sectionCount + 1 : 1}
+                                >
+                                  <div className="text-xs print:text-[10px]">{mt.title}</div>
+                                </th>
+                              );
+                            })}
                           </tr>
                           <tr className="bg-gray-50/70">
-                            <th className="border border-gray-200 px-3 py-1.5 text-xs text-gray-500 sticky left-0 bg-gray-50 z-10"></th>
-                            <th className="border border-gray-200 px-3 py-1.5 text-xs text-gray-500 sticky left-16 bg-gray-50 z-10"></th>
+                            <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-0 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
+                            <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-16 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
                             {report.mockTests.map((mt) => (
                               <React.Fragment key={mt.id}>
-                                <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
-                                  Total
-                                </th>
                                 {mt.hasReading && (
-                                  <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
+                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
                                     R({mt.readingTotal})
                                   </th>
                                 )}
                                 {mt.hasWriting && (
-                                  <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
+                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
                                     W({mt.writingTotal})
                                   </th>
                                 )}
                                 {mt.hasListening && (
-                                  <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
+                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
                                     L({mt.listeningTotal})
                                   </th>
                                 )}
                                 {mt.hasSpeaking && (
-                                  <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
+                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
                                     S
                                   </th>
                                 )}
                                 {mt.hasPresentation && (
-                                  <th className="border border-gray-200 px-1 py-1.5 text-[10px] text-gray-400 text-center font-normal">
+                                  <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">
                                     P({mt.presentationTotal})
                                   </th>
                                 )}
+                                <th className="border border-gray-200 px-2 py-1 text-[10px] font-semibold text-gray-700 text-center bg-orange-50/80 print:px-1.5 print:py-0.5 print:text-[9px]">
+                                  Total
+                                </th>
                               </React.Fragment>
                             ))}
                           </tr>
@@ -361,27 +436,21 @@ const BatchReport: React.FC = () => {
                             const studentResults = student.results || [];
                             return (
                               <tr key={student.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                                <td className="border border-gray-200 px-3 py-2 text-xs font-mono text-gray-600 sticky left-0 bg-inherit z-10">
+                                <td className="border border-gray-200 px-3 py-2 text-xs font-mono text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[9px]">
                                   {student.admissionId}
                                 </td>
-                                <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10">
+                                <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
                                   {student.fullName}
                                 </td>
                                 {report.mockTests.map((mt) => {
                                   const result = studentResults.find(
                                     (r) => r.mockTestId === mt.id
                                   );
+                                  const totalMarks = result?.totalMarks || 0;
                                   return (
                                     <React.Fragment key={mt.id}>
-                                      <td className="border border-gray-200 px-2 py-2 text-center text-sm font-semibold">
-                                        {result && result.totalMarks > 0 ? (
-                                          <span className="text-gray-900">{result.totalMarks}</span>
-                                        ) : (
-                                          <span className="text-gray-300">-</span>
-                                        )}
-                                      </td>
                                       {mt.hasReading && (
-                                        <td className="border border-gray-200 px-2 py-2 text-center text-xs">
+                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
                                           {result && result.reading.total > 0 ? (
                                             <span className="text-gray-700">{result.reading.obtained}</span>
                                           ) : (
@@ -390,7 +459,7 @@ const BatchReport: React.FC = () => {
                                         </td>
                                       )}
                                       {mt.hasWriting && (
-                                        <td className="border border-gray-200 px-2 py-2 text-center text-xs">
+                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
                                           {result && result.writing.total > 0 ? (
                                             <span className="text-gray-700">{result.writing.obtained}</span>
                                           ) : (
@@ -399,7 +468,7 @@ const BatchReport: React.FC = () => {
                                         </td>
                                       )}
                                       {mt.hasListening && (
-                                        <td className="border border-gray-200 px-2 py-2 text-center text-xs">
+                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
                                           {result && result.listening.total > 0 ? (
                                             <span className="text-gray-700">{result.listening.obtained}</span>
                                           ) : (
@@ -408,7 +477,7 @@ const BatchReport: React.FC = () => {
                                         </td>
                                       )}
                                       {mt.hasSpeaking && (
-                                        <td className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold">
+                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs font-semibold print:px-1 print:py-1.5 print:text-[9px]">
                                           {result && result.speaking.grade !== 'F' ? (
                                             <span className="text-gray-700">{result.speaking.grade}</span>
                                           ) : (
@@ -417,7 +486,7 @@ const BatchReport: React.FC = () => {
                                         </td>
                                       )}
                                       {mt.hasPresentation && (
-                                        <td className="border border-gray-200 px-2 py-2 text-center text-xs">
+                                        <td className="border border-gray-200 px-1.5 py-2 text-center text-xs print:px-1 print:py-1.5 print:text-[9px]">
                                           {result && result.presentation.total > 0 ? (
                                             <span className="text-gray-700">{result.presentation.marks}</span>
                                           ) : (
@@ -425,6 +494,9 @@ const BatchReport: React.FC = () => {
                                           )}
                                         </td>
                                       )}
+                                      <td className="border border-gray-200 px-2 py-2 text-center text-sm font-bold text-gray-900 bg-orange-50/50 print:px-1.5 print:py-1.5 print:text-[11px]">
+                                        {totalMarks > 0 ? totalMarks : '-'}
+                                      </td>
                                     </React.Fragment>
                                   );
                                 })}
@@ -435,16 +507,37 @@ const BatchReport: React.FC = () => {
                       </table>
                     </div>
                   ) : (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-8 text-gray-500">
                       <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                       <p>No data available for this report</p>
                     </div>
                   )}
 
+                  {/* Signature Section - Pushed to bottom */}
+                  <div className="mt-6 pt-4 border-t border-gray-200 print:mt-auto print:pt-3 signature-section">
+                    <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto print:gap-6">
+                      <div className="text-center">
+                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-10 signature-line">
+                          {/* Empty - placeholder for signature image */}
+                        </div>
+                        <p className="text-sm font-semibold text-gray-700 print:text-xs">Exam Coordinator</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="h-14 border-b-2 border-gray-400 mb-2 flex items-center justify-center print:h-10 signature-line">
+                          <img 
+                            src={msign} 
+                            alt="Academic Director Signature" 
+                            className="h-12 w-auto object-contain opacity-80 print:h-10 signature-img"
+                          />
+                        </div>
+                        <p className="text-sm font-semibold text-gray-700 print:text-xs">Academic Director</p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Footer */}
-                  <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-400">
-                    <p>Generated on {formatDate(report.generatedDate)}</p>
-                    <p className="mt-0.5">Beyond the Syllabus — Cambridge English Training Center</p>
+                  <div className="mt-4 pt-3 border-t border-gray-200 text-center text-xs text-gray-400 print:mt-2 print:pt-2 footer-text">
+                    <p>Beyond the Syllabus — Cambridge English Preparation Center</p>
                   </div>
                 </div>
               </div>
@@ -460,9 +553,6 @@ const BatchReport: React.FC = () => {
           )}
         </>
       ) : (
-        // ==========================================
-        // INDIVIDUAL REPORT VIEW - (This will be handled by IndividualReport component)
-        // ==========================================
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-yellow-700">
           <p>Individual Report view loaded from the IndividualReport component.</p>
           <p className="text-sm mt-1">The <strong>IndividualReport</strong> component handles this view with student search functionality.</p>

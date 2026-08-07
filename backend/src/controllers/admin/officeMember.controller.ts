@@ -290,6 +290,81 @@ export const restoreOfficeMember = async (req: Request, res: Response): Promise<
   }
 };
 
+
+
+
+
+
+
+// ============================================
+// PERMANENTLY DELETE OFFICE MEMBER
+// ============================================
+export const permanentlyDeleteOfficeMember = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const officeMember = await OfficeMember.findById(id);
+    if (!officeMember) {
+      res.status(404).json({
+        success: false,
+        message: 'Office member not found',
+      });
+      return;
+    }
+
+    // Store info for response
+    const memberInfo = {
+      id: officeMember._id,
+      fullName: officeMember.fullName,
+      employeeId: officeMember.employeeId,
+      email: officeMember.email,
+    };
+
+    // Delete the user account if exists
+    if (officeMember.userId) {
+      await User.findByIdAndDelete(officeMember.userId);
+    }
+
+    // Permanently delete the office member
+    await OfficeMember.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: `Office member "${memberInfo.fullName}" (${memberInfo.employeeId}) permanently deleted`,
+      data: memberInfo,
+    });
+  } catch (error: any) {
+    console.error('Permanently delete office member error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete office member',
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ============================================
 // GET OFFICE MEMBER STATS (Admin Only)
 // ============================================
