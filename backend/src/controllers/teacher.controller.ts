@@ -51,20 +51,70 @@ export const updateTeacherProfile = async (req: Request, res: Response): Promise
 };
 
 // ============================================
-// GET TEACHER'S PROGRAMS
+// GET TEACHER'S PROGRAMS (with counts)
 // ============================================
 export const getTeacherPrograms = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user?.id;
     const teacher = await Teacher.findOne({ userId }).populate('programIds');
+    
     if (!teacher) {
       res.status(404).json({ success: false, message: 'Teacher profile not found' });
       return;
     }
-    res.status(200).json({ success: true, data: teacher.programIds });
+
+    // Get programs with student and mock test counts
+    const programs = teacher.programIds;
+    
+    // If no programs, return empty array
+    if (!programs || programs.length === 0) {
+      res.status(200).json({ success: true, data: [] });
+      return;
+    }
+
+    // For each program, get student count and mock test count
+    const programsWithCounts = await Promise.all(
+      programs.map(async (program: any) => {
+        const programId = program._id || program;
+        
+        // Count active students in this program
+        const studentCount = await Student.countDocuments({
+          programId: programId,
+          isDeleted: false,
+          status: 'active'
+        });
+
+        // Count active mock tests for this program
+        const mockTestCount = await MockTest.countDocuments({
+          programId: programId,
+          isActive: true
+        });
+
+        // Return program with counts
+        return {
+          _id: program._id,
+          name: program.name,
+          displayName: program.displayName,
+          duration: program.duration,
+          description: program.description,
+          fee: program.fee,
+          studentCount,
+          mockTestCount
+        };
+      })
+    );
+
+    res.status(200).json({ 
+      success: true, 
+      data: programsWithCounts 
+    });
   } catch (error: any) {
     console.error('Get teacher programs error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get teacher programs', error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get teacher programs', 
+      error: error.message 
+    });
   }
 };
 
