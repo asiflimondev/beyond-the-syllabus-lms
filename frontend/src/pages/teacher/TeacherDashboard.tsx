@@ -44,7 +44,7 @@ const TeacherDashboard: React.FC = () => {
 
   const stats = [
     { 
-      title: 'My Programs', 
+      title: 'My Programmes', 
       value: programs.length, 
       icon: BookOpen, 
       color: 'from-blue-500 to-blue-600',
@@ -55,7 +55,7 @@ const TeacherDashboard: React.FC = () => {
       value: totalStudents, 
       icon: Users, 
       color: 'from-emerald-500 to-emerald-600',
-      description: 'In your programs'
+      description: 'In your programmes'
     },
     { 
       title: 'Mock Tests', 
@@ -122,7 +122,7 @@ const TeacherDashboard: React.FC = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'My Programs', icon: BookOpen, path: '/teacher/programs', color: 'from-blue-500 to-blue-600' },
+          { label: 'My Programmes', icon: BookOpen, path: '/teacher/programs', color: 'from-blue-500 to-blue-600' },
           { label: 'My Students', icon: Users, path: '/teacher/students', color: 'from-emerald-500 to-emerald-600' },
           { label: 'Mock Tests', icon: FileText, path: '/teacher/mock-tests', color: 'from-purple-500 to-purple-600' },
         ].map((action) => (
@@ -147,7 +147,7 @@ const TeacherDashboard: React.FC = () => {
         <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary-500" />
-            My Assigned Programs
+            My Assigned Programmes
           </h3>
           <Link to="/teacher/programs" className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
             View All

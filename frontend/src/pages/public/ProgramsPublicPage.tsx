@@ -112,7 +112,7 @@ const ProgramsPublicPage: React.FC = () => {
         <div className="relative z-10 container-fluid text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4 backdrop-blur-sm border border-orange-500/10">
             <Sparkles className="w-4 h-4" />
-            Cambridge English Programs
+            Cambridge English Programmes
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4">Our Programmes</h1>
           <p className="text-lg text-white/80 max-w-3xl mx-auto">
@@ -176,7 +176,7 @@ const ProgramsPublicPage: React.FC = () => {
                             <h3 className="text-2xl font-bold text-gray-900 font-display">
                               {program.displayName?.en || program.name}
                             </h3>
-                            <p className="text-sm text-gray-500 mt-1">Program Code: {program.name}</p>
+                            <p className="text-sm text-gray-500 mt-1">Programme Code: {program.name}</p>
                           </div>
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${program.gradient}`}>
                             <Award className="w-3.5 h-3.5" />
@@ -286,7 +286,7 @@ const ProgramsPublicPage: React.FC = () => {
         <div className="relative z-10 container-fluid max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold font-display text-white mb-4">Ready to Start Your Journey?</h2>
           <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
-            Contact us today to learn more about our programs and find the right course for you.
+            Contact us today to learn more about our programmes and find the right course for you.
           </p>
           <Link to="/contact" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-gray-100 hover:-translate-y-0.5 shadow-lg transition-all duration-300">
             Contact Us Now

@@ -170,7 +170,7 @@ const StudentDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <GraduationCap className="w-4 h-4 text-primary-500" />
-              My Program
+              My Programme
             </h3>
             <Link
               to="/student/program"
@@ -191,9 +191,7 @@ const StudentDashboard: React.FC = () => {
                 <p className="text-sm text-gray-600 mt-2 max-w-md">
                   {program.description?.en}
                 </p>
-                <p className="text-sm font-medium text-gray-700 mt-3">
-                  Fee: ৳{program.fee?.toLocaleString()}
-                </p>
+                
               </div>
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
                 <Award className="w-6 h-6 text-white" />

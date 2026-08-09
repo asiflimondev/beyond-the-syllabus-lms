@@ -165,7 +165,7 @@ const BatchReport: React.FC = () => {
 
   const handleGenerateReport = () => {
     if (!selectedProgram) {
-      toast.error('Please select a program');
+      toast.error('Please select a programme');
       return;
     }
     refetch();
@@ -242,7 +242,7 @@ const BatchReport: React.FC = () => {
                   onChange={(e) => setSelectedProgram(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 >
-                  <option value="">Select a program</option>
+                  <option value="">Select a programme</option>
                   {availablePrograms.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.displayName?.en || p.name}
@@ -328,7 +328,7 @@ const BatchReport: React.FC = () => {
                       <img src={btsLogo} alt="BTS Logo" className="h-20 w-auto object-contain print:h-16 logo-bts" />
                       <div>
                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight print:text-2xl brand-name">Beyond the Syllabus</h1>
-                        <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Center</p>
+                        <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Centre</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -342,7 +342,7 @@ const BatchReport: React.FC = () => {
                       Course Progress Report
                       <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-full print:h-0.5"></span>
                     </h2>
-                    <p className="text-base text-gray-500 mt-2 print:text-sm">Batch / Program Report</p>
+                    <p className="text-base text-gray-500 mt-2 print:text-sm"><br></br></p>
                   </div>
 
                   <div className="content-area">
@@ -509,7 +509,7 @@ const BatchReport: React.FC = () => {
                     </p>
                     <div className="mt-3 pt-3 border-t border-gray-100 print:mt-2 print:pt-2">
                       <p className="text-xs text-gray-400 print:text-[10px] footer-address">
-                        Beyond the Syllabus · Cambridge English Preparation Center · Dhaka, Bangladesh
+                        Beyond the Syllabus · Cambridge English Preparation Centre · Dhaka, Bangladesh
                       </p>
                       <p className="text-xs text-gray-400 mt-1 print:text-[10px] print:mt-0.5 footer-address">
                         www.beyondthesyllabus.org
@@ -524,8 +524,8 @@ const BatchReport: React.FC = () => {
           {!selectedProgram && !report && (
             <div className="bg-gray-50 rounded-2xl border border-gray-200 p-16 text-center">
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700">Select a program to generate report</h3>
-              <p className="text-sm text-gray-500 mt-1">Choose a program and click "Generate Report"</p>
+              <h3 className="text-lg font-semibold text-gray-700">Select a programme to generate report</h3>
+              <p className="text-sm text-gray-500 mt-1">Choose a programme and click "Generate Report"</p>
             </div>
           )}
         </>

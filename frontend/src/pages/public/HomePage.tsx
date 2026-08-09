@@ -294,7 +294,7 @@ const HomePage: React.FC = () => {
     {
       tag: 'Our vision',
       title: 'Fluency beyond exams',
-      description: 'To be Bangladesh\'s most trusted Cambridge English center — known for taking learners beyond the syllabus to lasting fluency.'
+      description: 'To be Bangladesh\'s most trusted Cambridge English centre — known for taking learners beyond the syllabus to lasting fluency.'
     },
     {
       tag: 'Our values',
@@ -306,7 +306,7 @@ const HomePage: React.FC = () => {
   const facilities = [
     { icon: BookOpen, title: 'Modern Classrooms', description: 'Smart classrooms with interactive technology' },
     { icon: Users, title: 'Expert Teachers', description: 'Expert experienced instructors' },
-    { icon: Award, title: 'Cambridge Affiliated', description: 'Official Cambridge preparation center' },
+    { icon: Award, title: 'Cambridge Affiliated', description: 'Official Cambridge preparation centre' },
     { icon: Clock, title: 'Flexible Schedule', description: 'Morning, afternoon & evening batches' },
   ];
 
@@ -314,12 +314,12 @@ const HomePage: React.FC = () => {
     { 
       icon: Shield, 
       title: 'Official Cambridge partner', 
-      description: 'An accredited preparation center following the Cambridge curriculum end to end.' 
+      description: 'An accredited preparation centre following the Cambridge curriculum end to end.' 
     },
     { 
       icon: Users, 
-      title: 'Cambridge-certified faculty', 
-      description: 'Experienced teachers who go beyond exam tricks toward genuine fluency.' 
+      title: 'Cambridge-certified courses', 
+      description: 'Comprehensive preparation for Cambridge-certified courses, building students\' core skills step-by-step from foundational English to test readiness.' 
     },
     { 
       icon: Clock, 
@@ -437,7 +437,7 @@ const HomePage: React.FC = () => {
                   <img src={cambridgeLogo} alt="Cambridge English" className="h-[34px] w-auto object-contain" />
                 </div>
                 <p className="text-sm text-white/70 max-w-xs">
-                  <strong className="text-white font-bold">Official Cambridge Assessment English</strong> preparation center in Bangladesh.
+                  <strong className="text-white font-bold">Official Cambridge Assessment English</strong> preparation centre in Bangladesh.
                 </p>
               </div>
             </div>
@@ -460,7 +460,7 @@ const HomePage: React.FC = () => {
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-sh-2 max-w-[240px] flex items-center gap-3">
                 <img src={btsLogo} alt="" className="w-12 h-12 rounded-xl bg-surface p-1.5 object-contain" />
                 <div>
-                  <p className="font-display font-bold text-blue-900 text-sm leading-tight">Cambridge-certified faculty</p>
+                  <p className="font-display font-bold text-blue-900 text-sm leading-tight">Cambridge-certified courses</p>
                   <p className="text-xs text-ink-soft">Smart classrooms in Dhaka</p>
                 </div>
               </div>
@@ -633,8 +633,8 @@ const HomePage: React.FC = () => {
                     <Star className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-blue-900 text-lg">Merit scholarships</h4>
-                    <p className="text-ink-soft text-sm">Outstanding students earn merit-based scholarships, with installment plans for everyone.</p>
+                    <h4 className="font-display font-bold text-blue-900 text-lg">Mock Tests and Practice</h4>
+                    <p className="text-ink-soft text-sm">Build exam confidence with Cambridge preparation materials, full-length practice tests, and detailed score feedback.</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start reveal" style={{ transitionDelay: '160ms' }}>

@@ -15,8 +15,8 @@ const OfficeDashboard: React.FC = () => {
   // ✅ Office Quick Actions - Only what's needed
   const quickActions = [
     {
-      title: 'Manage Programs',
-      description: 'View all programs',
+      title: 'Manage Programmes',
+      description: 'View all programmes',
       icon: BookOpen,
       path: '/admin/programs',
       color: 'from-emerald-500 to-emerald-600'

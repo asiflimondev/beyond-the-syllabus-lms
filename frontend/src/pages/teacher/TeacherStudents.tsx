@@ -52,7 +52,7 @@ const TeacherStudents: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">My Students</h2>
-        <p className="text-sm text-gray-500">Students enrolled in your programs</p>
+        <p className="text-sm text-gray-500">Students enrolled in your programmes</p>
       </div>
 
       {/* Search */}

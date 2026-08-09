@@ -144,11 +144,11 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(({ data }, re
           <div className="mb-6 print:mb-4">
             <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-2 print:text-xs print:mb-1.5">
               <span className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full print:h-4"></span>
-              Program & Payment Details
+              Programme & Payment Details
             </h3>
             <div className="grid grid-cols-2 gap-4 print:gap-2">
               <div className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 print:p-2 print:border-gray-300">
-                <p className="text-xs text-gray-500 font-medium print:text-[10px]">Program Name</p>
+                <p className="text-xs text-gray-500 font-medium print:text-[10px]">Programme Name</p>
                 <p className="font-semibold text-gray-900 text-base mt-0.5 print:text-sm">{data.programName}</p>
               </div>
               <div className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 print:p-2 print:border-gray-300">

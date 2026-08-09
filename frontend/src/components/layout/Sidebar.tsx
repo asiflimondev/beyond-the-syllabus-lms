@@ -72,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     });
 
     if (user?.role === 'admin') {
-      items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programs' });
+      items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programmes' });
       items.push({ path: '/admin/students', icon: Users, label: 'Students' });
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
       items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
@@ -85,13 +85,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
     if (user?.role === 'office') {
       // Office members only see: Dashboard, Programs, Mock Tests, Settings
-      items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programs' });
+      items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programmes' });
       items.push({ path: '/office/mock-tests', icon: FileText, label: 'Mock Tests' });
       items.push({ path: '/office/settings', icon: Settings, label: 'Settings' });
     }
 
     if (user?.role === 'teacher') {
-      items.push({ path: '/teacher/programs', icon: BookOpen, label: 'My Programs' });
+      items.push({ path: '/teacher/programs', icon: BookOpen, label: 'My Programmes' });
       items.push({ path: '/teacher/students', icon: Users, label: 'My Students' });
       items.push({ path: '/teacher/mock-tests', icon: FileText, label: 'Mock Tests' });
       items.push({ path: '/teacher/reports', icon: FileText, label: 'Reports' });

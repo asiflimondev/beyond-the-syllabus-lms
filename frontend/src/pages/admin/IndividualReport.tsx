@@ -407,7 +407,7 @@ const IndividualReport: React.FC = () => {
                   <img src={btsLogo} alt="BTS Logo" className="h-20 w-auto object-contain print:h-16 logo-bts" />
                   <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight print:text-2xl brand-name">Beyond the Syllabus</h1>
-                    <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Center</p>
+                    <p className="text-sm text-gray-500 print:text-xs brand-sub">Cambridge English Preparation Centre</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -573,7 +573,7 @@ const IndividualReport: React.FC = () => {
                 </p>
                 <div className="mt-3 pt-3 border-t border-gray-100 print:mt-2 print:pt-2">
                   <p className="text-xs text-gray-400 print:text-[10px] footer-address">
-                    Beyond the Syllabus · Cambridge English Preparation Center · Dhaka, Bangladesh
+                    Beyond the Syllabus · Cambridge English Preparation Centre · Dhaka, Bangladesh
                   </p>
                   <p className="text-xs text-gray-400 mt-1 print:text-[10px] print:mt-0.5 footer-address">
                     www.beyondthesyllabus.org

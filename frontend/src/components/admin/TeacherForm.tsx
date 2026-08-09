@@ -304,7 +304,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
               <div className="border-t border-gray-200/50 pt-6">
                 <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <span className="w-1 h-5 bg-primary-500 rounded-full" />
-                  Assigned Programs
+                  Assigned Programmes
                 </h4>
                 <div className="space-y-2">
                   {programs.length === 0 ? (

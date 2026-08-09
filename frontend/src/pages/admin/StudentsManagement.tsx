@@ -351,7 +351,7 @@ const StudentsManagement: React.FC = () => {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Admission ID</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Program</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Programme</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Account</th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
@@ -535,13 +535,13 @@ const StudentsManagement: React.FC = () => {
             <p className="text-xs text-gray-400 mt-1">Admission ID cannot be changed</p>
           </div>
           <div>
-            <label className="label font-medium text-gray-700">Program</label>
+            <label className="label font-medium text-gray-700">Programme</label>
             <select
               className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
               value={editFormData.programId || ''}
               onChange={(e) => setEditFormData({ ...editFormData, programId: e.target.value })}
             >
-              <option value="">Select Program</option>
+              <option value="">Select Programme</option>
               {programs.map((p: any) => (
                 <option key={p.id} value={p.id}>
                   {p.displayName?.en || p.name}

@@ -38,7 +38,7 @@ const formSchema = yup.object({
   phone: yup.string().required('Phone number is required').min(11, 'Phone number must be at least 11 digits'),
   parentPhone: yup.string().optional(),
   email: yup.string().email('Please enter a valid email').required('Email is required'),
-  programId: yup.string().required('Please select a program'),
+  programId: yup.string().required('Please select a programme'),
   admissionId: yup
     .string()
     .required('Admission ID is required')
@@ -421,7 +421,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">Admit New Student</h3>
-                  <p className="text-sm text-primary-100">Register a new student for a program</p>
+                  <p className="text-sm text-primary-100">Register a new student for a programme</p>
                 </div>
               </div>
               <button
@@ -817,20 +817,20 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
                       <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
                         <BookOpen className="w-4 h-4 text-primary-600" />
                       </div>
-                      <h4 className="text-sm font-semibold text-gray-700">Program & Admission</h4>
+                      <h4 className="text-sm font-semibold text-gray-700">Programme & Admission</h4>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="programId" className="block text-sm font-medium text-gray-700 mb-1.5">
-                          Program <span className="text-red-500">*</span>
+                          Programme <span className="text-red-500">*</span>
                         </label>
                         <select
                           id="programId"
                           className={`w-full px-4 py-2.5 rounded-xl border ${errors.programId ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'} focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200 outline-none bg-white`}
                           {...register('programId')}
                         >
-                          <option value="">Select a program</option>
+                          <option value="">Select a programme</option>
                           {programs && programs.length > 0 ? (
                             programs.map((program: Program) => (
                               <option key={program.id} value={program.id}>
@@ -838,7 +838,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
                               </option>
                             ))
                           ) : (
-                            <option value="" disabled>No active programs available</option>
+                            <option value="" disabled>No active programmes available</option>
                           )}
                         </select>
                         {errors.programId && (
@@ -850,7 +850,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({ isOpen, onClose, onSucces
                         {programs && programs.length === 0 && !programsLoading && (
                           <p className="mt-1.5 text-sm text-amber-600 flex items-center gap-1.5">
                             <AlertCircle className="w-3.5 h-3.5" />
-                            No active programs found. Please create a program first.
+                            No active programmes found. Please create a programme first.
                           </p>
                         )}
                       </div>

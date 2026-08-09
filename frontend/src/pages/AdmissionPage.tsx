@@ -201,7 +201,7 @@ const AdmissionPage: React.FC = () => {
                     Student Name
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Program
+                    Programme
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Status

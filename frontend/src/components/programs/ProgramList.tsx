@@ -119,7 +119,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search programs..."
+              placeholder="Search programmes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
@@ -136,7 +136,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
               <span>Show deleted</span>
             </label>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-              {total} programs
+              {total} programmes
             </span>
           </div>
         </div>
@@ -146,7 +146,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
       {isLoading && (
         <div className="flex items-center justify-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-          <span className="ml-3 text-gray-600">Loading programs...</span>
+          <span className="ml-3 text-gray-600">Loading programmes...</span>
         </div>
       )}
 
@@ -168,7 +168,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
                     <thead>
                       <tr className="bg-gradient-to-r from-gray-50/80 to-gray-50/40">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                          Program Code
+                          Programme Code
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                           Display Name
@@ -253,7 +253,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="text-sm text-gray-500">
                   Showing <span className="font-medium text-gray-700">{programs.length}</span> of{' '}
-                  <span className="font-medium text-gray-700">{total}</span> programs
+                  <span className="font-medium text-gray-700">{total}</span> programmes
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
@@ -282,7 +282,7 @@ const ProgramList: React.FC<ProgramListProps> = ({ onEdit }) => {
               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-gray-500 font-medium">No programs found</p>
+              <p className="text-gray-500 font-medium">No programmes found</p>
               <p className="text-sm text-gray-400 mt-1">
                 {search ? 'Try adjusting your search' : 'Get started by creating your first program'}
               </p>

@@ -352,13 +352,13 @@ const AdminMockTests: React.FC = () => {
             <div className="p-6 space-y-6">
               {/* Select Program */}
               <div>
-                <label className="label font-medium text-gray-700">Select Program *</label>
+                <label className="label font-medium text-gray-700">Select Programme *</label>
                 <select 
                   value={selectedProgramId} 
                   onChange={(e) => setSelectedProgramId(e.target.value)} 
                   className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
                 >
-                  <option value="">Select a program</option>
+                  <option value="">Select a programme</option>
                   {programs.map((program: any) => (
                     <option key={program.id} value={program.id}>
                       {program.displayName?.en || program.name}

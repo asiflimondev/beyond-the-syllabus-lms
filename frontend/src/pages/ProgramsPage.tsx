@@ -73,11 +73,11 @@ const ProgramsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <BookOpen className="w-5 h-5 text-primary-500" />
-            <span className="text-sm font-medium text-primary-600">Programs</span>
+            <span className="text-sm font-medium text-primary-600">Programmes</span>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display">Manage Programs</h2>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight font-display">Manage Programmes</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Create, edit, and manage all your Cambridge English programs
+            Create, edit, and manage all your Cambridge English programmes
           </p>
         </div>
         {/* Only ONE New Program button */}
@@ -86,7 +86,7 @@ const ProgramsPage: React.FC = () => {
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
           <Sparkles className="w-5 h-5" />
-          <span>New Program</span>
+          <span>New Programme</span>
         </button>
       </div>
 

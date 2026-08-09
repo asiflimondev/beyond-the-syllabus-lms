@@ -70,10 +70,10 @@ const ProgramForm: React.FC<ProgramFormProps> = ({ isOpen, onClose, onSubmit, pr
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white">
-                  {program ? 'Edit Program' : 'Create New Program'}
+                  {program ? 'Edit Programme' : 'Create New Programme'}
                 </h3>
                 <p className="text-sm text-primary-100">
-                  {program ? 'Update program details' : 'Add a new program to the system'}
+                  {program ? 'Update programme details' : 'Add a new programme to the system'}
                 </p>
               </div>
             </div>
@@ -91,11 +91,11 @@ const ProgramForm: React.FC<ProgramFormProps> = ({ isOpen, onClose, onSubmit, pr
             <div>
               <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="w-1 h-5 bg-primary-500 rounded-full" />
-                Program Information
+                Programme Information
               </h4>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="label">Program Code *</label>
+                  <label className="label">Programme Code *</label>
                   <input
                     type="text"
                     placeholder="e.g., KET, PET, FCE"
@@ -150,7 +150,7 @@ const ProgramForm: React.FC<ProgramFormProps> = ({ isOpen, onClose, onSubmit, pr
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    {program ? 'Update Program' : 'Create Program'}
+                    {program ? 'Update Programme' : 'Create Programme'}
                   </>
                 )}
               </button>

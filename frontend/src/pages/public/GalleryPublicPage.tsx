@@ -132,7 +132,7 @@ const GalleryPublicPage: React.FC = () => {
     { value: 'all', label: 'All Photos', icon: <ImageIcon className="w-4 h-4" /> },
     { value: 'classroom', label: 'Classroom', icon: <BookOpen className="w-4 h-4" /> },
     { value: 'events', label: 'Events', icon: <Calendar className="w-4 h-4" /> },
-    { value: 'programs', label: 'Programs', icon: <Sparkles className="w-4 h-4" /> },
+    { value: 'programs', label: 'Programmes', icon: <Sparkles className="w-4 h-4" /> },
     { value: 'facility', label: 'Facility', icon: <Users className="w-4 h-4" /> },
   ];
 
@@ -358,7 +358,7 @@ const GalleryPublicPage: React.FC = () => {
           <div className="absolute -top-20 -right-20 w-[420px] h-[420px] rounded-full bg-white/20 blur-3xl" />
         </div>
         <div className="relative z-10 container-fluid max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold font-display text-white mb-4">Visit Our Center</h2>
+          <h2 className="text-3xl md:text-4xl font-bold font-display text-white mb-4">Visit Our Centre</h2>
           <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
             See our facilities and meet our team in person. Contact us to schedule a visit.
           </p>
@@ -368,7 +368,7 @@ const GalleryPublicPage: React.FC = () => {
               <ChevronRightIcon className="w-4 h-4" />
             </Link>
             <Link to="/programs" className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/60 text-white font-bold rounded-full hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300">
-              Our Programs
+              Our Programmes
             </Link>
           </div>
         </div>

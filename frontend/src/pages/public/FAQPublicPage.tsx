@@ -119,7 +119,7 @@ const FAQPublicPage: React.FC = () => {
     { id: 'all', label: 'All', icon: HelpCircle },
     { id: 'general', label: 'General', icon: BookOpen },
     { id: 'admission', label: 'Admission', icon: Users },
-    { id: 'programs', label: 'Programs', icon: GraduationCap },
+    { id: 'programs', label: 'Programmes', icon: GraduationCap },
     { id: 'exam', label: 'Exam', icon: Award },
     { id: 'fees', label: 'Fees', icon: DollarSign },
   ];
@@ -161,7 +161,7 @@ const FAQPublicPage: React.FC = () => {
     const labels: Record<string, string> = {
       general: 'General',
       admission: 'Admission',
-      programs: 'Programs',
+      programs: 'Programmes',
       exam: 'Exam',
       fees: 'Fees',
     };

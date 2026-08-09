@@ -192,7 +192,7 @@ const TeacherManagement: React.FC = () => {
             <span className="text-sm font-medium text-primary-600">Teachers</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 font-display">Teacher Management</h2>
-          <p className="text-sm text-gray-500 mt-0.5">Manage teachers and their program assignments</p>
+          <p className="text-sm text-gray-500 mt-0.5">Manage teachers and their programme assignments</p>
         </div>
         <button
           onClick={() => {
@@ -281,7 +281,7 @@ const TeacherManagement: React.FC = () => {
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Programs</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Programmes</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
@@ -293,7 +293,7 @@ const TeacherManagement: React.FC = () => {
                           <td className="px-4 py-3 text-sm text-gray-700">{teacher.fullName}</td>
                           <td className="px-4 py-3 text-sm text-gray-600">{teacher.email}</td>
                           <td className="px-4 py-3 text-sm text-gray-600">{teacher.phone}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{teacher.programIds?.length || 0} programs</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{teacher.programIds?.length || 0} programmes</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                               !teacher.isDeleted && teacher.userId?.isActive !== false

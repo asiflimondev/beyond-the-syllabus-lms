@@ -83,7 +83,7 @@ const DashboardPage: React.FC = () => {
       gradient: 'from-blue-500/10 to-blue-600/10'
     },
     { 
-      title: 'Active Programs', 
+      title: 'Active Programmes', 
       value: activePrograms, 
       change: '+0%', 
       icon: BookOpen, 
@@ -116,7 +116,7 @@ const DashboardPage: React.FC = () => {
 
   const quickActions = [
     { title: 'Admit Student', icon: UserPlus, path: '/admin/admission', color: 'from-primary-500 to-primary-600' },
-    { title: 'Create Program', icon: BookOpen, path: '/admin/programs', color: 'from-emerald-500 to-emerald-600' },
+    { title: 'Create Programme', icon: BookOpen, path: '/admin/programs', color: 'from-emerald-500 to-emerald-600' },
     { title: 'Add Teacher', icon: Users, path: '/admin/teachers', color: 'from-purple-500 to-purple-600' },
     { title: 'View Reports', icon: BarChart3, path: '/admin/reports', color: 'from-orange-500 to-orange-600' },
   ];
@@ -301,7 +301,7 @@ const DashboardPage: React.FC = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white/80 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-4 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Programs</p>
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Programmes</p>
           {isLoading ? (
             <div className="h-7 w-12 mx-auto bg-gray-200 rounded-lg animate-pulse mt-1" />
           ) : (

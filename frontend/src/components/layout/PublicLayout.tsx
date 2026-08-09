@@ -239,7 +239,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             </div>
 
             <div>
-              <h5 className="font-display text-white text-sm font-bold tracking-widest uppercase mb-4">Programs</h5>
+              <h5 className="font-display text-white text-sm font-bold tracking-widest uppercase mb-4">Programmes</h5>
               <ul className="space-y-2 text-sm">
                 <li><Link to="/programs" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Movers · A1</Link></li>
                 <li><Link to="/programs" className="hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">KET · A2</Link></li>
