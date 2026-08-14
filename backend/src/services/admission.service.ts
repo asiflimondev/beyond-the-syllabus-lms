@@ -4,6 +4,7 @@ import { Program } from '../models/Program.model.js';
 import { User } from '../models/User.model.js';
 import { IStudent } from '../types/index.js';
 import { generateReceipt } from './receipt.service.js';
+import { sendEmail, generateWelcomeEmail } from '../utils/email.js';
 
 // ============================================
 // ADMISSION SETTINGS TYPE
@@ -165,6 +166,35 @@ export const admitStudent = async (data: {
       updatedBy: data.createdBy,
       isDeleted: false,
     });
+
+    // ============================================
+    // SEND WELCOME EMAIL (Non-blocking)
+    // ============================================
+    if (student.email) {
+      try {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://beyondthesyllabus.org';
+        const programName = program.displayName?.en || program.name || 'N/A';
+        
+        const emailHtml = generateWelcomeEmail(
+          student.fullName,
+          student.admissionId,
+          programName,
+          frontendUrl
+        );
+        
+        // Send email asynchronously - don't await to avoid blocking
+        sendEmail({
+          to: student.email,
+          subject: '🎓 Welcome to Beyond the Syllabus!',
+          html: emailHtml,
+        }).catch((err) => {
+          console.error('⚠️ Welcome email failed (non-blocking):', err.message);
+        });
+      } catch (emailError) {
+        // Log but don't fail the admission
+        console.error('⚠️ Failed to send welcome email:', emailError);
+      }
+    }
 
     // Generate receipt
     const receipt = await generateReceipt({

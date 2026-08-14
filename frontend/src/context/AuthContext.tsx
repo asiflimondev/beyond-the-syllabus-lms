@@ -118,7 +118,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, confirmPassword: string, role: string = 'student'): Promise<void> => {
     try {
-      const response = await authApi.register({ email, password, confirmPassword, role });
+      // ✅ Send all fields including confirmPassword
+      // The backend will validate password match
+      const response = await authApi.register({ 
+        email, 
+        password, 
+        confirmPassword, 
+        role 
+      });
       
       if (response.data.success && response.data.data) {
         const { accessToken, refreshToken, user: userData } = response.data.data;

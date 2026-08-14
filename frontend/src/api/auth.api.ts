@@ -8,7 +8,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string; // <--- ADD THIS
   role?: string;
 }
 
@@ -24,26 +24,45 @@ export interface AuthResponse {
       role: string;
       isActive: boolean;
       lastLogin?: string;
-      profile?: any;
-      fullName?: string;  // <--- ADD THIS
-      phone?: string;     // <--- ADD THIS
+      fullName: string;
+      phone: string;
+      profile: any;
     };
   };
 }
 
 export const authApi = {
-  login: (data: LoginRequest) => 
+  // ============================================
+  // AUTHENTICATION
+  // ============================================
+  login: (data: LoginRequest) =>
     apiClient.post<AuthResponse>('/auth/login', data),
-  
-  register: (data: RegisterRequest) => 
+
+  register: (data: RegisterRequest) =>
     apiClient.post<AuthResponse>('/auth/register', data),
-  
-  refreshToken: (refreshToken: string) => 
+
+  refreshToken: (refreshToken: string) =>
     apiClient.post<AuthResponse>('/auth/refresh-token', { refreshToken }),
-  
-  logout: () => 
+
+  logout: () =>
     apiClient.post('/auth/logout'),
-  
-  getCurrentUser: () => 
+
+  getCurrentUser: () =>
     apiClient.get('/auth/me'),
+
+  // ============================================
+  // PASSWORD RESET
+  // ============================================
+  forgotPassword: (identifier: string) =>
+    apiClient.post<{ success: boolean; message: string }>('/auth/forgot-password', { identifier }),
+
+  resetPassword: (token: string, newPassword: string, confirmPassword: string) =>
+    apiClient.post<{ success: boolean; message: string }>('/auth/reset-password', { 
+      token, 
+      newPassword, 
+      confirmPassword 
+    }),
+
+  verifyResetToken: (token: string) =>
+    apiClient.get<{ success: boolean; message: string }>(`/auth/verify-reset-token/${token}`),
 };

@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import crypto from 'crypto';
 import { User } from '../models/index.js';
 import { Student } from '../models/Student.model.js';
 import { Teacher } from '../models/Teacher.model.js';
 import { OfficeMember } from '../models/OfficeMember.model.js';
+import { PasswordResetToken } from '../models/PasswordResetToken.model.js';
 import { generateTokens, verifyRefreshToken } from '../utils/jwt.utils.js';
+import { sendEmail, generateResetEmail } from '../utils/email.js';
 
 // ============================================
 // HELPER: Find user by email or phone
@@ -463,6 +466,251 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
     res.status(500).json({
       success: false,
       message: 'Failed to get user data',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// FORGOT PASSWORD
+// ============================================
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { identifier } = req.body; // email or phone
+
+    if (!identifier) {
+      res.status(400).json({
+        success: false,
+        message: 'Email or phone is required',
+      });
+      return;
+    }
+
+    // Find user by email or phone
+    let user = await User.findOne({ email: identifier }).select('+password');
+    
+    if (!user) {
+      // Try by phone in Student model
+      const student = await Student.findOne({ phone: identifier });
+      if (student && student.userId) {
+        user = await User.findById(student.userId).select('+password');
+      }
+    }
+
+    if (!user) {
+      // Try by phone in Teacher model
+      const teacher = await Teacher.findOne({ phone: identifier });
+      if (teacher && teacher.userId) {
+        user = await User.findById(teacher.userId).select('+password');
+      }
+    }
+
+    if (!user) {
+      // Try by phone in OfficeMember model
+      const officeMember = await OfficeMember.findOne({ phone: identifier });
+      if (officeMember && officeMember.userId) {
+        user = await User.findById(officeMember.userId).select('+password');
+      }
+    }
+
+    // Don't reveal if user exists - security best practice
+    if (!user) {
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists, a password reset link has been sent.',
+      });
+      return;
+    }
+
+    // Check if user has an email
+    if (!user.email) {
+      res.status(400).json({
+        success: false,
+        message: 'No email associated with this account. Please contact the center for assistance.',
+      });
+      return;
+    }
+
+    // Generate secure token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+    // Delete any existing tokens for this user
+    await PasswordResetToken.deleteMany({ userId: user._id });
+
+    // Save new token
+    await PasswordResetToken.create({
+      userId: user._id,
+      token,
+      expiresAt,
+    });
+
+    // Build reset link
+    const frontendUrl = process.env.FRONTEND_URL || 'https://beyondthesyllabus.org';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+    // Get user's full name
+    let fullName = user.fullName || 'Student';
+    
+    // Try to get from profile if not in User
+    if (!user.fullName) {
+      const student = await Student.findOne({ userId: user._id });
+      if (student) fullName = student.fullName;
+    }
+
+    // Send email
+    try {
+      const emailHtml = generateResetEmail(fullName, resetLink, frontendUrl);
+      await sendEmail({
+        to: user.email,
+        subject: '🔐 Reset Your Password - Beyond the Syllabus',
+        html: emailHtml,
+      });
+    } catch (emailError) {
+      console.error('Failed to send reset email:', emailError);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send reset email. Please try again later.',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'If an account exists, a password reset link has been sent.',
+    });
+  } catch (error: any) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process password reset request',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// RESET PASSWORD
+// ============================================
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { token, newPassword, confirmPassword } = req.body;
+
+    if (!token || !newPassword) {
+      res.status(400).json({
+        success: false,
+        message: 'Token and new password are required',
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      res.status(400).json({
+        success: false,
+        message: 'Passwords do not match',
+      });
+      return;
+    }
+
+    // Find valid token
+    const resetToken = await PasswordResetToken.findOne({
+      token,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!resetToken) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token. Please request a new one.',
+      });
+      return;
+    }
+
+    // Update user password
+    const user = await User.findById(resetToken.userId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+      return;
+    }
+
+    // Hash password (will be handled by pre-save hook)
+    user.password = newPassword;
+    await user.save();
+
+    // Mark token as used
+    resetToken.used = true;
+    await resetToken.save();
+
+    // Delete all other tokens for this user
+    await PasswordResetToken.deleteMany({
+      userId: user._id,
+      _id: { $ne: resetToken._id },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully. You can now login with your new password.',
+    });
+  } catch (error: any) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset password',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// VERIFY RESET TOKEN
+// ============================================
+export const verifyResetToken = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      res.status(400).json({
+        success: false,
+        message: 'Token is required',
+      });
+      return;
+    }
+
+    const resetToken = await PasswordResetToken.findOne({
+      token,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!resetToken) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token is valid',
+    });
+  } catch (error: any) {
+    console.error('Verify token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify token',
       error: error.message,
     });
   }

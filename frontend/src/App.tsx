@@ -17,6 +17,8 @@ import ContactPage from '@pages/public/ContactPage';
 import LoginPage from '@pages/LoginPage';
 import RegisterPage from '@pages/RegisterPage';
 import StudentRegisterPage from '@pages/StudentRegisterPage';
+import ForgotPasswordPage from '@pages/ForgotPasswordPage';  // <--- NEW
+import ResetPasswordPage from '@pages/ResetPasswordPage';    // <--- NEW
 
 // Protected Pages (Admin)
 import DashboardPage from '@pages/DashboardPage';
@@ -39,7 +41,7 @@ import TeacherMarkEntry from '@pages/teacher/TeacherMarkEntry';
 // Protected Pages (Student)
 import StudentDashboard from '@pages/student/StudentDashboard';
 import MockTestsPage from '@pages/student/MockTestsPage';
-import MockTestDetail from '@pages/student/MockTestDetail';  // <--- ADD THIS IMPORT
+import MockTestDetail from '@pages/student/MockTestDetail';
 import StudentProfile from '@pages/student/StudentProfile';
 
 // Protected Pages (Office)
@@ -125,6 +127,10 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/student-register" element={<StudentRegisterPage />} />
 
+            {/* Password Reset Routes - NEW */}
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
             {/* Protected Routes - Admin */}
             <Route path="/admin" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
@@ -155,7 +161,7 @@ function App() {
             <Route path="/student" element={<ProtectedRoute><Navigate to="/student/dashboard" /></ProtectedRoute>} />
             <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/mock-tests" element={<ProtectedRoute><MockTestsPage /></ProtectedRoute>} />
-            <Route path="/student/mock-tests/:id" element={<ProtectedRoute><MockTestDetail /></ProtectedRoute>} />  {/* <--- UPDATED ROUTE */}
+            <Route path="/student/mock-tests/:id" element={<ProtectedRoute><MockTestDetail /></ProtectedRoute>} />
             <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
 
             {/* Protected Routes - Office */}

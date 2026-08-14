@@ -125,7 +125,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                     shadow-sh-orange hover:shadow-sh-orange-lg
                   `}
                 >
-                  Login
+                  Join Now
                 </Link>
 
                 {/* Mobile Menu Button */}
