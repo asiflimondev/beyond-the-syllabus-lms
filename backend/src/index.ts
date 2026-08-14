@@ -29,7 +29,7 @@ import adminActivityRoutes from './routes/admin/activity.routes.js'; // NEW
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
 
-const app: Express = express();
+const app: Express = express(); 
 
 // ============================================
 // BODY PARSER - CRITICAL!
