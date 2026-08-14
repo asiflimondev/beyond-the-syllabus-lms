@@ -7,7 +7,11 @@ import { Teacher } from '../models/Teacher.model.js';
 import { OfficeMember } from '../models/OfficeMember.model.js';
 import { PasswordResetToken } from '../models/PasswordResetToken.model.js';
 import { generateTokens, verifyRefreshToken } from '../utils/jwt.utils.js';
-import { sendEmail, generateResetEmail } from '../utils/email.js';
+import { 
+  sendEmail, 
+  generateResetEmail, 
+  generateResetEmailText 
+} from '../utils/email.js';
 
 // ============================================
 // HELPER: Find user by email or phone
@@ -561,9 +565,12 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     // Send email
     try {
       const emailHtml = generateResetEmail(fullName, resetLink, frontendUrl);
+      const emailText = generateResetEmailText(fullName, resetLink);
+      
       await sendEmail({
         to: user.email,
         subject: '🔐 Reset Your Password - Beyond the Syllabus',
+        text: emailText,
         html: emailHtml,
       });
     } catch (emailError) {

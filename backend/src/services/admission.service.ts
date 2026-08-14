@@ -4,7 +4,11 @@ import { Program } from '../models/Program.model.js';
 import { User } from '../models/User.model.js';
 import { IStudent } from '../types/index.js';
 import { generateReceipt } from './receipt.service.js';
-import { sendEmail, generateWelcomeEmail } from '../utils/email.js';
+import { 
+  sendEmail, 
+  generateWelcomeEmail, 
+  generateWelcomeEmailText 
+} from '../utils/email.js';
 
 // ============================================
 // ADMISSION SETTINGS TYPE
@@ -182,10 +186,18 @@ export const admitStudent = async (data: {
           frontendUrl
         );
         
+        const emailText = generateWelcomeEmailText(
+          student.fullName,
+          student.admissionId,
+          programName,
+          frontendUrl
+        );
+        
         // Send email asynchronously - don't await to avoid blocking
         sendEmail({
           to: student.email,
           subject: '🎓 Welcome to Beyond the Syllabus!',
+          text: emailText,
           html: emailHtml,
         }).catch((err) => {
           console.error('⚠️ Welcome email failed (non-blocking):', err.message);

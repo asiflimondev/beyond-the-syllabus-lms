@@ -12,8 +12,9 @@ interface EmailOptions {
 const createTransporter = (): Transporter => {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.hostinger.com',
-    port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: true, // true for 465, false for other ports
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false, // false for port 587 (STARTTLS)
+    requireTLS: true,
     auth: {
       user: process.env.SMTP_USER || 'info@beyondthesyllabus.org',
       pass: process.env.SMTP_PASSWORD,
@@ -21,17 +22,24 @@ const createTransporter = (): Transporter => {
     tls: {
       rejectUnauthorized: false,
     },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
   });
 };
 
 // Send email
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
+    console.log(`📧 Attempting to send email to: ${options.to}`);
+    console.log(`📧 Subject: ${options.subject}`);
+    console.log(`📧 SMTP Host: ${process.env.SMTP_HOST}`);
+    console.log(`📧 SMTP Port: ${process.env.SMTP_PORT}`);
+
     const transporter = createTransporter();
     const from = process.env.EMAIL_FROM || 'info@beyondthesyllabus.org';
     const fromName = 'Beyond the Syllabus';
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"${fromName}" <${from}>`,
       to: options.to,
       subject: options.subject,
@@ -39,14 +47,51 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
       html: options.html,
     });
 
-    console.log(`📧 Email sent to ${options.to}`);
+    console.log(`✅ Email sent successfully to ${options.to}`);
+    console.log(`✅ Message ID: ${info.messageId}`);
+    console.log(`✅ Response: ${info.response}`);
   } catch (error) {
     console.error('❌ Failed to send email:', error);
     throw error;
   }
 };
 
-// Generate welcome email HTML
+// ============================================
+// WELCOME EMAIL TEMPLATES
+// ============================================
+
+// Plain text version of welcome email
+export const generateWelcomeEmailText = (
+  fullName: string,
+  admissionId: string,
+  programName: string,
+  frontendUrl: string
+): string => {
+  return `
+Dear ${fullName},
+
+Welcome to Beyond the Syllabus — your trusted Cambridge English Preparation Centre!
+
+Your admission has been successfully processed.
+
+Admission ID: ${admissionId}
+Program: ${programName}
+
+Login to your portal: ${frontendUrl}/login
+
+How to Login:
+1. Visit: ${frontendUrl}/login
+2. Enter your registered email address
+3. Use the password you created during registration
+4. If you haven't set a password yet, please use the "Forgot Password" option on the login page
+
+Need help? Contact us at info@beyondthesyllabus.org
+
+© ${new Date().getFullYear()} Beyond the Syllabus. All rights reserved.
+  `;
+};
+
+// HTML version of welcome email
 export const generateWelcomeEmail = (
   fullName: string,
   admissionId: string,
@@ -135,30 +180,6 @@ export const generateWelcomeEmail = (
       border-radius: 6px;
       display: inline-block;
     }
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin: 16px 0;
-    }
-    .info-item {
-      background: #f7fafc;
-      border-radius: 8px;
-      padding: 12px 16px;
-    }
-    .info-item .label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #718096;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .info-item .value {
-      font-size: 15px;
-      font-weight: 500;
-      color: #1a365d;
-      margin-top: 2px;
-    }
     .button {
       display: inline-block;
       background: linear-gradient(135deg, #1a365d 0%, #0d9488 100%);
@@ -218,7 +239,6 @@ export const generateWelcomeEmail = (
     @media (max-width: 480px) {
       .content { padding: 24px; }
       .header { padding: 24px; }
-      .info-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -292,7 +312,34 @@ export const generateWelcomeEmail = (
   `;
 };
 
-// Generate password reset email HTML
+// ============================================
+// PASSWORD RESET EMAIL TEMPLATES
+// ============================================
+
+// Plain text version of reset email
+export const generateResetEmailText = (
+  fullName: string,
+  resetLink: string
+): string => {
+  return `
+Hello ${fullName},
+
+We received a request to reset the password for your Beyond the Syllabus account.
+
+Click the link below to reset your password:
+${resetLink}
+
+This link will expire in 1 hour and can only be used once.
+
+If you didn't request this, please ignore this email.
+
+Need help? Contact us at info@beyondthesyllabus.org
+
+© ${new Date().getFullYear()} Beyond the Syllabus. All rights reserved.
+  `;
+};
+
+// HTML version of reset email
 export const generateResetEmail = (
   fullName: string,
   resetLink: string,
