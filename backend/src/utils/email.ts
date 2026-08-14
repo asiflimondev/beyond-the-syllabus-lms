@@ -27,17 +27,19 @@ const createTransporter = (): Transporter => {
   });
 };
 
-// Send email
+// Send email using SMTP
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
     console.log(`📧 Attempting to send email to: ${options.to}`);
     console.log(`📧 Subject: ${options.subject}`);
-    console.log(`📧 SMTP Host: ${process.env.SMTP_HOST}`);
-    console.log(`📧 SMTP Port: ${process.env.SMTP_PORT}`);
+    console.log(`📧 Using SMTP (port ${process.env.SMTP_PORT || '587'})`);
 
     const transporter = createTransporter();
     const from = process.env.EMAIL_FROM || 'info@beyondthesyllabus.org';
     const fromName = 'Beyond the Syllabus';
+
+    // BCC the sender to see a copy
+    const bcc = process.env.SMTP_USER || 'info@beyondthesyllabus.org';
 
     const info = await transporter.sendMail({
       from: `"${fromName}" <${from}>`,
@@ -45,11 +47,13 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
       subject: options.subject,
       text: options.text || '',
       html: options.html,
+      bcc: bcc,
     });
 
     console.log(`✅ Email sent successfully to ${options.to}`);
     console.log(`✅ Message ID: ${info.messageId}`);
     console.log(`✅ Response: ${info.response}`);
+    console.log(`📬 BCC copy sent to: ${bcc}`);
   } catch (error) {
     console.error('❌ Failed to send email:', error);
     throw error;
