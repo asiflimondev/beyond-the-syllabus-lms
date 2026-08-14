@@ -132,7 +132,7 @@ export const getStudentProgram = async (req: Request, res: Response): Promise<vo
 };
 
 // ============================================
-// GET STUDENT'S MOCK TESTS WITH RESULTS
+// GET STUDENT'S MOCK TESTS WITH RESULTS (ALL PROGRAMS)
 // ============================================
 export const getStudentMockTests = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -147,32 +147,79 @@ export const getStudentMockTests = async (req: Request, res: Response): Promise<
       return;
     }
 
-    // Get all mock tests for the student's program
-    const mockTests = await MockTest.find({
+    // Get ALL results for this student (from all programs)
+    const allResults = await Result.find({
+      studentId: student._id,
+      isDeleted: false,
+    })
+      .populate({
+        path: 'mockTestId',
+        populate: {
+          path: 'programId',
+          select: 'name displayName',
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    // Group results by program
+    const resultsByProgram = allResults.reduce((acc: any, result: any) => {
+      const program = result.mockTestId?.programId;
+      const programId = program?._id?.toString() || 'unknown';
+      
+      if (!acc[programId]) {
+        acc[programId] = {
+          programName: program?.displayName?.en || program?.name || 'Unknown Program',
+          programId: program?._id,
+          results: [],
+        };
+      }
+      
+      // Get the mock test details
+      const mockTest = result.mockTestId;
+      acc[programId].results.push({
+        resultId: result._id,
+        mockTestId: mockTest?._id,
+        title: mockTest?.title || `Mock Test ${mockTest?.testNumber || ''}`,
+        testNumber: mockTest?.testNumber,
+        testDate: mockTest?.testDate,
+        reading: result.reading,
+        writing: result.writing,
+        listening: result.listening,
+        speaking: result.speaking,
+        presentation: result.presentation,
+        totalMarks: result.totalMarks,
+        percentage: result.percentage,
+        grade: result.grade,
+        createdAt: result.createdAt,
+      });
+      
+      return acc;
+    }, {});
+
+    // Convert to array and sort by program order
+    const programsWithResults = Object.values(resultsByProgram);
+
+    // Also get current program mock tests that don't have results yet
+    const currentProgramMockTests = await MockTest.find({
       programId: student.programId,
       isActive: true,
     }).sort({ testNumber: 1 });
 
-    // Get results for each mock test
-    const mockTestsWithResults = await Promise.all(
-      mockTests.map(async (mockTest) => {
-        const result = await Result.findOne({
-          studentId: student._id,
-          mockTestId: mockTest._id,
-          isDeleted: false,
-        });
+    // Get IDs of mock tests that already have results
+    const resultMockTestIds = allResults.map((r: any) => r.mockTestId?._id?.toString());
 
-        return {
-          ...mockTest.toObject(),
-          result: result || null,
-          hasResult: !!result,
-        };
-      })
+    // Filter out mock tests that already have results
+    const pendingMockTests = currentProgramMockTests.filter(
+      (test: any) => !resultMockTestIds.includes(test._id.toString())
     );
 
     res.status(200).json({
       success: true,
-      data: mockTestsWithResults,
+      data: {
+        programs: programsWithResults,
+        currentProgram: student.programId,
+        pendingTests: pendingMockTests,
+      },
     });
   } catch (error: any) {
     console.error('Get student mock tests error:', error);
@@ -201,9 +248,10 @@ export const getStudentResult = async (req: Request, res: Response): Promise<voi
       return;
     }
 
+    // First, find the result for this mock test
     const result = await Result.findOne({
       studentId: student._id,
-      mockTestId,
+      mockTestId: mockTestId, // This is the mock test ID
       isDeleted: false,
     }).populate('mockTestId', 'title testNumber testDate');
 
@@ -230,7 +278,7 @@ export const getStudentResult = async (req: Request, res: Response): Promise<voi
 };
 
 // ============================================
-// GET STUDENT STATISTICS
+// GET STUDENT STATISTICS (UPDATED)
 // ============================================
 export const getStudentStats = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -245,46 +293,69 @@ export const getStudentStats = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    // Get total mock tests
-    const totalMockTests = await MockTest.countDocuments({
+    // Get ALL results for this student (from all programs)
+    const allResults = await Result.find({
+      studentId: student._id,
+      isDeleted: false,
+    });
+
+    // Get current program mock tests (for pending count)
+    const currentProgramMockTests = await MockTest.countDocuments({
       programId: student.programId,
       isActive: true,
     });
 
-    // Get completed mock tests
-    const completedResults = await Result.countDocuments({
-      studentId: student._id,
-      isDeleted: false,
-    });
+    const completedTests = allResults.length;
+    const pendingTests = Math.max(0, currentProgramMockTests - completedTests);
 
-    // Get average percentage
-    const results = await Result.find({
-      studentId: student._id,
-      isDeleted: false,
-    });
-
+    // Calculate average percentage from ALL results
     let averagePercentage = 0;
-    if (results.length > 0) {
-      const totalPercentage = results.reduce((sum, r) => sum + r.percentage, 0);
-      averagePercentage = totalPercentage / results.length;
+    if (allResults.length > 0) {
+      const totalPercentage = allResults.reduce((sum, r) => sum + r.percentage, 0);
+      averagePercentage = totalPercentage / allResults.length;
     }
 
-    // Get latest result
+    // Get latest result from ALL programs
     const latestResult = await Result.findOne({
       studentId: student._id,
       isDeleted: false,
     })
       .sort({ createdAt: -1 })
-      .populate('mockTestId', 'title testNumber');
+      .populate('mockTestId', 'title testNumber programId');
+
+    // Get total mock tests across all programs (completed only)
+    const totalMockTests = allResults.length;
+
+    // Get results by program (for stats breakdown)
+    const resultsByProgram = allResults.reduce((acc: any, result: any) => {
+      const programId = result.programId?.toString() || 'unknown';
+      if (!acc[programId]) {
+        acc[programId] = {
+          count: 0,
+          totalPercentage: 0,
+        };
+      }
+      acc[programId].count++;
+      acc[programId].totalPercentage += result.percentage;
+      return acc;
+    }, {});
+
+    // Calculate average per program
+    const programStats = Object.entries(resultsByProgram).map(([programId, data]: [string, any]) => ({
+      programId,
+      testCount: data.count,
+      averagePercentage: Math.round(data.totalPercentage / data.count),
+    }));
 
     res.status(200).json({
       success: true,
       data: {
         totalMockTests,
-        completedTests: completedResults,
-        pendingTests: totalMockTests - completedResults,
+        completedTests,
+        pendingTests,
         averagePercentage: Math.round(averagePercentage),
         latestResult: latestResult || null,
+        programStats,
       },
     });
   } catch (error: any) {

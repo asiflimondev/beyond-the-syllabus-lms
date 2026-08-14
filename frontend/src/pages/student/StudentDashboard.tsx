@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@context/AuthContext';
 import { studentApi } from '@api/student.api';
@@ -13,11 +13,14 @@ import {
   Sparkles,
   GraduationCap,
   Award,
-  BookOpen
+  BookOpen,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
+  const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
 
   const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ['student-profile'],
@@ -36,7 +39,11 @@ const StudentDashboard: React.FC = () => {
 
   const profile = profileData?.data?.data;
   const stats = statsData?.data?.data;
-  const mockTests = mockTestsData?.data?.data || [];
+  const mockTestsDataResponse = mockTestsData?.data?.data;
+
+  // Extract data from new response structure
+  const programsWithResults = mockTestsDataResponse?.programs || [];
+  const pendingTests = mockTestsDataResponse?.pendingTests || [];
 
   if (profileLoading || statsLoading || mockTestsLoading) {
     return (
@@ -57,6 +64,10 @@ const StudentDashboard: React.FC = () => {
   };
 
   const program = profile?.programId;
+
+  const toggleProgram = (programId: string) => {
+    setExpandedProgram(expandedProgram === programId ? null : programId);
+  };
 
   return (
     <div className="space-y-6">
@@ -170,14 +181,8 @@ const StudentDashboard: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <GraduationCap className="w-4 h-4 text-primary-500" />
-              My Programme
+              Current Programme
             </h3>
-            <Link
-              to="/student/program"
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-            >
-              View Details
-            </Link>
           </div>
           <div className="p-6">
             <div className="flex items-start justify-between">
@@ -191,7 +196,6 @@ const StudentDashboard: React.FC = () => {
                 <p className="text-sm text-gray-600 mt-2 max-w-md">
                   {program.description?.en}
                 </p>
-                
               </div>
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
                 <Award className="w-6 h-6 text-white" />
@@ -201,58 +205,128 @@ const StudentDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Mock Tests */}
+      {/* Results by Program */}
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-primary-500" />
-            Mock Tests
+            My Results
           </h3>
-          <Link
-            to="/student/mock-tests"
-            className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-          >
-            View All
-          </Link>
         </div>
-        {mockTests.length === 0 ? (
+
+        {programsWithResults.length === 0 && pendingTests.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 font-medium">No mock tests available yet</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100/50">
-            {mockTests.slice(0, 3).map((test: any) => (
-              <div key={test._id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      {test.title || `Mock Test ${test.testNumber}`}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Test #{test.testNumber} • {new Date(test.testDate).toLocaleDateString()}
-                    </p>
+            {/* Programs with results */}
+            {programsWithResults.map((programData: any) => (
+              <div key={programData.programId || 'unknown'} className="px-6 py-4">
+                <button
+                  onClick={() => toggleProgram(programData.programId || 'unknown')}
+                  className="w-full flex items-center justify-between hover:bg-gray-50/50 transition-colors rounded-lg p-2"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
+                      <GraduationCap className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-900">
+                        {programData.programName}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {programData.results.length} tests • Avg: {programData.averagePercentage}%
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    {test.hasResult ? (
-                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
-                        {test.result?.percentage || 0}%
-                      </span>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      programData.averagePercentage >= 70
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : programData.averagePercentage >= 50
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {programData.averagePercentage}%
+                    </span>
+                    {expandedProgram === (programData.programId || 'unknown') ? (
+                      <ChevronUp className="w-5 h-5 text-gray-400" />
                     ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Expanded results */}
+                {expandedProgram === (programData.programId || 'unknown') && (
+                  <div className="mt-3 space-y-2 pl-4 border-l-2 border-primary-200">
+                    {programData.results.map((result: any) => (
+                      <Link
+                        key={result.resultId}
+                        to={`/student/mock-tests/${result.mockTestId}`}
+                        className="block p-3 bg-gray-50/50 rounded-lg hover:bg-gray-100/50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">
+                              {result.title}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Test #{result.testNumber} • {new Date(result.testDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-gray-900">
+                              {result.percentage}%
+                            </span>
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                              result.grade?.startsWith('A')
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : result.grade?.startsWith('B')
+                                ? 'bg-blue-100 text-blue-700'
+                                : result.grade?.startsWith('C')
+                                ? 'bg-amber-100 text-amber-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}>
+                              {result.grade || 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Pending tests */}
+            {pendingTests.length > 0 && (
+              <div className="px-6 py-4 bg-gray-50/30">
+                <h4 className="text-sm font-medium text-gray-600 mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  Pending Tests - Current Program
+                </h4>
+                <div className="space-y-2">
+                  {pendingTests.map((test: any) => (
+                    <div key={test._id} className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-700 text-sm">
+                          {test.title || `Mock Test ${test.testNumber}`}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Test #{test.testNumber} • {new Date(test.testDate).toLocaleDateString()}
+                        </p>
+                      </div>
                       <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
                         Pending
                       </span>
-                    )}
-                    <Link
-                      to={`/student/mock-tests/${test._id}`}
-                      className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-                    >
-                      View
-                    </Link>
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>

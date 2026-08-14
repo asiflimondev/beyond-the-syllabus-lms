@@ -60,6 +60,8 @@ export interface IndividualReportResult {
   mockTestTitle: string;
   mockTestNumber: number;
   testDate: string;
+  programId?: string;
+  programName?: string;
   reading: { obtained: number; total: number };
   writing: { obtained: number; total: number };
   listening: { obtained: number; total: number };
@@ -70,6 +72,13 @@ export interface IndividualReportResult {
   grade: string;
 }
 
+export interface ProgramSummary {
+  id: string;
+  name: string;
+  testCount: number;
+  averagePercentage: number;
+}
+
 export interface IndividualReportData {
   student: {
     id: string;
@@ -78,6 +87,7 @@ export interface IndividualReportData {
     phone: string;
     email: string;
     programName: string;
+    currentProgramId?: string;
     profileImage?: { url: string };
   };
   teacher: {
@@ -89,6 +99,7 @@ export interface IndividualReportData {
   averagePercentage: number;
   generatedDate: string;
   results: IndividualReportResult[];
+  programs: ProgramSummary[]; // Added this for program filtering
 }
 
 export interface ReportFilters {

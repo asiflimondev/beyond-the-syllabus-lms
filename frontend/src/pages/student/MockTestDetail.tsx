@@ -66,7 +66,7 @@ const MockTestDetail: React.FC = () => {
     queryFn: () => studentApi.getProfile(),
   });
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['student-mock-test-result', id],
     queryFn: () => studentApi.getResult(id!),
     enabled: !!id,
@@ -75,7 +75,12 @@ const MockTestDetail: React.FC = () => {
   const profile = profileData?.data?.data;
   const result = data?.data?.data as MockTestResult;
 
-  // Print setup - kept for future use
+  // Debug logging
+  console.log('Result data:', data);
+  console.log('Result object:', result);
+  console.log('Error:', error);
+
+  // Print setup
   useReactToPrint({
     contentRef: printRef,
     pageStyle: `
@@ -217,7 +222,6 @@ const MockTestDetail: React.FC = () => {
     return Math.round((obtained / total) * 100);
   };
 
-  // Format percentage to 2 decimal places
   const formatPercentage = (value: number): string => {
     return value.toFixed(2);
   };
@@ -236,7 +240,9 @@ const MockTestDetail: React.FC = () => {
       <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
         <h3 className="text-lg font-semibold text-red-700">Failed to load result</h3>
-        <p className="text-red-600 mt-1">The result for this mock test could not be found.</p>
+        <p className="text-red-600 mt-1">
+          {error?.message || 'The result for this mock test could not be found.'}
+        </p>
         <button
           onClick={() => navigate('/student/mock-tests')}
           className="mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all"

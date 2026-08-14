@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportApi } from '@api/report.api';
 import { toast } from 'react-hot-toast';
-import { Printer, Download, RefreshCw, FileText } from 'lucide-react';
+import { Printer, Download, RefreshCw, FileText, Users, GraduationCap, Award, AlertCircle } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { Link, useLocation } from 'react-router-dom';
 import btsLogo from '/bts-logo.png';
@@ -159,6 +159,9 @@ const BatchReport: React.FC = () => {
         .content-area {
           flex: 1;
         }
+        .status-badge {
+          display: none !important;
+        }
       }
     `,
   });
@@ -249,6 +252,9 @@ const BatchReport: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <p className="text-xs text-gray-400 mt-1.5">
+                  Shows all students who have ever been in this program
+                </p>
               </div>
 
               <div>
@@ -292,8 +298,9 @@ const BatchReport: React.FC = () => {
           </div>
 
           {isError && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
-              Failed to generate report. Please try again.
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span>Failed to generate report. Please try again.</span>
             </div>
           )}
 
@@ -322,7 +329,7 @@ const BatchReport: React.FC = () => {
 
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden print-container">
                 <div ref={printRef} id="report-print-area" className="p-8 print:p-4">
-                  {/* Report Header - Larger Logos */}
+                  {/* Report Header */}
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4 print:pb-4 print:mb-4">
                     <div className="flex items-center gap-4">
                       <img src={btsLogo} alt="BTS Logo" className="h-20 w-auto object-contain print:h-16 logo-bts" />
@@ -336,13 +343,15 @@ const BatchReport: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Title with Premium Styling */}
+                  {/* Title */}
                   <div className="text-center mb-6 print:mb-4 report-header">
                     <h2 className="text-4xl font-extrabold text-gray-900 tracking-wider uppercase relative inline-block print:text-3xl receipt-title">
-                      Course Progress Report
+                      Batch Progress Report
                       <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 rounded-full print:h-0.5"></span>
                     </h2>
-                    <p className="text-base text-gray-500 mt-2 print:text-sm"><br></br></p>
+                    <p className="text-base text-gray-500 mt-2 print:text-sm">
+                      {report.program.displayName?.en || report.program.name}
+                    </p>
                   </div>
 
                   <div className="content-area">
@@ -362,16 +371,20 @@ const BatchReport: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Stats Summary */}
                     <div className="grid grid-cols-3 gap-4 mb-5 print:gap-3 print:mb-4">
                       <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl border border-gray-200 p-4 text-center print:p-3 summary-box">
+                        <Users className="w-6 h-6 text-blue-500 mx-auto mb-1" />
                         <p className="text-2xl font-bold text-blue-600 print:text-xl">{report.totalStudents}</p>
                         <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Total Students</p>
                       </div>
                       <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-xl border border-emerald-200 p-4 text-center print:p-3 summary-box">
+                        <Award className="w-6 h-6 text-emerald-500 mx-auto mb-1" />
                         <p className="text-2xl font-bold text-emerald-600 print:text-xl">{report.totalMockTests}</p>
-                        <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Total Mock Tests</p>
+                        <p className="text-[10px] text-gray-500 font-medium print:text-[9px] label">Mock Tests</p>
                       </div>
                       <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200 p-4 text-center print:p-3 summary-box">
+                        <GraduationCap className="w-6 h-6 text-orange-500 mx-auto mb-1" />
                         <p className="text-2xl font-bold text-orange-500 print:text-xl">
                           {report.totalMockTests > 0 && report.students.length > 0
                             ? Math.round(
@@ -394,7 +407,8 @@ const BatchReport: React.FC = () => {
                             <tr className="bg-gradient-to-r from-gray-50 to-blue-50/30">
                               <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">ID</th>
                               <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">Student</th>
-                              {report.mockTests.map((mt) => {
+                              <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold text-gray-600 sticky left-48 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">Current Program</th>
+                              {report.mockTests.map((mt: any) => {
                                 const hasSections = mt.hasReading || mt.hasWriting || mt.hasListening || mt.hasSpeaking || mt.hasPresentation;
                                 const sectionCount = [mt.hasReading, mt.hasWriting, mt.hasListening, mt.hasSpeaking, mt.hasPresentation].filter(Boolean).length;
                                 return (
@@ -411,7 +425,8 @@ const BatchReport: React.FC = () => {
                             <tr className="bg-gray-50/70">
                               <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-0 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
                               <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-16 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
-                              {report.mockTests.map((mt) => (
+                              <th className="border border-gray-200 px-3 py-1 text-xs text-gray-500 sticky left-48 bg-inherit z-10 print:px-2 print:py-0.5 print:text-[9px]"></th>
+                              {report.mockTests.map((mt: any) => (
                                 <React.Fragment key={mt.id}>
                                   {mt.hasReading && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">R({mt.readingTotal})</th>}
                                   {mt.hasWriting && <th className="border border-gray-200 px-1.5 py-1 text-[10px] text-gray-400 text-center font-normal print:px-1 print:py-0.5 print:text-[8px]">W({mt.writingTotal})</th>}
@@ -424,14 +439,25 @@ const BatchReport: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {report.students.map((student, idx) => {
+                            {report.students.map((student: any, idx: number) => {
                               const studentResults = student.results || [];
+                              const isCurrent = student.isCurrentProgram;
                               return (
-                                <tr key={student.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                                <tr key={student.id} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} ${!isCurrent ? 'opacity-75' : ''}`}>
                                   <td className="border border-gray-200 px-3 py-2 text-xs font-mono text-gray-600 sticky left-0 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[9px]">{student.admissionId}</td>
-                                  <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">{student.fullName}</td>
-                                  {report.mockTests.map((mt) => {
-                                    const result = studentResults.find((r) => r.mockTestId === mt.id);
+                                  <td className="border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 sticky left-16 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[10px]">
+                                    {student.fullName}
+                                    {!isCurrent && (
+                                      <span className="ml-2 text-[10px] text-gray-400 font-normal status-badge">
+                                        (Moved On)
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="border border-gray-200 px-3 py-2 text-xs text-gray-500 sticky left-48 bg-inherit z-10 print:px-2 print:py-1.5 print:text-[9px]">
+                                    {student.currentProgram}
+                                  </td>
+                                  {report.mockTests.map((mt: any) => {
+                                    const result = studentResults.find((r: any) => r.mockTestId === mt.id);
                                     const totalMarks = result?.totalMarks || 0;
                                     return (
                                       <React.Fragment key={mt.id}>
@@ -526,6 +552,9 @@ const BatchReport: React.FC = () => {
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-700">Select a programme to generate report</h3>
               <p className="text-sm text-gray-500 mt-1">Choose a programme and click "Generate Report"</p>
+              <p className="text-xs text-gray-400 mt-2">
+                Shows all students who have ever been in this programme
+              </p>
             </div>
           )}
         </>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { studentApi } from '@api/student.api';
 import { useNavigate } from 'react-router-dom';
-import { FileText, CheckCircle, Clock, Eye, Calendar, ChevronRight } from 'lucide-react';
+import { FileText, CheckCircle, Clock, Eye, Calendar, ChevronRight, GraduationCap } from 'lucide-react';
 
 const MockTestsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,54 @@ const MockTestsPage: React.FC = () => {
     queryFn: () => studentApi.getMockTests(),
   });
 
-  const mockTests = mockTestsData?.data?.data || [];
+  const data = mockTestsData?.data?.data;
+  
+  // Extract data from new response structure
+  const programsWithResults = data?.programs || [];
+  const pendingTests = data?.pendingTests || [];
+  const currentProgram = data?.currentProgram;
+
+  // Flatten all results from all programs into a single array for the grid view
+  const allTests: any[] = [];
+  
+  // Add completed tests from all programs
+  programsWithResults.forEach((program: any) => {
+    program.results.forEach((result: any) => {
+      allTests.push({
+        _id: result.mockTestId,
+        title: result.title,
+        testNumber: result.testNumber,
+        testDate: result.testDate,
+        hasResult: true,
+        result: {
+          totalMarks: result.totalMarks,
+          percentage: result.percentage,
+          grade: result.grade,
+        },
+        programName: program.programName,
+        programId: program.programId,
+      });
+    });
+  });
+
+  // Add pending tests (only from current program)
+  pendingTests.forEach((test: any) => {
+    allTests.push({
+      _id: test._id,
+      title: test.title,
+      testNumber: test.testNumber,
+      testDate: test.testDate,
+      hasResult: false,
+      result: null,
+      programName: currentProgram?.displayName?.en || 'Current Program',
+      programId: currentProgram?._id,
+    });
+  });
+
+  // Sort by test date (newest first)
+  const sortedTests = allTests.sort((a, b) => 
+    new Date(b.testDate).getTime() - new Date(a.testDate).getTime()
+  );
 
   // Format percentage to 2 decimal places
   const formatPercentage = (value: number): string => {
@@ -54,11 +101,11 @@ const MockTestsPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
           <FileText className="w-4 h-4 text-orange-500" />
-          <span className="text-sm font-medium text-gray-700">{mockTests.length} Tests</span>
+          <span className="text-sm font-medium text-gray-700">{sortedTests.length} Tests</span>
         </div>
       </div>
 
-      {mockTests.length === 0 ? (
+      {sortedTests.length === 0 ? (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-16 text-center">
           <div className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <FileText className="w-10 h-10 text-orange-400" />
@@ -68,7 +115,7 @@ const MockTestsPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {mockTests.map((test: any) => (
+          {sortedTests.map((test: any) => (
             <div
               key={test._id}
               className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden"
@@ -78,9 +125,17 @@ const MockTestsPage: React.FC = () => {
               <div className={`px-5 py-2.5 flex items-center justify-between border-b border-gray-100 ${
                 test.hasResult ? 'bg-emerald-50/50' : 'bg-amber-50/50'
               }`}>
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Test #{test.testNumber}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Test #{test.testNumber}
+                  </span>
+                  {test.programName && (
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <GraduationCap className="w-3 h-3" />
+                      {test.programName}
+                    </span>
+                  )}
+                </div>
                 {test.hasResult ? (
                   <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                     <CheckCircle className="w-3.5 h-3.5" />

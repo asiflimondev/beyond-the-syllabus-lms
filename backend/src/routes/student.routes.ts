@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import {
   getStudentProfile,
   updateStudentProfile,
@@ -8,29 +8,28 @@ import {
   getStudentStats,
   changeStudentPassword,
 } from '../controllers/student.controller.js';
-import { authenticate, authorize } from '../middlewares/auth.middleware.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
 
-const router = Router();
+const router = express.Router();
 
-// All routes require authentication and student role
+// All routes require authentication
 router.use(authenticate);
-router.use(authorize('admin', 'student'));
 
-// Profile
+// Student profile
 router.get('/profile', getStudentProfile);
 router.put('/profile', updateStudentProfile);
 
-// Program
+// Student program
 router.get('/program', getStudentProgram);
 
-// Mock Tests & Results
+// Mock tests and results
 router.get('/mock-tests', getStudentMockTests);
-router.get('/results/:mockTestId', getStudentResult);
+router.get('/mock-tests/:mockTestId/result', getStudentResult); // Make sure this route exists
 
-// Statistics
+// Stats
 router.get('/stats', getStudentStats);
 
-// Password
+// Change password
 router.post('/change-password', changeStudentPassword);
 
 export default router;

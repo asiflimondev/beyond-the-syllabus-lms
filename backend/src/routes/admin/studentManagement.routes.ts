@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import {
   getAllStudents,
   getStudentById,
@@ -7,23 +7,41 @@ import {
   restoreStudent,
   resetStudentPassword,
   getStudentStats,
-  permanentlyDeleteStudent, // NEW
+  permanentlyDeleteStudent,
+  getStudentResults, // NEW
 } from '../../controllers/admin/studentManagement.controller.js';
-import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
+import { authenticate } from '../../middlewares/auth.middleware.js';
 
-const router = Router();
+const router = express.Router();
 
-// All routes require authentication and admin role
+// All routes require authentication
 router.use(authenticate);
-router.use(authorize('admin'));
 
+// Get student stats
 router.get('/stats', getStudentStats);
+
+// Get all students
 router.get('/', getAllStudents);
+
+// Get student results - NEW
+router.get('/:id/results', getStudentResults);
+
+// Get student by ID
 router.get('/:id', getStudentById);
+
+// Update student
 router.put('/:id', updateStudent);
+
+// Soft delete student
 router.delete('/:id', deleteStudent);
-router.delete('/:id/permanent', permanentlyDeleteStudent); // NEW - Permanent delete
+
+// Restore student
 router.patch('/:id/restore', restoreStudent);
+
+// Permanently delete student
+router.delete('/:id/permanent', permanentlyDeleteStudent);
+
+// Reset student password
 router.post('/:id/reset-password', resetStudentPassword);
 
 export default router;

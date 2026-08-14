@@ -17,7 +17,11 @@ import {
   CheckSquare,
   Square,
   Edit,
-  Trash2
+  Trash2,
+  GraduationCap,
+  ChevronRight,
+  ChevronDown,
+  Users
 } from 'lucide-react';
 
 interface SectionConfig {
@@ -37,13 +41,40 @@ interface MockTestFormData {
   presentation: SectionConfig;
 }
 
+interface ProgramWithCount {
+  _id: string;
+  name: string;
+  displayName: {
+    en: string;
+    bn: string;
+  };
+  mockTestCount: number;
+}
+
+interface MockTest {
+  _id: string;
+  title: string;
+  description: string;
+  testNumber: number;
+  testDate: string;
+  isActive: boolean;
+  programId: string;
+  programName?: string;
+  reading?: { totalMarks: number; description: string };
+  writing?: { totalMarks: number; description: string };
+  listening?: { totalMarks: number; description: string };
+  speaking?: { description: string };
+  presentation?: { totalMarks: number; description: string };
+}
+
 const AdminMockTests: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTest, setEditingTest] = useState<any>(null);
+  const [editingTest, setEditingTest] = useState<MockTest | null>(null);
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
+  const [expandedPrograms, setExpandedPrograms] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<MockTestFormData>({
     title: '',
     description: '',
@@ -56,9 +87,9 @@ const AdminMockTests: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch ALL programs using programsApi (for Admin)
-  const programsQuery: any = useQuery({
-    queryKey: ['admin-programs'],
+  // Fetch all programs
+  const programsQuery = useQuery({
+    queryKey: ['admin-programs-list'],
     queryFn: () => programsApi.getAll({ isActive: true, limit: 100 }),
   });
 
@@ -81,36 +112,68 @@ const AdminMockTests: React.FC = () => {
 
   const programs = extractPrograms();
 
-  // Fetch mock tests using admin API
-  const mockTestsQuery: any = useQuery({
-    queryKey: ['admin-all-mocktests'],
+  // Fetch mock tests for each program and calculate counts
+  const mockTestsQuery = useQuery({
+    queryKey: ['admin-all-mocktests-counts'],
     queryFn: async () => {
-      const programsRes = await programsApi.getAll({ isActive: true, limit: 100 });
-      const programsData = programsRes?.data?.data?.programs || [];
-      let allMockTests: any[] = [];
-      for (const program of programsData) {
+      const allPrograms = extractPrograms();
+      const programsWithCounts: ProgramWithCount[] = [];
+      
+      for (const program of allPrograms) {
         try {
           const mockTestsRes = await adminMockTestApi.getMockTestsByProgram(program.id);
+          console.log(`📊 Mock tests for program ${program.displayName?.en || program.name}:`, mockTestsRes?.data?.data);
           const mockTests = mockTestsRes?.data?.data || [];
-          allMockTests = [...allMockTests, ...mockTests.map((m: any) => ({
-            ...m,
-            programName: program.displayName?.en || program.name,
-          }))];
+          programsWithCounts.push({
+            _id: program.id,
+            name: program.name,
+            displayName: program.displayName,
+            mockTestCount: mockTests.length,
+          });
         } catch (error) {
           console.error(`Error fetching mock tests for program ${program.id}:`, error);
+          programsWithCounts.push({
+            _id: program.id,
+            name: program.name,
+            displayName: program.displayName,
+            mockTestCount: 0,
+          });
         }
       }
-      return { data: { data: allMockTests } };
+      
+      return programsWithCounts;
     },
+    enabled: programs.length > 0,
   });
 
-  const mockTests = mockTestsQuery?.data?.data?.data || [];
+  const programsWithCounts: ProgramWithCount[] = mockTestsQuery.data || [];
 
-  // CREATE mutation - using admin API
-  const createMutation: any = useMutation({
+  // Fetch mock tests for selected program
+  const { data: mockTestsData, isLoading: mockTestsLoading, refetch } = useQuery({
+    queryKey: ['admin-mocktests', selectedProgramId],
+    queryFn: () => adminMockTestApi.getMockTestsByProgram(selectedProgramId),
+    enabled: !!selectedProgramId,
+  });
+
+  const mockTests: MockTest[] = mockTestsData?.data?.data || [];
+  
+  // Debug: Log mock tests when they change
+  React.useEffect(() => {
+    if (selectedProgramId && mockTests.length > 0) {
+      console.log(`✅ Found ${mockTests.length} mock tests for program:`, mockTests);
+    }
+    if (selectedProgramId && mockTests.length === 0 && mockTestsData) {
+      console.log(`ℹ️ No mock tests found for program ${selectedProgramId}`);
+      console.log('Response data:', mockTestsData);
+    }
+  }, [selectedProgramId, mockTests, mockTestsData]);
+
+  // CREATE mutation
+  const createMutation = useMutation({
     mutationFn: (data: any) => adminMockTestApi.createMockTest(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests-counts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-mocktests'] });
       toast.success('Mock test created successfully!');
       setIsFormOpen(false);
       resetForm();
@@ -122,11 +185,12 @@ const AdminMockTests: React.FC = () => {
     },
   });
 
-  // UPDATE mutation - using admin API
-  const updateMutation: any = useMutation({
+  // UPDATE mutation
+  const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => adminMockTestApi.updateMockTest(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests-counts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-mocktests'] });
       toast.success('Mock test updated successfully!');
       setIsFormOpen(false);
       setEditingTest(null);
@@ -139,12 +203,14 @@ const AdminMockTests: React.FC = () => {
     },
   });
 
-  // DELETE mutation - using admin API
-  const deleteMutation: any = useMutation({
-    mutationFn: (id: string) => adminMockTestApi.deleteMockTest(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests'] });
-      toast.success('Mock test deleted successfully!');
+  // DELETE mutation - PERMANENT DELETE with cascade
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminMockTestApi.permanentlyDeleteMockTest(id),
+    onSuccess: (data) => {
+      const resultsDeleted = data?.data?.data?.resultsDeleted || 0;
+      toast.success(`Mock test and ${resultsDeleted} associated results deleted successfully!`);
+      queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests-counts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-mocktests'] });
     },
     onError: (error: any) => {
       console.error('Delete mock test error:', error);
@@ -172,7 +238,7 @@ const AdminMockTests: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = (test: any) => {
+  const handleOpenEdit = (test: MockTest) => {
     setEditingTest(test);
     setSelectedProgramId(test.programId);
     setFormData({
@@ -207,8 +273,8 @@ const AdminMockTests: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this mock test? All associated results will also be deleted.')) {
+  const handleDelete = (id: string, title: string) => {
+    if (window.confirm(`Are you sure you want to permanently delete "${title}"? This will also delete all associated results.`)) {
       deleteMutation.mutate(id);
     }
   };
@@ -229,6 +295,20 @@ const AdminMockTests: React.FC = () => {
         },
       });
     }
+  };
+
+  const toggleProgram = (programId: string) => {
+    const newExpanded = new Set(expandedPrograms);
+    if (newExpanded.has(programId)) {
+      newExpanded.delete(programId);
+      setSelectedProgramId('');
+    } else {
+      newExpanded.add(programId);
+      setSelectedProgramId(programId);
+      // Refetch mock tests when expanding
+      setTimeout(() => refetch(), 100);
+    }
+    setExpandedPrograms(newExpanded);
   };
 
   const handleSubmit = async () => {
@@ -309,11 +389,20 @@ const AdminMockTests: React.FC = () => {
     }
   };
 
-  if (mockTestsQuery.isLoading || programsQuery.isLoading) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  if (programsQuery.isLoading || mockTestsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
-        <span className="ml-3 text-gray-600">Loading mock tests...</span>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
+        <span className="ml-3 text-gray-600">Loading programs...</span>
       </div>
     );
   }
@@ -327,7 +416,7 @@ const AdminMockTests: React.FC = () => {
         <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm" onClick={() => { setIsFormOpen(false); resetForm(); }} />
         <div className="relative z-[10000] min-h-screen flex items-center justify-center p-4">
           <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-white/50 animate-scale-in">
-            <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-5 flex items-center justify-between rounded-t-2xl">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                   <FileText className="w-5 h-5 text-white" />
@@ -336,7 +425,7 @@ const AdminMockTests: React.FC = () => {
                   <h3 className="text-lg font-semibold text-white">
                     {editingTest ? 'Edit Mock Test' : 'Create Mock Test'}
                   </h3>
-                  <p className="text-sm text-primary-100">
+                  <p className="text-sm text-orange-100">
                     {editingTest ? 'Update mock test details' : 'Add a new mock test'}
                   </p>
                 </div>
@@ -356,7 +445,7 @@ const AdminMockTests: React.FC = () => {
                 <select 
                   value={selectedProgramId} 
                   onChange={(e) => setSelectedProgramId(e.target.value)} 
-                  className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 >
                   <option value="">Select a programme</option>
                   {programs.map((program: any) => (
@@ -370,7 +459,7 @@ const AdminMockTests: React.FC = () => {
               {/* Basic Information */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  <span className="w-1 h-5 bg-orange-500 rounded-full" />
                   Basic Information
                 </h4>
                 <div className="space-y-4">
@@ -381,7 +470,7 @@ const AdminMockTests: React.FC = () => {
                       placeholder="e.g., Mock Test 1"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -391,7 +480,7 @@ const AdminMockTests: React.FC = () => {
                       placeholder="Test description..."
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all resize-none"
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all resize-none"
                     />
                   </div>
                   <div>
@@ -400,7 +489,7 @@ const AdminMockTests: React.FC = () => {
                       type="date"
                       value={formData.testDate}
                       onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                      className="w-full px-4 py-3 bg-white/80 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -409,17 +498,17 @@ const AdminMockTests: React.FC = () => {
               {/* Sections */}
               <div className="border-t border-gray-200/50 pt-6">
                 <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-5 bg-primary-500 rounded-full" />
+                  <span className="w-1 h-5 bg-orange-500 rounded-full" />
                   Select Sections to Include
                 </h4>
                 <p className="text-xs text-gray-500 mb-4">Toggle sections on/off. Only enabled sections will be included.</p>
 
                 <div className="space-y-3">
                   {/* Reading */}
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-orange-200/50 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleSection('reading')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                        <button onClick={() => toggleSection('reading')} className="text-orange-600 hover:text-orange-700 transition-colors">
                           {formData.reading.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                         </button>
                         <label className="font-medium text-gray-900">Reading</label>
@@ -433,7 +522,7 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             reading: { ...formData.reading, totalMarks: parseInt(e.target.value) || 0 }
                           })}
-                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                           placeholder="Marks"
                         />
                       )}
@@ -448,17 +537,17 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             reading: { ...formData.reading, description: e.target.value }
                           })}
-                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                         />
                       </div>
                     )}
                   </div>
 
                   {/* Writing */}
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-orange-200/50 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleSection('writing')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                        <button onClick={() => toggleSection('writing')} className="text-orange-600 hover:text-orange-700 transition-colors">
                           {formData.writing.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                         </button>
                         <label className="font-medium text-gray-900">Writing</label>
@@ -472,7 +561,7 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             writing: { ...formData.writing, totalMarks: parseInt(e.target.value) || 0 }
                           })}
-                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                           placeholder="Marks"
                         />
                       )}
@@ -487,17 +576,17 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             writing: { ...formData.writing, description: e.target.value }
                           })}
-                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                         />
                       </div>
                     )}
                   </div>
 
                   {/* Listening */}
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-orange-200/50 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleSection('listening')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                        <button onClick={() => toggleSection('listening')} className="text-orange-600 hover:text-orange-700 transition-colors">
                           {formData.listening.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                         </button>
                         <label className="font-medium text-gray-900">Listening</label>
@@ -511,7 +600,7 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             listening: { ...formData.listening, totalMarks: parseInt(e.target.value) || 0 }
                           })}
-                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                           placeholder="Marks"
                         />
                       )}
@@ -526,17 +615,17 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             listening: { ...formData.listening, description: e.target.value }
                           })}
-                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                         />
                       </div>
                     )}
                   </div>
 
                   {/* Speaking */}
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-orange-200/50 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleSection('speaking')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                        <button onClick={() => toggleSection('speaking')} className="text-orange-600 hover:text-orange-700 transition-colors">
                           {formData.speaking.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                         </button>
                         <label className="font-medium text-gray-900">Speaking</label>
@@ -552,17 +641,17 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             speaking: { ...formData.speaking, description: e.target.value }
                           })}
-                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                         />
                       </div>
                     )}
                   </div>
 
                   {/* Presentation */}
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-primary-200/50 transition-all">
+                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 hover:border-orange-200/50 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleSection('presentation')} className="text-primary-600 hover:text-primary-700 transition-colors">
+                        <button onClick={() => toggleSection('presentation')} className="text-orange-600 hover:text-orange-700 transition-colors">
                           {formData.presentation.enabled ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                         </button>
                         <label className="font-medium text-gray-900">Presentation</label>
@@ -576,7 +665,7 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             presentation: { ...formData.presentation, totalMarks: parseInt(e.target.value) || 0 }
                           })}
-                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-24 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                           placeholder="Marks"
                         />
                       )}
@@ -591,7 +680,7 @@ const AdminMockTests: React.FC = () => {
                             ...formData,
                             presentation: { ...formData.presentation, description: e.target.value }
                           })}
-                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                          className="w-full px-3 py-1.5 bg-white/80 rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-sm"
                         />
                       </div>
                     )}
@@ -610,7 +699,7 @@ const AdminMockTests: React.FC = () => {
                 <button 
                   onClick={handleSubmit} 
                   disabled={isSubmitting} 
-                  className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
+                  className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -639,97 +728,156 @@ const AdminMockTests: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <FileText className="w-5 h-5 text-primary-500" />
-            <span className="text-sm font-medium text-primary-600">Mock Tests</span>
+            <FileText className="w-5 h-5 text-orange-500" />
+            <span className="text-sm font-medium text-orange-600">Mock Tests</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 font-display">Mock Tests</h2>
           <p className="text-sm text-gray-500 mt-0.5">Create, manage, and enter marks for mock tests</p>
         </div>
         <button 
           onClick={handleOpenCreate} 
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
           <Plus className="w-5 h-5" />
           <span>Create Mock Test</span>
         </button>
       </div>
 
-      {/* Mock Tests Grid */}
-      {mockTests.length === 0 ? (
+      {/* Programs with Mock Tests */}
+      {programs.length === 0 ? (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-16 text-center">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">No mock tests created yet</p>
-          <p className="text-sm text-gray-400 mt-1">Create your first mock test for any program</p>
+          <GraduationCap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 font-medium">No programs found</p>
+          <p className="text-sm text-gray-400 mt-1">Create a program first to add mock tests</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockTests.map((test: any) => {
-            const sections = [];
-            if (test.reading) sections.push('Reading');
-            if (test.writing) sections.push('Writing');
-            if (test.listening) sections.push('Listening');
-            if (test.speaking) sections.push('Speaking');
-            if (test.presentation) sections.push('Presentation');
-
-            return (
-              <div
-                key={test._id}
-                className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-lg font-display">
-                      {test.title || `Mock Test ${test.testNumber}`}
-                    </h3>
-                    <p className="text-sm text-gray-500">Test #{test.testNumber}</p>
-                    <p className="text-xs text-primary-600 mt-1">{test.programName}</p>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <button
-                      onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                      title="Enter Marks"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleOpenEdit(test)}
-                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(test._id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-3 space-y-1 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-primary-500" />
-                    <span>{new Date(test.testDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center flex-wrap gap-1">
-                    <Clock className="w-4 h-4 mr-2 text-primary-500" />
-                    <span className="text-xs">{sections.join(' • ')}</span>
-                  </div>
-                </div>
-
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="divide-y divide-gray-100">
+            {programsWithCounts.map((program: ProgramWithCount) => (
+              <div key={program._id} className="transition-all">
+                {/* Program Header */}
                 <button
-                  className="mt-4 w-full px-4 py-3 bg-gradient-to-r from-primary-500/10 to-primary-600/10 text-primary-700 font-medium rounded-xl border border-primary-200/50 hover:from-primary-500 hover:to-primary-600 hover:text-white transition-all duration-300"
-                  onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
+                  onClick={() => toggleProgram(program._id)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
                 >
-                  <Eye className="w-4 h-4 inline-block mr-2" />
-                  Enter Marks
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                      expandedPrograms.has(program._id) ? 'bg-orange-100' : 'bg-gray-100'
+                    }`}>
+                      <GraduationCap className={`w-4 h-4 ${
+                        expandedPrograms.has(program._id) ? 'text-orange-600' : 'text-gray-500'
+                      }`} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-900">
+                        {program.displayName?.en || program.name}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {program.mockTestCount} mock test{program.mockTestCount !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {expandedPrograms.has(program._id) ? (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
                 </button>
+
+                {/* Mock Tests List */}
+                {expandedPrograms.has(program._id) && (
+                  <div className="px-6 pb-4 pt-2 bg-gray-50/30">
+                    {mockTestsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-4 border-orange-500 border-t-transparent"></div>
+                        <span className="ml-3 text-sm text-gray-600">Loading mock tests...</span>
+                      </div>
+                    ) : mockTests.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-sm">No mock tests created for this program</p>
+                        <button
+                          onClick={handleOpenCreate}
+                          className="mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
+                        >
+                          Create your first mock test
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {mockTests.map((test: MockTest) => {
+                          const sections = [];
+                          if (test.reading) sections.push('Reading');
+                          if (test.writing) sections.push('Writing');
+                          if (test.listening) sections.push('Listening');
+                          if (test.speaking) sections.push('Speaking');
+                          if (test.presentation) sections.push('Presentation');
+
+                          return (
+                            <div
+                              key={test._id}
+                              className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <h5 className="font-semibold text-gray-900 truncate">
+                                    {test.title || `Mock Test ${test.testNumber}`}
+                                  </h5>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Test #{test.testNumber}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                                    <Calendar className="w-3 h-3" />
+                                    <span>{formatDate(test.testDate)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-1 flex-wrap">
+                                    <Clock className="w-3 h-3 text-gray-400" />
+                                    <span className="text-xs text-gray-400">{sections.join(' • ')}</span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                                  <button
+                                    onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
+                                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                                    title="Enter Marks"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenEdit(test)}
+                                    className="p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
+                                    title="Edit"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(test._id, test.title)}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    title="Delete"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <button
+                                className="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-500/10 to-orange-600/10 text-orange-700 font-medium rounded-lg border border-orange-200/50 hover:from-orange-500 hover:to-orange-600 hover:text-white transition-all duration-300 text-sm"
+                                onClick={() => navigate(`/admin/mark-entry/${test._id}`)}
+                              >
+                                <Users className="w-4 h-4 inline-block mr-1.5" />
+                                Enter Marks
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       )}
 

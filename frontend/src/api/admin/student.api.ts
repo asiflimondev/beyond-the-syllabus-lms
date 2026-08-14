@@ -70,4 +70,8 @@ export const studentManagementApi = {
 
   getStats: () =>
     apiClient.get('/admin/students/stats'),
+
+  // NEW: Get student results
+  getStudentResults: (id: string) =>
+    apiClient.get(`/admin/students/${id}/results`),
 };

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { Student } from '../../models/Student.model.js';
 import { User } from '../../models/User.model.js';
 import { Program } from '../../models/Program.model.js';
+import { StudentEnrollment } from '../../models/StudentEnrollment.model.js';
+import { Result } from '../../models/Result.model.js';
 
 // ============================================
 // GET ALL STUDENTS (Admin)
@@ -108,7 +110,7 @@ export const getStudentById = async (req: Request, res: Response): Promise<void>
 };
 
 // ============================================
-// UPDATE STUDENT (Admin)
+// UPDATE STUDENT (Admin) - With Enrollment Tracking
 // ============================================
 export const updateStudent = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -138,6 +140,35 @@ export const updateStudent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    // If programId is being changed, create enrollment record
+    if (programId && programId !== student.programId?.toString()) {
+      // Check if enrollment already exists for this program
+      const existingEnrollment = await StudentEnrollment.findOne({
+        studentId: student._id,
+        programId: programId,
+      });
+
+      if (!existingEnrollment) {
+        // If student has a previous program, mark it as completed
+        if (student.programId) {
+          await StudentEnrollment.findOneAndUpdate(
+            {
+              studentId: student._id,
+              programId: student.programId,
+            },
+            { status: 'completed', completedAt: new Date() }
+          );
+        }
+
+        // Create new enrollment
+        await StudentEnrollment.create({
+          studentId: student._id,
+          programId: programId,
+          enrolledAt: new Date(),
+          status: 'active',
+        });
+      }
+    }
 
     // If admissionId is being changed, check if the new one already exists
     if (admissionId && admissionId !== student.admissionId) {
@@ -385,7 +416,6 @@ export const getStudentStats = async (req: Request, res: Response): Promise<void
   }
 };
 
-
 // ============================================
 // PERMANENTLY DELETE STUDENT (Admin)
 // ============================================
@@ -414,6 +444,12 @@ export const permanentlyDeleteStudent = async (req: Request, res: Response): Pro
       await User.findByIdAndDelete(student.userId);
     }
 
+    // Delete all enrollments for this student
+    await StudentEnrollment.deleteMany({ studentId: student._id });
+
+    // Delete all results for this student
+    await Result.deleteMany({ studentId: student._id });
+
     // Permanently delete the student
     await Student.findByIdAndDelete(id);
 
@@ -427,6 +463,107 @@ export const permanentlyDeleteStudent = async (req: Request, res: Response): Pro
     res.status(500).json({
       success: false,
       message: 'Failed to permanently delete student',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
+// GET STUDENT RESULTS (Admin)
+// ============================================
+export const getStudentResults = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Check if student exists
+    const student = await Student.findById(id)
+      .populate('programId', 'name displayName');
+
+    if (!student) {
+      res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+      return;
+    }
+
+    // Get ALL results for this student
+    const results = await Result.find({
+      studentId: id,
+      isDeleted: false,
+    })
+      .populate({
+        path: 'mockTestId',
+        populate: {
+          path: 'programId',
+          select: 'name displayName',
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    // Group results by program
+    const resultsByProgram = results.reduce((acc: any, result: any) => {
+      const program = result.mockTestId?.programId;
+      const programId = program?._id?.toString() || 'unknown';
+      
+      if (!acc[programId]) {
+        acc[programId] = {
+          programName: program?.displayName?.en || program?.name || 'Unknown Program',
+          programId: program?._id,
+          results: [],
+          totalTests: 0,
+          totalPercentage: 0,
+        };
+      }
+      
+      acc[programId].results.push({
+        resultId: result._id,
+        mockTestId: result.mockTestId?._id,
+        title: result.mockTestId?.title || `Mock Test ${result.mockTestId?.testNumber || ''}`,
+        testNumber: result.mockTestId?.testNumber,
+        testDate: result.mockTestId?.testDate,
+        reading: result.reading,
+        writing: result.writing,
+        listening: result.listening,
+        speaking: result.speaking,
+        presentation: result.presentation,
+        totalMarks: result.totalMarks,
+        percentage: result.percentage,
+        grade: result.grade,
+        createdAt: result.createdAt,
+      });
+      
+      acc[programId].totalTests++;
+      acc[programId].totalPercentage += result.percentage;
+      
+      return acc;
+    }, {});
+
+    // Calculate average per program
+    const programsWithStats = Object.values(resultsByProgram).map((program: any) => ({
+      ...program,
+      averagePercentage: Math.round(program.totalPercentage / program.totalTests),
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        student: {
+          id: student._id,
+          fullName: student.fullName,
+          admissionId: student.admissionId,
+          currentProgram: student.programId,
+          status: student.status,
+        },
+        programs: programsWithStats,
+        totalResults: results.length,
+      },
+    });
+  } catch (error: any) {
+    console.error('Get student results error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get student results',
       error: error.message,
     });
   }

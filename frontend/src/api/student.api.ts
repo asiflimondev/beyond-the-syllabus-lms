@@ -75,6 +75,45 @@ export interface StudentStats {
     grade: string;
     createdAt: string;
   } | null;
+  programStats?: {
+    programId: string;
+    testCount: number;
+    averagePercentage: number;
+  }[];
+}
+
+export interface MockTestResult {
+  _id: string;
+  mockTestId: string;
+  title: string;
+  testNumber: number;
+  testDate: string;
+  reading?: {
+    obtained: number;
+    total: number;
+  };
+  writing?: {
+    obtained: number;
+    total: number;
+  };
+  listening?: {
+    obtained: number;
+    total: number;
+  };
+  speaking?: {
+    grade: string;
+    comment: string;
+  };
+  presentation?: {
+    marks: number;
+    total: number;
+    comment: string;
+  };
+  totalMarks: number;
+  percentage: number;
+  grade: string;
+  hasResult: boolean;
+  createdAt: string;
 }
 
 export const studentApi = {
@@ -91,7 +130,7 @@ export const studentApi = {
     apiClient.get('/student/mock-tests'),
 
   getResult: (mockTestId: string) =>
-    apiClient.get(`/student/results/${mockTestId}`),
+    apiClient.get(`/student/mock-tests/${mockTestId}/result`),
 
   getStats: () =>
     apiClient.get('/student/stats'),

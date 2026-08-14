@@ -5,6 +5,47 @@ import { Result } from '../models/Result.model.js';
 import { Program } from '../models/Program.model.js';
 
 // ============================================
+// GET ALL PROGRAMS WITH MOCK TEST COUNTS (Admin)
+// ============================================
+export const getProgramsWithMockTestsAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Get all active programs
+    const programs = await Program.find({ isActive: true })
+      .sort({ name: 1 })
+      .select('_id name displayName');
+
+    // Get mock test counts for each program
+    const programsWithCounts = await Promise.all(
+      programs.map(async (program) => {
+        const mockTestCount = await MockTest.countDocuments({
+          programId: program._id,
+          isActive: true,
+        });
+
+        return {
+          id: program._id,
+          name: program.name,
+          displayName: program.displayName,
+          mockTestCount,
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      data: programsWithCounts,
+    });
+  } catch (error: any) {
+    console.error('Get programs with mock tests admin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get programs',
+      error: error.message,
+    });
+  }
+};
+
+// ============================================
 // GET MOCK TESTS BY PROGRAM (Admin)
 // ============================================
 export const getMockTestsByProgramAdmin = async (req: Request, res: Response): Promise<void> => {
@@ -153,12 +194,11 @@ export const updateMockTestAdmin = async (req: Request, res: Response): Promise<
 };
 
 // ============================================
-// DELETE MOCK TEST (Admin)
+// PERMANENTLY DELETE MOCK TEST (Admin) - WITH CASCADE
 // ============================================
-export const deleteMockTestAdmin = async (req: Request, res: Response): Promise<void> => {
+export const permanentlyDeleteMockTestAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = (req as any).user?.id;
 
     const mockTest = await MockTest.findById(id);
     if (!mockTest) {
@@ -166,25 +206,35 @@ export const deleteMockTestAdmin = async (req: Request, res: Response): Promise<
       return;
     }
 
-    // Soft delete
-    mockTest.isActive = false;
-    mockTest.deletedAt = new Date();
-    mockTest.updatedBy = userId;
-    await mockTest.save();
+    // Store info for response
+    const mockTestInfo = {
+      id: mockTest._id,
+      title: mockTest.title,
+      programId: mockTest.programId,
+    };
 
-    // Soft delete all results
-    await Result.updateMany(
-      { mockTestId: id },
-      { isDeleted: true, deletedAt: new Date() }
-    );
+    // FIRST: Delete all results associated with this mock test (hard delete)
+    const deletedResults = await Result.deleteMany({ mockTestId: id });
+    console.log(`🗑️ Deleted ${deletedResults.deletedCount} results for mock test ${mockTestInfo.title}`);
+
+    // SECOND: Permanently delete the mock test
+    await MockTest.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
-      message: 'Mock test deleted successfully',
+      message: `Mock test "${mockTestInfo.title}" and ${deletedResults.deletedCount} associated results permanently deleted`,
+      data: {
+        mockTest: mockTestInfo,
+        resultsDeleted: deletedResults.deletedCount,
+      },
     });
   } catch (error: any) {
-    console.error('Delete mock test admin error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete mock test', error: error.message });
+    console.error('Permanently delete mock test admin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to permanently delete mock test',
+      error: error.message,
+    });
   }
 };
 
