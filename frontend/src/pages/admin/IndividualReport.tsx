@@ -8,6 +8,7 @@ import {
   Printer, 
   Download, 
   Search, 
+  UserCircle, 
   AlertCircle, 
   GraduationCap, 
   Users,
@@ -90,16 +91,37 @@ const IndividualReport: React.FC = () => {
         const students = studentsRes?.data?.data?.students || [];
         
         // Format students with program names
-        const formattedStudents = students.map((s: any) => ({
-          id: s.id,
-          fullName: s.fullName,
-          admissionId: s.admissionId,
-          phone: s.phone,
-          email: s.email,
-          status: s.status,
-          programId: s.program?.id || '',
-          programName: programMap.get(s.program?.id) || 'No Program',
-        }));
+        const formattedStudents = students.map((s: any) => {
+          let programName = 'No Program';
+          let programId = '';
+          
+          // Check if program is an object
+          if (s.program) {
+            if (typeof s.program === 'object') {
+              programName = s.program.displayName?.en || s.program.name || 'No Program';
+              programId = s.program.id || s.program._id || '';
+            }
+          }
+          // If program is just an ID, try to find it in the map
+          else if (s.programId) {
+            const foundProgram = programs.find((p: any) => p.id === s.programId || p._id === s.programId);
+            if (foundProgram) {
+              programName = foundProgram.displayName?.en || foundProgram.name || 'No Program';
+              programId = foundProgram.id || foundProgram._id || '';
+            }
+          }
+          
+          return {
+            id: s.id || s._id,
+            fullName: s.fullName,
+            admissionId: s.admissionId,
+            phone: s.phone || '',
+            email: s.email || '',
+            status: s.status || 'unknown',
+            programId: programId,
+            programName: programName,
+          };
+        });
 
         setAllStudents(formattedStudents);
       } catch (error) {
@@ -142,7 +164,6 @@ const IndividualReport: React.FC = () => {
         if (hasCurrent) {
           setSelectedProgramId(report.student.currentProgramId);
         } else if (programs.length > 0) {
-          // If current program has no results, show the first program with results
           setSelectedProgramId(programs[0].id);
         } else {
           setSelectedProgramId('current');
@@ -399,12 +420,10 @@ const IndividualReport: React.FC = () => {
   const getFilteredResults = () => {
     if (!report || !report.results) return [];
     
-    // If 'current' is selected, filter by current program ID
     if (selectedProgramId === 'current') {
       return report.results.filter((result: any) => result.programId === report.student?.currentProgramId);
     }
     
-    // Filter by selected program ID
     return report.results.filter((result: any) => result.programId === selectedProgramId);
   };
 
