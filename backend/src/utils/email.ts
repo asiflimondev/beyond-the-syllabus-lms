@@ -81,13 +81,11 @@ Your admission has been successfully processed.
 Admission ID: ${admissionId}
 Program: ${programName}
 
-Login to your portal: ${frontendUrl}/login
+Please complete your registration using your Admission ID:
+${frontendUrl}/student-register
 
-How to Login:
-1. Visit: ${frontendUrl}/login
-2. Enter your registered email address
-3. Use the password you created during registration
-4. If you haven't set a password yet, please use the "Forgot Password" option on the login page
+After registration, you can login at:
+${frontendUrl}/login
 
 Need help? Contact us at info@beyondthesyllabus.org
 
@@ -275,21 +273,20 @@ export const generateWelcomeEmail = (
       </div>
 
       <p style="color: #4a5568; font-size: 15px;">
-        Your admission has been successfully processed. You can now access your student portal to track your progress,
-        view mock test results, and stay updated with your learning journey.
+        Your admission has been successfully processed. Please complete your registration using your Admission ID.
       </p>
 
       <div style="text-align: center;">
-        <a href="${frontendUrl}/login" class="button">Login to Your Portal</a>
+        <a href="${frontendUrl}/student-register" class="button">Register Now</a>
       </div>
 
       <div class="instruction">
-        <div class="title">🔑 How to Login</div>
+        <div class="title">🔑 How to Register</div>
         <ul class="steps">
-          <li>Visit: <strong>${frontendUrl}/login</strong></li>
-          <li>Enter your registered email address</li>
-          <li>Use the password you created during registration</li>
-          <li><strong>Important:</strong> If you haven't set a password yet, please use the "Forgot Password" option on the login page to set one</li>
+          <li>Visit: <strong>${frontendUrl}/student-register</strong></li>
+          <li>Enter your <strong>Admission ID</strong>: ${admissionId}</li>
+          <li>Enter your email and create a password</li>
+          <li>After registration, login at: <strong>${frontendUrl}/login</strong></li>
         </ul>
       </div>
 
