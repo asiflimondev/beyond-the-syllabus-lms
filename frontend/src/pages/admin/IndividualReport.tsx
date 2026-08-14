@@ -7,8 +7,7 @@ import { toast } from 'react-hot-toast';
 import { 
   Printer, 
   Download, 
-  Search, 
-  UserCircle, 
+  Search,
   AlertCircle, 
   GraduationCap, 
   Users,
