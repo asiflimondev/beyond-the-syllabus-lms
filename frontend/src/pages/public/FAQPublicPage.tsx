@@ -40,7 +40,7 @@ const FAQPublicPage: React.FC = () => {
     {
       id: 'g2',
       question: 'Is Beyond the Syllabus affiliated with Cambridge?',
-      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation centre. Our programmes follow the Cambridge curriculum and our teachers are Cambridge-certified instructors.',
+      answer: 'Yes! Beyond the Syllabus is an official Cambridge Assessment English preparation centre. Our programmes follow the Cambridge curriculum and our teachers are expert instructors.',
       category: 'general'
     },
     {
@@ -179,13 +179,6 @@ const FAQPublicPage: React.FC = () => {
       <section className="relative overflow-hidden text-white pt-32 pb-16" style={{ 
         background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
       }}>
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c7f1?auto=format&fit=crop&w=1900&q=80" 
-            alt="FAQ" 
-            className="w-full h-full object-cover opacity-20"
-          />
-        </div>
         <div className="relative z-10 container-fluid text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4">
             <HelpCircle className="w-4 h-4" />

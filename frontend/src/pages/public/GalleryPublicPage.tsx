@@ -176,13 +176,6 @@ const GalleryPublicPage: React.FC = () => {
       <section className="relative overflow-hidden text-white pt-32 pb-16" style={{ 
         background: 'linear-gradient(115deg, rgba(14,18,53,0.97) 0%, rgba(20,26,74,0.92) 44%, rgba(28,37,100,0.8) 100%)'
       }}>
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c7f1?auto=format&fit=crop&w=1900&q=80" 
-            alt="Gallery" 
-            className="w-full h-full object-cover opacity-20"
-          />
-        </div>
         <div className="relative z-10 container-fluid text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full text-orange-200 text-sm font-medium mb-4">
             <Camera className="w-4 h-4" />
@@ -261,6 +254,7 @@ const GalleryPublicPage: React.FC = () => {
                     alt={image.title}
                     className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
+                    style={{ display: 'none' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -288,6 +282,7 @@ const GalleryPublicPage: React.FC = () => {
                     alt={image.title}
                     className="w-full sm:w-48 h-32 object-cover rounded-xl"
                     loading="lazy"
+                    style={{ display: 'none' }}
                   />
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">{image.title}</h4>
@@ -338,6 +333,7 @@ const GalleryPublicPage: React.FC = () => {
               src={selectedImage.imageUrl}
               alt={selectedImage.title}
               className="max-w-full max-h-[80vh] object-contain rounded-2xl"
+              style={{ display: 'none' }}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 rounded-b-2xl">
               <h3 className="text-xl font-semibold text-white">{selectedImage.title}</h3>
