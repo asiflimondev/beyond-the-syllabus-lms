@@ -445,7 +445,7 @@ const HomePage: React.FC = () => {
             <div className="relative reveal" style={{ transitionDelay: '140ms' }}>
               <div className="relative rounded-3xl overflow-hidden shadow-sh-3 aspect-[4/4.7] bg-surface border-4 border-white/90 transform transition-transform duration-300 hover:scale-[1.02]">
                 <img
-                  src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1000&q=80"
+                  src="hero.jpeg"
                   alt="Students learning together"
                   className="w-full h-full object-cover"
                 />
@@ -653,7 +653,7 @@ const HomePage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2 rounded-2xl overflow-hidden shadow-sh-2 aspect-[16/9]">
                   <img 
-                    src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80" 
+                    src="sA1.jpeg" 
                     alt="University campus" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     loading="lazy"
@@ -661,7 +661,7 @@ const HomePage: React.FC = () => {
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-sh-1 aspect-square">
                   <img 
-                    src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=700&q=80" 
+                    src="sA2.jpg" 
                     alt="Graduation" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     loading="lazy"
@@ -669,7 +669,7 @@ const HomePage: React.FC = () => {
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-sh-1 aspect-square">
                   <img 
-                    src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=700&q=80" 
+                    src="sA3.jpg" 
                     alt="International students" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     loading="lazy"
@@ -723,7 +723,7 @@ const HomePage: React.FC = () => {
             <div className="order-1 lg:order-2 relative reveal" style={{ transitionDelay: '140ms' }}>
               <div className="rounded-3xl overflow-hidden shadow-sh-2 aspect-[5/5.4]">
                 <img 
-                  src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1000&q=80" 
+                  src="BuildtoGetRR.jpg" 
                   alt="Teacher with students" 
                   className="w-full h-full object-cover"
                   loading="lazy"
@@ -761,28 +761,28 @@ const HomePage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { 
-                src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80', 
-                label: 'Group study sessions',
+                src: 'CTLT1.jpeg', 
+                label: '',
                 tall: true,
               },
               { 
-                src: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=700&q=80', 
-                label: 'Speaking practice',
+                src: 'CTLT2.jpg', 
+                label: '',
                 tall: false,
               },
               { 
-                src: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=700&q=80', 
-                label: 'Young learners',
+                src: 'CTLT3.jpeg', 
+                label: '',
                 tall: false,
               },
               { 
-                src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80', 
-                label: 'Library & resources',
+                src: 'CTLT4m.jpeg', 
+                label: '',
                 tall: false,
               },
               { 
-                src: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=700&q=80', 
-                label: 'Our community',
+                src: 'CTLT5.jpeg', 
+                label: '',
                 tall: false,
               },
             ].map((item, index) => (
