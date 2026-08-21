@@ -74,7 +74,7 @@ const useStaircaseObserver = () => {
 };
 
 // ============================================
-// TESTIMONIALS CAROUSEL - MATCHES TEMPLATE
+// TESTIMONIALS CAROUSEL - WITH IMAGES
 // ============================================
 const TestimonialsCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -85,46 +85,36 @@ const TestimonialsCarousel: React.FC = () => {
       id: 1,
       name: 'Afnan Osman',
       score: 'Overall Band 8.5',
-      university: 'University of Cambridge, UK',
       testimonial: 'Beyond the Syllabus helped me achieve my dream of studying at Cambridge. The teachers are exceptional and the teaching methodology is world-class!',
-      color: '#f1592a',
-      initials: 'AO'
+      image: 'https://ui-avatars.com/api/?name=Afnan+Osman&size=150&background=f1592a&color=fff&font-size=0.5',
     },
     {
       id: 2,
       name: 'Rifat Hossain',
       score: 'Overall Band 8.5',
-      university: 'University of Melbourne, Australia',
       testimonial: 'The preparation I received was outstanding. I felt confident and prepared for the exam. Beyond the Syllabus truly goes beyond!',
-      color: '#283890',
-      initials: 'RH'
+      image: 'https://ui-avatars.com/api/?name=Rifat+Hossain&size=150&background=283890&color=fff&font-size=0.5',
     },
     {
       id: 3,
       name: 'Asif Limon',
       score: 'Overall Band 8.0',
-      university: 'University of Toronto, Canada',
       testimonial: 'I never thought I could achieve such a high score. The personalized attention and rigorous practice sessions made all the difference.',
-      color: '#3648ad',
-      initials: 'AL'
+      image: 'https://ui-avatars.com/api/?name=Asif+Limon&size=150&background=3648ad&color=fff&font-size=0.5',
     },
     {
       id: 4,
-      name: 'Ihram Mashhood',
+      name: 'Atiya Suhaila Simin',
       score: 'Overall Band 8.0',
-      university: 'University of Sydney, Australia',
-      testimonial: 'The mock tests and daily practice sessions were incredibly helpful. I felt fully prepared for the actual exam day.',
-      color: '#f4a06a',
-      initials: 'IM'
+      testimonial: 'I used to think English was all rules and structure, a subject you had to pass exams for. Cambridge English made me truly see that it is actually a language — a tool to communicate with. It was really about confidence in how I think, how I express myself, and how I show up. It\'s the reason I walked into a job feeling ready.',
+      image: 'simin.jpeg',
     },
     {
       id: 5,
-      name: 'Muntaqa Nudar',
+      name: 'Fatin Hamama',
       score: 'Overall Band 8.5',
-      university: 'National University of Singapore',
-      testimonial: 'Beyond the Syllabus gave me the confidence I needed. The teachers really care about their students\' success.',
-      color: '#7c85c8',
-      initials: 'MN'
+      testimonial: 'We often grow up thinking language learning is just rigid structures and rules. Beyond the Syllabus makes language learning feel like what it really is—communication, creative expression, and critical thinking. It was the most lively learning experience that actually stayed with me.',
+      image: 'fatin.jpeg',
     },
   ];
 
@@ -142,43 +132,42 @@ const TestimonialsCarousel: React.FC = () => {
     return () => clearInterval(timer);
   }, [isAutoPlaying]);
 
+  const current = testimonials[currentIndex];
+
   return (
     <div className="relative max-w-4xl mx-auto">
-      <div className="overflow-hidden rounded-3xl">
-        <div 
-          className="flex transition-transform duration-700 ease-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {testimonials.map((testimonial) => (
-            <div 
-              key={testimonial.id}
-              className="flex-none w-full px-6 py-12 md:py-16 text-center bg-white/5 border border-white/20 rounded-3xl"
-            >
-              <div className="flex justify-center gap-1 mb-4 text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-              </div>
-              <blockquote className="font-display text-xl md:text-2xl text-white leading-relaxed max-w-3xl mx-auto">
-                {testimonial.testimonial}
-              </blockquote>
-              <div className="flex items-center justify-center gap-3 mt-6">
-                <div 
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-display font-extrabold text-lg shadow-lg flex-shrink-0"
-                  style={{ backgroundColor: testimonial.color }}
-                >
-                  {testimonial.initials}
-                </div>
-                <div className="text-left">
-                  <p className="font-bold text-white font-display text-lg">{testimonial.name}</p>
-                  <p className="text-orange-200 text-sm font-semibold">{testimonial.score}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+      <div className="bg-white/5 border border-white/20 rounded-3xl px-8 py-10 md:px-12 md:py-12">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center md:items-center">
+          {/* Left - Student Image */}
+          <div className="flex-shrink-0">
+            <img 
+              src={current.image}
+              alt={current.name}
+              className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover shadow-lg border-2 border-white/20"
+            />
+          </div>
+
+          {/* Right - Content */}
+          <div className="flex-1 text-center md:text-left">
+            {/* Name */}
+            <p className="font-bold text-white font-display text-2xl md:text-3xl">
+              {current.name}
+            </p>
+
+            {/* Score */}
+            <p className="text-orange-300 text-base md:text-lg font-semibold mt-1">
+              {current.score}
+            </p>
+
+            {/* Testimonial */}
+            <blockquote className="text-lg md:text-xl text-white/90 leading-relaxed mt-4">
+              "{current.testimonial}"
+            </blockquote>
+          </div>
         </div>
       </div>
 
+      {/* Navigation Buttons */}
       <button
         onClick={() => { setIsAutoPlaying(false); prevSlide(); setTimeout(() => setIsAutoPlaying(true), 5000); }}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white hover:bg-orange-500 hover:border-transparent transition-all duration-300 flex items-center justify-center"
@@ -194,6 +183,7 @@ const TestimonialsCarousel: React.FC = () => {
         <ChevronRight className="w-6 h-6" />
       </button>
 
+      {/* Dots */}
       <div className="flex justify-center gap-2 mt-6">
         {testimonials.map((_, index) => (
           <button
@@ -563,7 +553,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          STUDY ABROAD & SCHOLARSHIPS - MOVED UP (Now with darkish background)
+          STUDY ABROAD & SCHOLARSHIPS
           ========================================== */}
       <section className="py-16 lg:py-20 bg-surface border-y border-line overflow-hidden">
         <div className="container-fluid">
@@ -651,7 +641,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          HOW WE TEACH - MOVED DOWN (Now with white background)
+          HOW WE TEACH
           ========================================== */}
       <section className="py-16 lg:py-20 bg-white border-y border-line">
         <div className="container-fluid">
@@ -809,9 +799,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          SUCCESS STORIES
+          SUCCESS STORIES - WITH IMAGES
           ========================================== */}
-      <section className="py-16 lg:py-20 text-white relative overflow-hidden" style={{ 
+      <section className="py-20 lg:py-28 text-white relative overflow-hidden" style={{ 
         background: 'linear-gradient(115deg, #0e1235 0%, #141a4a 44%, #1c2564 100%)'
       }}>
         <div className="absolute inset-0 opacity-30">
@@ -819,7 +809,7 @@ const HomePage: React.FC = () => {
           <div className="absolute bottom-0 right-0 w-1/2 h-full bg-blue-600/20 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 container-fluid">
-          <div className="section-head centered reveal" style={{ marginBottom: '40px' }}>
+          <div className="section-head centered reveal" style={{ marginBottom: '48px' }}>
             <span className="kicker" style={{ color: '#ffd6c4' }}>
               <span className="tick" style={{ background: 'rgba(241,89,42,0.22)', color: '#ffd6c4' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">

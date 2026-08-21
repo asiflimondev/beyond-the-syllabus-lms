@@ -40,11 +40,11 @@ const testimonials = [
   },
   {
     id: 5,
-    name: 'Muntaqa Nudar',
+    name: 'Fatin Hamama',
     score: 'Overall Band 8.5',
     university: 'National University of Singapore',
     testimonial: 'Beyond the Syllabus gave me the confidence I needed. The teachers really care about their students\' success.',
-    image: 'https://ui-avatars.com/api/?name=Muntaqa+Nudar&size=80&background=0ea5e9&color=fff&font-size=0.5',
+    image: 'fatin.jpeg',
     rating: 5,
   },
 ];
