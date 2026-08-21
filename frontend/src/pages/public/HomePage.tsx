@@ -504,7 +504,7 @@ const HomePage: React.FC = () => {
             <span className="kicker">
               <span className="tick">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <path d="M4 19V5m0 14h16M8 19v-6m4 6V9m4 10V6" />
+                  <path d="M4 19V5m0 14h16M8 19v-6m4 19V9m4 10V6" />
                 </svg>
               </span>
               Cambridge Qualifications
@@ -563,44 +563,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ==========================================
-          HOW WE TEACH - WITH 8 CARDS
+          STUDY ABROAD & SCHOLARSHIPS - MOVED UP (Now with darkish background)
           ========================================== */}
-      <section className="py-16 lg:py-20 bg-surface border-y border-line">
-        <div className="container-fluid">
-          <div className="section-head centered reveal">
-            <span className="kicker">
-              <span className="tick">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <path d="M12 2l3 7h7l-6 4 2 8-6-4-6 4 2-8-6-4h7z" />
-                </svg>
-              </span>
-              How we teach
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A whole system — not just a classroom.</h2>
-            <p className="text-gray-500 text-lg">Everything a learner needs to prepare, practise and pass, under one roof in Dhaka.</p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 reveal">
-            {quickServices.map((service, index) => (
-              <div 
-                key={index} 
-                className="bg-white rounded-r-lg p-6 border border-line hover:shadow-sh-2 hover:-translate-y-1 transition-all duration-300 text-center"
-                style={{ transitionDelay: `${index * 40}ms` }}
-              >
-                <div className={`w-14 h-14 rounded-xl ${service.color} flex items-center justify-center mx-auto mb-3`}>
-                  <service.icon className="w-7 h-7" />
-                </div>
-                <span className="text-sm font-semibold text-ink">{service.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================
-          STUDY ABROAD & SCHOLARSHIPS
-          ========================================== */}
-      <section className="py-16 lg:py-20 bg-white border-y border-line overflow-hidden">
+      <section className="py-16 lg:py-20 bg-surface border-y border-line overflow-hidden">
         <div className="container-fluid">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="order-2 lg:order-1">
@@ -681,6 +646,41 @@ const HomePage: React.FC = () => {
                 Worldwide recognition
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================
+          HOW WE TEACH - MOVED DOWN (Now with white background)
+          ========================================== */}
+      <section className="py-16 lg:py-20 bg-white border-y border-line">
+        <div className="container-fluid">
+          <div className="section-head centered reveal">
+            <span className="kicker">
+              <span className="tick">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 2l3 7h7l-6 4 2 8-6-4-6 4 2-8-6-4h7z" />
+                </svg>
+              </span>
+              How we teach
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A whole system — not just a classroom.</h2>
+            <p className="text-gray-500 text-lg">Everything a learner needs to prepare, practise and pass, under one roof in Dhaka.</p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 reveal">
+            {quickServices.map((service, index) => (
+              <div 
+                key={index} 
+                className="bg-white rounded-r-lg p-6 border border-line hover:shadow-sh-2 hover:-translate-y-1 transition-all duration-300 text-center"
+                style={{ transitionDelay: `${index * 40}ms` }}
+              >
+                <div className={`w-14 h-14 rounded-xl ${service.color} flex items-center justify-center mx-auto mb-3`}>
+                  <service.icon className="w-7 h-7" />
+                </div>
+                <span className="text-sm font-semibold text-ink">{service.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
