@@ -429,14 +429,15 @@ const StudentRegisterPage: React.FC = () => {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-white text-gray-400"></span>
+                  <span className="px-3 bg-white text-gray-400">or</span>
                 </div>
               </div>
               <Link
-                
+                to="/register"
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition-colors group"
               >
-                
-                <span className="group-hover:underline"></span>
+                <UserPlus className="w-4 h-4 text-orange-400 group-hover:scale-110 transition-transform" />
+                <span className="group-hover:underline">Create a new account</span>
               </Link>
             </div>
           </form>

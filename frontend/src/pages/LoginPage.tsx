@@ -352,9 +352,9 @@ const LoginPage: React.FC = () => {
             {/* Register Links */}
             <div className="text-center space-y-3 pt-2">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                
                 <Link to="/register" className="font-medium text-orange-600 hover:text-orange-700 transition-colors hover:underline">
-                  Create one now
+                  
                 </Link>
               </p>
               <div className="relative">
@@ -362,7 +362,7 @@ const LoginPage: React.FC = () => {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-white text-gray-400">or</span>
+                  <span className="px-3 bg-white text-gray-400"></span>
                 </div>
               </div>
               <Link
