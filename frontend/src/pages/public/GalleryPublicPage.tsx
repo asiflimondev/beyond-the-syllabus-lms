@@ -37,108 +37,93 @@ const GalleryPublicPage: React.FC = () => {
     {
       id: '1',
       title: 'Modern Classroom',
-      description: 'Our state-of-the-art classroom with smart board technology',
-      imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=400&fit=crop',
+      description: '',
+      imageUrl: '1.jpg',
       category: 'classroom',
       date: '2024-01-15'
     },
     {
       id: '2',
       title: 'Interactive Learning',
-      description: 'Students engaged in interactive group activities',
-      imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop',
+      description: '',
+      imageUrl: '2.jpg',
       category: 'classroom',
       date: '2024-02-20'
     },
     {
       id: '3',
       title: 'Smart Classroom',
-      description: 'Technology-enabled classroom for enhanced learning',
-      imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop',
+      description: '',
+      imageUrl: '3.jpg',
       category: 'classroom',
       date: '2024-03-10'
     },
     {
       id: '4',
       title: 'Student Collaboration',
-      description: 'Students working together on group projects',
-      imageUrl: 'https://images.unsplash.com/photo-1513258496099-48168024aec0?w=600&h=400&fit=crop',
+      description: '',
+      imageUrl: '4.jpg',
       category: 'classroom',
       date: '2024-04-05'
     },
     // Events Images
-    
     {
       id: '6',
       title: 'Award Ceremony',
-      description: 'Recognizing outstanding student performance',
-      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&h=400&fit=crop',
-      category: 'events',
+      description: '',
+      imageUrl: '6.jpg',
+      category: 'classroom',
       date: '2024-06-20'
     },
     {
       id: '7',
       title: 'Annual Day Celebration',
-      description: 'Students performing at our annual day event',
-      imageUrl: 'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=600&h=400&fit=crop',
-      category: 'events',
+      description: '',
+      imageUrl: '7.jpg',
+      category: 'classroom',
       date: '2024-07-10'
     },
     // Programs Images
     {
       id: '8',
       title: 'Cambridge Exam Preparation',
-      description: 'Students preparing for Cambridge English exams',
-      imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop',
-      category: 'programs',
+      description: '',
+      imageUrl: '8.jpg',
+      category: 'classroom',
       date: '2024-08-15'
     },
     {
       id: '9',
       title: 'Speaking Practice Session',
-      description: 'Students practicing their speaking skills',
-      imageUrl: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=600&h=400&fit=crop',
-      category: 'programs',
+      description: '',
+      imageUrl: '9.jpg',
+      category: 'classroom',
       date: '2024-09-05'
-    },
-    {
-      id: '10',
-      title: 'Writing Workshop',
-      description: 'Developing academic writing skills',
-      imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&h=400&fit=crop',
-      category: 'programs',
-      date: '2024-10-20'
     },
     // Facility Images
     {
       id: '11',
       title: 'Library & Study Area',
-      description: 'Quiet study space with extensive resources',
-      imageUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600&h=400&fit=crop',
-      category: 'facility',
+      description: '',
+      imageUrl: '10.jpg',
+      category: 'classroom',
       date: '2024-11-01'
     },
     {
       id: '12',
       title: 'Student Lounge',
-      description: 'Comfortable lounge area for students to relax',
-      imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop',
-      category: 'facility',
+      description: '',
+      imageUrl: '5.jpg',
+      category: 'classroom',
       date: '2024-12-10'
     }
   ];
 
   const categories: { value: GalleryCategory; label: string; icon: React.ReactNode }[] = [
     { value: 'all', label: 'All Photos', icon: <ImageIcon className="w-4 h-4" /> },
-    { value: 'classroom', label: 'Classroom', icon: <BookOpen className="w-4 h-4" /> },
-    { value: 'events', label: 'Events', icon: <Calendar className="w-4 h-4" /> },
-    { value: 'programs', label: 'Programmes', icon: <Sparkles className="w-4 h-4" /> },
-    { value: 'facility', label: 'Facility', icon: <Users className="w-4 h-4" /> },
   ];
 
-  const filteredImages = selectedCategory === 'all' 
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === selectedCategory);
+  const filteredImages = galleryImages;
 
   const getCategoryCount = (category: GalleryCategory) => {
     if (category === 'all') return galleryImages.length;
@@ -238,7 +223,7 @@ const GalleryPublicPage: React.FC = () => {
           {filteredImages.length === 0 ? (
             <div className="text-center py-12">
               <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No photos found in this category.</p>
+              <p className="text-gray-500">No photos found.</p>
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -254,7 +239,6 @@ const GalleryPublicPage: React.FC = () => {
                     alt={image.title}
                     className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
-                    style={{ display: 'none' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -282,7 +266,6 @@ const GalleryPublicPage: React.FC = () => {
                     alt={image.title}
                     className="w-full sm:w-48 h-32 object-cover rounded-xl"
                     loading="lazy"
-                    style={{ display: 'none' }}
                   />
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">{image.title}</h4>
@@ -333,7 +316,6 @@ const GalleryPublicPage: React.FC = () => {
               src={selectedImage.imageUrl}
               alt={selectedImage.title}
               className="max-w-full max-h-[80vh] object-contain rounded-2xl"
-              style={{ display: 'none' }}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 rounded-b-2xl">
               <h3 className="text-xl font-semibold text-white">{selectedImage.title}</h3>
