@@ -77,7 +77,7 @@ const useStaircaseObserver = () => {
 };
 
 // ============================================
-// LATEST NOTICES SECTION
+// LATEST NOTICES SECTION - FINAL
 // ============================================
 const LatestNotices: React.FC = () => {
   const { data, isLoading } = useQuery({
@@ -109,25 +109,11 @@ const LatestNotices: React.FC = () => {
     });
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <section className="py-16 lg:py-20 bg-surface border-y border-line">
-        <div className="container-fluid">
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
-            <p className="mt-3 text-gray-500">Loading notices...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="py-16 lg:py-20 bg-surface border-y border-line">
       <div className="container-fluid">
         <div className="max-w-6xl mx-auto">
-          {/* Section Header - Matching "Study Abroad" and "How We Teach" */}
+          {/* Section Header */}
           <div className="section-head centered reveal">
             <span className="kicker">
               <span className="tick">
@@ -145,36 +131,42 @@ const LatestNotices: React.FC = () => {
             </p>
           </div>
 
-          {notices.length === 0 ? (
+          {/* Loading */}
+          {isLoading && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
+              <p className="mt-3 text-gray-500">Loading notices...</p>
+            </div>
+          )}
+
+          {/* No Notices */}
+          {!isLoading && notices.length === 0 && (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
               <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 font-medium">No notices available at the moment.</p>
               <p className="text-sm text-gray-400 mt-1">Check back later for updates.</p>
             </div>
-          ) : (
+          )}
+
+          {/* Notices Grid - With Proper Centering */}
+          {!isLoading && notices.length > 0 && (
             <>
-              {/* Responsive grid with proper centering */}
-              <div className={`grid gap-6 reveal ${
-                notices.length === 1 
-                  ? 'grid-cols-1 max-w-md mx-auto' 
-                  : notices.length === 2 
-                  ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto' 
-                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              }`}>
-                {notices.slice(0, 5).map((notice, index) => (
+              <div className={`
+                grid gap-6
+                ${notices.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : ''}
+                ${notices.length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto' : ''}
+                ${notices.length >= 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : ''}
+              `}>
+                {notices.slice(0, 5).map((notice: any, index: number) => (
                   <Link
                     key={notice._id}
                     to={`/notices/${notice._id}`}
                     className="group bg-white rounded-2xl border border-line p-6 hover:shadow-sh-2 hover:-translate-y-1 transition-all duration-300 flex flex-col"
                     style={{ transitionDelay: `${index * 80}ms` }}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      {/* Title - Bigger and more prominent */}
-                      <h3 className="font-display font-extrabold text-xl md:text-2xl text-blue-900 group-hover:text-orange-600 transition-colors line-clamp-2 flex-1 leading-tight">
-                        {notice.title}
-                      </h3>
-                    </div>
-                    {/* Description - Smaller and lighter */}
+                    <h3 className="font-display font-extrabold text-xl md:text-2xl text-blue-900 group-hover:text-orange-600 transition-colors line-clamp-2 leading-tight">
+                      {notice.title}
+                    </h3>
                     <p className="text-ink-soft text-sm mt-2 line-clamp-3 flex-1">
                       {notice.content}
                     </p>
@@ -190,7 +182,7 @@ const LatestNotices: React.FC = () => {
                 ))}
               </div>
 
-              {/* View All Button - Matching "Why Choose Us" style */}
+              {/* View All Button */}
               <div className="flex justify-center mt-10">
                 <Link
                   to="/notices"
