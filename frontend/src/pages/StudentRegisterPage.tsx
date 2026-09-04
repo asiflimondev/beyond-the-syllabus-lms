@@ -18,8 +18,7 @@ import {
   X,
   BookOpen,
   Sparkles,
-  GraduationCap,
-  UserPlus
+  GraduationCap
 } from 'lucide-react';
 import btsLogo from '/bts-logo.png';
 import cambridgeLogo from '/cambridge-logo.png';
