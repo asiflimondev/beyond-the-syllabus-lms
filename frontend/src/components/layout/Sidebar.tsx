@@ -78,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items.push({ path: '/admin/students', icon: Users, label: 'Students' });
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });
       items.push({ path: '/admin/receipts', icon: Receipt, label: 'Receipts' });
-      items.push({ path: '/admin/mock-tests', icon: FileText, label: 'Mock Tests' });
+      items.push({ path: '/admin/mock-tests', icon: FileText, label: 'Tests' });
       items.push({ path: '/admin/reports', icon: FileText, label: 'Reports' });
       items.push({ path: '/admin/teachers', icon: Users, label: 'Teachers' });
       items.push({ path: '/admin/office-members', icon: Users, label: 'Office Members' });

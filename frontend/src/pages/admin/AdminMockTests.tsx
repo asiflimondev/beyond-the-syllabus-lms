@@ -174,13 +174,13 @@ const AdminMockTests: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests-counts'] });
       queryClient.invalidateQueries({ queryKey: ['admin-mocktests'] });
-      toast.success('Mock test created successfully!');
+      toast.success('Test created successfully!');
       setIsFormOpen(false);
       resetForm();
     },
     onError: (error: any) => {
       console.error('Create mock test error:', error);
-      const message = error.response?.data?.message || error.message || 'Failed to create mock test';
+      const message = error.response?.data?.message || error.message || 'Failed to create test';
       toast.error(message);
     },
   });
@@ -191,7 +191,7 @@ const AdminMockTests: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-all-mocktests-counts'] });
       queryClient.invalidateQueries({ queryKey: ['admin-mocktests'] });
-      toast.success('Mock test updated successfully!');
+      toast.success('Test updated successfully!');
       setIsFormOpen(false);
       setEditingTest(null);
       resetForm();
@@ -729,17 +729,17 @@ const AdminMockTests: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <FileText className="w-5 h-5 text-orange-500" />
-            <span className="text-sm font-medium text-orange-600">Mock Tests</span>
+            <span className="text-sm font-medium text-orange-600">Tests</span>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 font-display">Mock Tests</h2>
-          <p className="text-sm text-gray-500 mt-0.5">Create, manage, and enter marks for mock tests</p>
+          <h2 className="text-2xl font-bold text-gray-900 font-display">Tests</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Create, manage, and enter marks for tests</p>
         </div>
         <button 
           onClick={handleOpenCreate} 
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
           <Plus className="w-5 h-5" />
-          <span>Create Mock Test</span>
+          <span>Create Test</span>
         </button>
       </div>
 
@@ -748,7 +748,7 @@ const AdminMockTests: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg p-16 text-center">
           <GraduationCap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500 font-medium">No programs found</p>
-          <p className="text-sm text-gray-400 mt-1">Create a program first to add mock tests</p>
+          <p className="text-sm text-gray-400 mt-1">Create a program first to add tests</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -773,7 +773,7 @@ const AdminMockTests: React.FC = () => {
                         {program.displayName?.en || program.name}
                       </h4>
                       <p className="text-xs text-gray-500">
-                        {program.mockTestCount} mock test{program.mockTestCount !== 1 ? 's' : ''}
+                        {program.mockTestCount} test{program.mockTestCount !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
@@ -797,12 +797,12 @@ const AdminMockTests: React.FC = () => {
                     ) : mockTests.length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
                         <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-sm">No mock tests created for this program</p>
+                        <p className="text-sm">No tests created for this program</p>
                         <button
                           onClick={handleOpenCreate}
                           className="mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
                         >
-                          Create your first mock test
+                          Create your first test
                         </button>
                       </div>
                     ) : (
