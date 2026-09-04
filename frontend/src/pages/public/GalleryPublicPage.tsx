@@ -9,10 +9,6 @@ import {
   Grid,
   List,
   Image as ImageIcon,
-  Users,
-  Calendar,
-  BookOpen,
-  Sparkles,
   ChevronRight as ChevronRightIcon
 } from 'lucide-react';
 
