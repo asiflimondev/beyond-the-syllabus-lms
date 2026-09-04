@@ -13,12 +13,16 @@ import GalleryPublicPage from '@pages/public/GalleryPublicPage';
 import FAQPublicPage from '@pages/public/FAQPublicPage';
 import ContactPage from '@pages/public/ContactPage';
 
+// Notice Pages
+import NoticesPage from '@pages/public/NoticesPage';
+import NoticeDetailPage from '@pages/public/NoticeDetailPage';
+
 // Auth Pages
 import LoginPage from '@pages/LoginPage';
 import RegisterPage from '@pages/RegisterPage';
 import StudentRegisterPage from '@pages/StudentRegisterPage';
-import ForgotPasswordPage from '@pages/ForgotPasswordPage';  // <--- NEW
-import ResetPasswordPage from '@pages/ResetPasswordPage';    // <--- NEW
+import ForgotPasswordPage from '@pages/ForgotPasswordPage';
+import ResetPasswordPage from '@pages/ResetPasswordPage';
 
 // Protected Pages (Admin)
 import DashboardPage from '@pages/DashboardPage';
@@ -30,6 +34,7 @@ import AdminMockTests from '@pages/admin/AdminMockTests';
 import AdminMarkEntry from '@pages/admin/AdminMarkEntry';
 import BatchReport from '@pages/admin/BatchReport';
 import IndividualReport from '@pages/admin/IndividualReport';
+import NoticeManagement from '@pages/admin/NoticeManagement';
 
 // Protected Pages (Teacher)
 import TeacherDashboard from '@pages/teacher/TeacherDashboard';
@@ -122,12 +127,16 @@ function App() {
             <Route path="/faq" element={<FAQPublicPage />} />
             <Route path="/contact" element={<ContactPage />} />
 
+            {/* Notice Routes */}
+            <Route path="/notices" element={<NoticesPage />} />
+            <Route path="/notices/:id" element={<NoticeDetailPage />} />
+
             {/* Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/student-register" element={<StudentRegisterPage />} />
 
-            {/* Password Reset Routes - NEW */}
+            {/* Password Reset Routes */}
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
@@ -145,6 +154,9 @@ function App() {
             <Route path="/admin/reports" element={<ProtectedRoute><BatchReport /></ProtectedRoute>} />
             <Route path="/admin/reports/individual" element={<ProtectedRoute><IndividualReport /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
+            {/* Notice Management - Admin */}
+            <Route path="/admin/notices" element={<ProtectedRoute><NoticeManagement /></ProtectedRoute>} />
 
             {/* Protected Routes - Teacher */}
             <Route path="/teacher" element={<ProtectedRoute><Navigate to="/teacher/dashboard" /></ProtectedRoute>} />

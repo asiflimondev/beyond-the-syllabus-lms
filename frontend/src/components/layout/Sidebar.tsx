@@ -12,6 +12,7 @@ import {
   User,
   Receipt,
   ChevronRight,
+  Megaphone, // <-- ADD THIS
 } from 'lucide-react';
 import btsLogo from '/bts-logo.png';
 
@@ -72,6 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     });
 
     if (user?.role === 'admin') {
+      items.push({ path: '/admin/notices', icon: Megaphone, label: 'Notices' }); // <-- ADDED
       items.push({ path: '/admin/programs', icon: BookOpen, label: 'Programmes' });
       items.push({ path: '/admin/students', icon: Users, label: 'Students' });
       items.push({ path: '/admin/admission', icon: UserPlus, label: 'Admission' });

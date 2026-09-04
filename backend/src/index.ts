@@ -24,12 +24,13 @@ import publicRoutes from './routes/public.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import officeMemberRoutes from './routes/admin/officeMember.routes.js';
 import contactRoutes from './routes/contact.routes.js';
-import adminActivityRoutes from './routes/admin/activity.routes.js'; // NEW
+import adminActivityRoutes from './routes/admin/activity.routes.js';
+import noticeRoutes from './routes/notice.routes.js'; // NEW
 
 import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import { seedAdmin } from './utils/seedAdmin.js';
 
-const app: Express = express(); 
+const app: Express = express();
 
 // ============================================
 // BODY PARSER - CRITICAL!
@@ -147,8 +148,11 @@ console.log('✅ Office Member routes mounted at /api/admin/office-members');
 app.use('/api/contact', contactRoutes);
 console.log('✅ Contact routes mounted at /api/contact');
 
-app.use('/api/admin/activities', adminActivityRoutes); // NEW
-console.log('✅ Admin Activity routes mounted at /api/admin/activities'); // NEW
+app.use('/api/admin/activities', adminActivityRoutes);
+console.log('✅ Admin Activity routes mounted at /api/admin/activities');
+
+app.use('/api/notices', noticeRoutes); // NEW
+console.log('✅ Notice routes mounted at /api/notices');
 
 // ============================================
 // ERROR HANDLING
@@ -188,7 +192,8 @@ const startServer = async (): Promise<void> => {
       console.log(`   📄 /api/admin/receipts    - Admin Receipt Management`);
       console.log(`   📝 /api/admin/mock-tests  - Admin Mock Test Management`);
       console.log(`   📝 /api/office/mock-tests - Office Mock Test Management`);
-      console.log(`   📊 /api/admin/activities  - Admin Dashboard Activities`); // NEW
+      console.log(`   📊 /api/admin/activities  - Admin Dashboard Activities`);
+      console.log(`   📢 /api/notices           - Notice Management`); // NEW
       console.log(`   🌐 /api/public            - Public Routes`);
       console.log('=================================\n');
     });

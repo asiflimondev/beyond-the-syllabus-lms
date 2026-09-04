@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { noticeApi } from '@api/notice.api';
 import { 
   Award, 
   Users, 
@@ -18,7 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  Shield
+  Shield,
+  FileText
 } from 'lucide-react';
 import PublicLayout from '@components/layout/PublicLayout';
 import ScrollProgress from '@components/ScrollProgress';
@@ -74,6 +77,138 @@ const useStaircaseObserver = () => {
 };
 
 // ============================================
+// LATEST NOTICES SECTION
+// ============================================
+const LatestNotices: React.FC = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['latest-notices'],
+    queryFn: () => noticeApi.getLatestNotices(5),
+  });
+
+  const notices = data?.data?.data || [];
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      General: 'bg-blue-100 text-blue-700',
+      Admission: 'bg-green-100 text-green-700',
+      Exam: 'bg-orange-100 text-orange-700',
+      Class: 'bg-purple-100 text-purple-700',
+      Holiday: 'bg-red-100 text-red-700',
+      Event: 'bg-pink-100 text-pink-700',
+      Important: 'bg-amber-100 text-amber-700',
+    };
+    return colors[category] || 'bg-gray-100 text-gray-700';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section className="py-16 lg:py-20 bg-surface border-y border-line">
+        <div className="container-fluid">
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
+            <p className="mt-3 text-gray-500">Loading notices...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-16 lg:py-20 bg-surface border-y border-line">
+      <div className="container-fluid">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header - Matching "Study Abroad" and "How We Teach" */}
+          <div className="section-head centered reveal">
+            <span className="kicker">
+              <span className="tick">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 2l2.4 5 5.6.6-4.2 3.8 1.2 5.6L12 20l-5 2.6 1.2-5.6L4 13.2l5.6-.6z" />
+                </svg>
+              </span>
+              Latest Notices
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">
+              Stay updated with our announcements
+            </h2>
+            <p className="text-gray-500 text-lg">
+              Important updates, schedules, and information from Beyond the Syllabus
+            </p>
+          </div>
+
+          {notices.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 font-medium">No notices available at the moment.</p>
+              <p className="text-sm text-gray-400 mt-1">Check back later for updates.</p>
+            </div>
+          ) : (
+            <>
+              {/* Responsive grid with proper centering */}
+              <div className={`grid gap-6 reveal ${
+                notices.length === 1 
+                  ? 'grid-cols-1 max-w-md mx-auto' 
+                  : notices.length === 2 
+                  ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto' 
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`}>
+                {notices.slice(0, 5).map((notice, index) => (
+                  <Link
+                    key={notice._id}
+                    to={`/notices/${notice._id}`}
+                    className="group bg-white rounded-2xl border border-line p-6 hover:shadow-sh-2 hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                    style={{ transitionDelay: `${index * 80}ms` }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Title - Bigger and more prominent */}
+                      <h3 className="font-display font-extrabold text-xl md:text-2xl text-blue-900 group-hover:text-orange-600 transition-colors line-clamp-2 flex-1 leading-tight">
+                        {notice.title}
+                      </h3>
+                    </div>
+                    {/* Description - Smaller and lighter */}
+                    <p className="text-ink-soft text-sm mt-2 line-clamp-3 flex-1">
+                      {notice.content}
+                    </p>
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-line">
+                      <span className="text-xs text-muted">
+                        {formatDate(notice.publishedAt || notice.createdAt)}
+                      </span>
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${getCategoryColor(notice.category)}`}>
+                        {notice.category}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* View All Button - Matching "Why Choose Us" style */}
+              <div className="flex justify-center mt-10">
+                <Link
+                  to="/notices"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold rounded-full border-2 border-orange-200 hover:bg-orange-50 hover:-translate-y-0.5 shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  View All Notices
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
 // TESTIMONIALS CAROUSEL - WITH IMAGES
 // ============================================
 const TestimonialsCarousel: React.FC = () => {
@@ -85,7 +220,7 @@ const TestimonialsCarousel: React.FC = () => {
       id: 1,
       name: 'Atiya Suhaila Simin',
       score: 'CAE Score: 201',
-      testimonial: 'I used to think English was just rules for passing exams. Cambridge English showed me it’s a tool to communicate, express myself, and think clearly. It\'s the reason I walked into my job feeling completely ready.',
+      testimonial: 'I used to think English was just rules for passing exams. Cambridge English showed me it\'s a tool to communicate, express myself, and think clearly. It\'s the reason I walked into my job feeling completely ready.',
       image: 'simin.jpeg',
     },
     {
@@ -463,6 +598,11 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ==========================================
+          LATEST NOTICES
+          ========================================== */}
+      <LatestNotices />
 
       {/* ==========================================
           CAMBRIDGE QUALIFICATIONS - STAIRCASE
