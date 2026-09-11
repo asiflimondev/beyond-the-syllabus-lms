@@ -23,6 +23,12 @@ const FacebookIcon = () => (
   </svg>
 );
 
+const YoutubeIcon = () => (
+  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path fillRule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" clipRule="evenodd" />
+  </svg>
+);
+
 const contactSchema = yup.object({
   name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
   email: yup.string().email('Please enter a valid email').required('Email is required'),
@@ -109,11 +115,11 @@ const ContactPage: React.FC = () => {
     },
     {
       icon: Clock,
-      title: 'Working Hours',
+      title: 'Office Hours',
       details: [
-        'Saturday - Tuesday: 9:00 AM - 8:00 PM',
-        'Thursday: 9:00 AM - 8:00 PM',
-        'Wednesday & Friday: Closed'
+        'Saturday: 9:00 AM to 8:00 PM',
+        'Sunday to Thursday: 1:30 PM to 8:00 PM',
+        'Monday & Friday: Closed'
       ],
       description: ''
     }
@@ -124,6 +130,11 @@ const ContactPage: React.FC = () => {
       icon: FacebookIcon, 
       label: 'Facebook', 
       url: 'https://www.facebook.com/BeyondTheSyllabusedu' 
+    },
+    { 
+      icon: YoutubeIcon, 
+      label: 'YouTube', 
+      url: 'https://www.youtube.com/@BeyondTheSyllabusOrg' 
     },
   ];
 
@@ -173,7 +184,9 @@ const ContactPage: React.FC = () => {
                     <div>
                       <h4 className="font-semibold text-gray-900">{info.title}</h4>
                       {info.details.map((detail, i) => (
-                        <p key={i} className="text-sm text-gray-600">{detail}</p>
+                        <p key={i} className={`text-sm ${info.title === 'Office Hours' && detail.includes('Closed') ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                          {detail}
+                        </p>
                       ))}
                       {info.description && (
                         <p className="text-xs text-gray-400 mt-1">{info.description}</p>

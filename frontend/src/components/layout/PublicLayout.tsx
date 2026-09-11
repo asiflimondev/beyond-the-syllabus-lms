@@ -213,26 +213,26 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 A Cambridge English Language Preparation Centre in Dhaka, Bangladesh — helping learners achieve their English goals, one level at a time.
               </p>
               <div className="flex gap-2 pt-2">
-                <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300">
+                {/* Facebook */}
+                <a 
+                  href="https://www.facebook.com/BeyondTheSyllabusedu" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300"
+                >
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z"/>
                   </svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <rect x="2" y="2" width="20" height="20" rx="5.5"/>
-                    <circle cx="12" cy="12" r="4"/>
-                    <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/>
-                  </svg>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300">
+                {/* YouTube */}
+                <a 
+                  href="https://www.youtube.com/@BeyondTheSyllabusOrg" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300"
+                >
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 00-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4A2.5 2.5 0 001.4 7.3C1 8.8 1 12 1 12s0 3.2.4 4.7a2.5 2.5 0 001.7 1.7c1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4a2.5 2.5 0 001.7-1.7C23 15.2 23 12 23 12zM9.8 15.3V8.7l6 3.3z"/>
-                  </svg>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-orange-500 hover:-translate-y-0.5 transition-all duration-300">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2a10 10 0 00-8.5 15.2L2 22l4.9-1.5A10 10 0 1012 2zm5.3 13.9c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.9-4.5-4-.1-.2-1-1.4-1-2.6s.6-1.8.9-2.1c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.6-.1 1.2z"/>
                   </svg>
                 </a>
               </div>

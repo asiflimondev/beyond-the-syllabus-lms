@@ -219,7 +219,7 @@ const TestimonialsCarousel: React.FC = () => {
       id: 2,
       name: 'Fatin Hamama',
       score: 'CAE Score: 209',
-      testimonial: 'We often grow up thinking language learning is just rigid structures and rules. Beyond the Syllabus makes language learning feel like what it really is—communication, creative expression, and critical thinking. It was the most lively learning experience that actually stayed with me.',
+      testimonial: 'We often grow up thinking language learning is just rigid structures and rules. Beyond the Syllabus makes language learning feel like what it really is-communication, creative expression, and critical thinking. It was the most lively learning experience that actually stayed with me.',
       image: 'fatin.jpeg',
     },
   ];
@@ -390,12 +390,12 @@ const HomePage: React.FC = () => {
     {
       tag: 'Our vision',
       title: 'Fluency beyond exams',
-      description: 'To be Bangladesh\'s most trusted Cambridge English centre — known for taking learners beyond the syllabus to lasting fluency.'
+      description: 'To be Bangladesh\'s most trusted Cambridge English centre - known for taking learners beyond the syllabus to lasting fluency.'
     },
     {
       tag: 'Our values',
       title: 'Rigour & care',
-      description: 'Academic excellence, integrity and individual attention — every student supported as a person, not a number.'
+      description: 'Academic excellence, integrity and individual attention - every student supported as a person, not a number.'
     }
   ];
 
@@ -509,7 +509,7 @@ const HomePage: React.FC = () => {
               </h1>
 
               <p className="text-lg text-white/80 max-w-2xl mt-6 leading-relaxed reveal" style={{ transitionDelay: '140ms' }}>
-                Cambridge-certified courses, a proven level-by-level path, and real classroom energy — guiding learners from their first words to confident, exam-ready fluency and the world beyond.
+                Cambridge-certified courses, a proven level-by-level path, and real classroom energy - guiding learners from their first words to confident, exam-ready fluency and the world beyond.
               </p>
 
               <div className="flex flex-wrap gap-4 mt-8 reveal" style={{ transitionDelay: '220ms' }}>
@@ -611,7 +611,7 @@ const HomePage: React.FC = () => {
               Cambridge Qualifications
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Climb the staircase, <br></br>step by step.</h2>
-            <p className="text-gray-500 text-lg">Every learner is placed at the right level, then rises one confident Cambridge step at a time — each stage mapped to the Common European Framework (CEFR).</p>
+            <p className="text-gray-500 text-lg">Every learner is placed at the right level, then rises one confident Cambridge step at a time - each stage mapped to the Common European Framework (CEFR).</p>
           </div>
 
           <div className="staircase-container" id="staircase">
@@ -681,7 +681,7 @@ const HomePage: React.FC = () => {
                   Study Abroad &amp; Scholarships
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Your English, a passport to the world.</h2>
-                <p className="text-gray-500 text-lg">A Cambridge Qualification is recognised by universities and employers across the globe — the first step from a classroom in Dhaka to a campus abroad.</p>
+                <p className="text-gray-500 text-lg">A Cambridge Qualification is recognised by universities and employers across the globe - the first step from a classroom in Dhaka to a campus abroad.</p>
               </div>
 
               <div className="space-y-4">
@@ -765,7 +765,7 @@ const HomePage: React.FC = () => {
               </span>
               How we teach
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A whole system — not just a classroom.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">A whole system, not just a classroom.</h2>
             <p className="text-gray-500 text-lg">Everything a learner needs to prepare, practise and pass, under one roof in Dhaka.</p>
           </div>
 
@@ -803,7 +803,7 @@ const HomePage: React.FC = () => {
                   Why families choose us
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Built to get real results.</h2>
-                <p className="text-gray-500 text-lg">Cambridge rigour with genuine care — the reason students trust us with their goals.</p>
+                <p className="text-gray-500 text-lg">Cambridge rigour with genuine care - the reason students trust us with their goals.</p>
               </div>
 
               <div className="space-y-6">
@@ -952,7 +952,7 @@ const HomePage: React.FC = () => {
               What drives us
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight font-display">Beyond the Syllabus, on purpose.</h2>
-            <p className="text-gray-500 text-lg">We believe language learning should reach past textbooks — into confidence, character and real communication.</p>
+            <p className="text-gray-500 text-lg">We believe language learning should reach past textbooks - into confidence, character and real communication.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
